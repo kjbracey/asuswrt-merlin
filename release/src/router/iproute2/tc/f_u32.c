@@ -386,6 +386,44 @@ static int parse_ip6_addr(int *argc_p, char ***argv_p, struct tc_u32_sel *sel, i
 	return res;
 }
 
+static int parse_ip6_class(int *argc_p, char ***argv_p, struct tc_u32_sel *sel)
+{
+	int res = -1;
+	int argc = *argc_p;
+	char **argv = *argv_p;
+	__u32 key;
+	__u32 mask;
+	int off = 0;
+	int offmask = 0;
+
+	if (argc < 2)
+		return -1;
+
+	if (get_u32(&key, *argv, 0))
+		return -1;
+	argc--; argv++;
+
+	if (get_u32(&mask, *argv, 16))
+		return -1;
+	argc--; argv++;
+
+	if (key > 0xFF || mask > 0xFF)
+		return -1;
+
+	key <<= 20;
+	mask <<= 20;
+	key = htonl(key);
+	mask = htonl(mask);
+
+	res = pack_key(sel, key, mask, off, offmask);
+	if (res < 0)
+		return -1;
+
+	*argc_p = argc;
+	*argv_p = argv;
+	return 0;
+}
+
 static int parse_ip(int *argc_p, char ***argv_p, struct tc_u32_sel *sel)
 {
 	int res = -1;
@@ -495,7 +533,7 @@ static int parse_ip6(int *argc_p, char ***argv_p, struct tc_u32_sel *sel)
 	}
 	if (strcmp(*argv, "priority") == 0) {
 		NEXT_ARG();
-		res = parse_u8(&argc, &argv, sel, 4, 0);
+		res = parse_ip6_class(&argc, &argv, sel);
 		goto done;
 	}
 	if (strcmp(*argv, "protocol") == 0) {
