@@ -1183,7 +1183,7 @@ cyassl-install:
 	@true
 
 ifeq ($(RTCONFIG_OPENVPN),y)
-OPENSSL_CIPHERS:=enable-rc5 no-rc4
+OPENSSL_CIPHERS:=enable-rc5 no-rc4 no-ssl3
 else
 #OPENSSL_CIPHERS:=no-dh no-idea no-rc2 no-rc5 no-aes no-aes192 no-cast no-des no-modes no-tls1 no-tlsext
 OPENSSL_CIPHERS:=no-rc4
@@ -1195,7 +1195,7 @@ openssl/Makefile:
 	cd openssl && \
 	./Configure $(HOSTCONFIG) -DOPENSSL_NO_BUF_FREELISTS --prefix=/usr --openssldir=/etc/ssl --cross-compile-prefix=' ' \
 	-ffunction-sections -fdata-sections -Wl,--gc-sections \
-	shared $(OPENSSL_CIPHERS)
+	shared $(OPENSSL_CIPHERS) no-ssl2 no-err
 #	no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd \
 #	no-seed no-capieng no-cms no-gms no-gmp no-rfc3779 \
 #	no-ec no-ecdh no-ecdsa no-err no-hw no-jpake no-threads \
@@ -1253,7 +1253,9 @@ openssl-1.1-install:
 		install -D openssl-1.1/libcrypto.so.1.1 $(INSTALLDIR)/openssl-1.1/usr/lib/libcrypto.so.1.1 ; \
 		install -D openssl-1.1/libssl.so.1.1 $(INSTALLDIR)/openssl-1.1/usr/lib/libssl.so.1.1 ; \
 		$(STRIP) $(INSTALLDIR)/openssl-1.1/usr/lib/libssl.so.1.1 ; \
+		cd $(INSTALLDIR)/openssl/usr/lib/openssl11 && rm -f libssl.so && ln -sf libssl.so.1.1 libssl.so ; \
 		$(STRIP) $(INSTALLDIR)/openssl-1.1/usr/lib/libcrypto.so.1.1 ; \
+		cd $(INSTALLDIR)/openssl/usr/lib/openssl11 && rm -f libcrypto.so && ln -sf libcrypto.so.1.1 libcrypto.so ; \
 		install -D openssl-1.1/apps/openssl $(INSTALLDIR)/openssl/usr/sbin/openssl11 ; \
 		$(STRIP) $(INSTALLDIR)/openssl/usr/sbin/openssl11 ; \
 		chmod 0500 $(INSTALLDIR)/openssl/usr/sbin/openssl11 ; \
