@@ -1351,7 +1351,6 @@ dnscrypt: dnscrypt/stamp-h1
 dnscrypt-install: dnscrypt
 	install -D dnscrypt/src/proxy/.libs/dnscrypt-proxy $(INSTALLDIR)/dnscrypt/usr/sbin/dnscrypt-proxy
 	install -D dnscrypt/src/hostip/.libs/hostip $(INSTALLDIR)/dnscrypt/usr/sbin/hostip
-	install -D -m 0644 dnscrypt/dnscrypt-resolvers.csv $(INSTALLDIR)/rom/rom/dnscrypt-resolvers.csv
 	$(STRIP) -s $(INSTALLDIR)/dnscrypt/usr/sbin/dnscrypt-proxy
 	$(STRIP) -s $(INSTALLDIR)/dnscrypt/usr/sbin/hostip
 
@@ -1405,7 +1404,6 @@ getdns-install:
 #		ln -sf libgetdns.so.10.0.2 libgetdns.so
 	install -d $(INSTALLDIR)/getdns/usr/sbin
 	install -D getdns/src/stubby $(INSTALLDIR)/getdns/usr/sbin/stubby
-	install -D -m 0644 getdns/stubby/stubby-resolvers.csv $(INSTALLDIR)/rom/rom/stubby-resolvers.csv
 	$(STRIP) -s $(INSTALLDIR)/getdns/usr/sbin/stubby
 
 getdns-clean:

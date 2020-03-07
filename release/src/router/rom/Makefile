@@ -80,10 +80,19 @@ endif
 	cp -f --preserve=timestamps others/ca-bundle.crt $(INSTALLDIR)/rom/ca-bundle.crt
 
 ifeq ($(RTCONFIG_OPENVPN),y)
-	cp -f others/dh2048.pem	 $(INSTALLDIR)/rom/dh2048.pem
+	cp -f others/dh2048.pem  $(INSTALLDIR)/rom/dh2048.pem
 endif
 
-	# remove comments, compress whitespace
+#	DNS privacy providers
+ifeq ($(RTCONFIG_DNSCRYPT),y)
+	cp -f others/dnscrypt-resolvers.csv  $(INSTALLDIR)/rom/dnscrypt-resolvers.csv
+endif
+
+ifeq ($(RTCONFIG_STUBBY),y)
+	cp -f others/stubby-resolvers.csv  $(INSTALLDIR)/rom/stubby-resolvers.csv
+endif
+
+# remove comments, compress whitespace
 	sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < rom/etc/services > $(INSTALLDIR)/rom/etc/services
 	sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < rom/etc/protocols > $(INSTALLDIR)/rom/etc/protocols
 	sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < rom/etc/ethertypes > $(INSTALLDIR)/rom/etc/ethertypes
