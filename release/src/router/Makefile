@@ -478,6 +478,30 @@ obj-$(RTCONFIG_TCPDUMP) += libpcap
 obj-$(RTCONFIG_TCPDUMP) += tcpdump-4.4.0
 
 # Merlin/fork addons
+define CMAKE_CrossOptions
+	( \
+		echo "SET(CMAKE_CROSSCOMPILING \"TRUE\")" >>$(1); \
+		echo "SET(TOP $(TOP))" >>$(1); \
+		echo "SET(CMAKE_SYSTEM_NAME Linux)" >>$(1); \
+		echo "SET(CMAKE_SYSTEM_VERSION $(LINUX_KERNEL))" >>$(1); \
+		echo "SET(CMAKE_SYSTEM $(PLATFORM))" >>$(1); \
+		echo "SET(CMAKE_SYSTEM_PROCESSOR $(ARCH))" >>$(1); \
+		echo "SET(CMAKE_C_COMPILER $(CROSS_COMPILE)gcc)" >>$(1); \
+		echo "SET(CMAKE_CXX_COMPILER $(CROSS_COMPILE)g++)" >>$(1); \
+		echo "SET(CMAKE_AR $(CROSS_COMPILE)ar)" >>$(1); \
+		echo "SET(CMAKE_LINKER $(CROSS_COMPILE)ld)" >>$(1); \
+		echo "SET(CMAKE_NM $(CROSS_COMPILE)nm)" >>$(1); \
+		echo "SET(CMAKE_OBJCOPY $(CROSS_COMPILE)objcopy)" >>$(1); \
+		echo "SET(CMAKE_OBJDUMP $(CROSS_COMPILE)objdump)" >>$(1); \
+		echo "SET(CMAKE_RANLIB $(CROSS_COMPILE)ranlib)" >>$(1); \
+		echo "SET(CMAKE_STRIP $(CROSS_COMPILE)strip)" >>$(1); \
+		echo "SET(CMAKE_FIND_ROOT_PATH $(TOOLS))" >>$(1); \
+		echo "SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >>$(1); \
+		echo "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >>$(1); \
+		echo "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >>$(1); \
+	)
+endef
+
 obj-y += haveged
 ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
 obj-y += libnfnetlink
@@ -1381,19 +1405,35 @@ libyaml-clean:
 	-$(MAKE) -C libyaml clean
 	@rm -rf libyaml/stamp-h1 libyaml/src/.deps libyaml/src/tests/.deps
 
-getdns/stamp-h1:
-	cd $(TOP)/getdns && CC=$(CC) AR=$(AR) LD=$(LD) STRIP=$(CROSS_COMPILE)strip && libtoolize -ci && autoreconf -fi && \
-	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
-	CPPFLAGS="-I$(TOP)/libyaml/include -I$(TOP)/openssl-1.1/include" \
-	LDFLAGS="$(LDFLAGS) -static -ffunction-sections -fdata-sections -Wl,--gc-sections -L$(TOP)/libyaml/src/.libs -lyaml -L$(TOP)/openssl-1.1" \
-	LIBS="-lpthread -lssl -lcrypto -ldl" \
-	$(CONFIGURE) --enable-static --disable-shared --disable-gost --prefix=/usr --bindir=/usr/sbin --libdir=/usr/lib --sysconfdir=/etc --localstatedir=/var \
-	--enable-stub-only --without-libidn --without-libidn2 --without-getdns_query --without-getdns_server_mon $(if $(RTCONFIG_BCMARM),,--enable-old-getaddrinfo) \
-	--with-ssl=$(TOP)/openssl-1.1 --with-libyaml=$(TOP)/libyaml --with-stubby
-	touch getdns/stamp-h1
+getdns/build/Makefile:
+	@rm -rf getdns/build && mkdir -p getdns/build
+	cd getdns/build && \
+	$(call CMAKE_CrossOptions, crosscompiled.cmake) && \
+	cmake -DCMAKE_TOOLCHAIN_FILE=crosscompiled.cmake \
+		-DCMAKE_INSTALL_PREFIX:PATH=/usr \
+		-DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_SKIP_RPATH=TRUE \
+		-DCMAKE_C_FLAGS="-Os -DNDEBUG -ffunction-sections -fdata-sections $(EXTRACFLAGS)" \
+		-DCMAKE_EXE_LINKER_FLAGS="-Wl,--gc-sections $(EXTRALDFLAGS) -lpthread" \
+		-DENABLE_STATIC=TRUE -DENABLE_SHARED=FALSE -DENABLE_GOST=FALSE \
+		-DBUILD_GETDNS_QUERY=FALSE \
+		-DBUILD_GETDNS_SERVER_MON=FALSE \
+		-DBUILD_STUBBY=TRUE -DENABLE_STUB_ONLY=TRUE \
+		-DBUILD_LIBEV=FALSE -DBUILD_LIBEVENT2=FALSE -DBUILD_LIBUV=FALSE \
+		-DBUILD_TESTING=FALSE \
+		-DOPENSSL_ROOT_DIR=$(TOP)/openssl-1.1 \
+		-DOPENSSL_INCLUDE_DIR=$(TOP)/openssl-1.1/include \
+		-DOPENSSL_CRYPTO_LIBRARY=$(TOP)/openssl-1.1/libcrypto.so \
+		-DOPENSSL_SSL_LIBRARY=$(TOP)/openssl-1.1/libssl.so \
+		-DLIBYAML_DIR=$(TOP)/libyaml \
+		-DLIBYAML_INCLUDE_DIR=$(TOP)/libyaml/include \
+		-DLIBYAML_LIBRARY=$(TOP)/libyaml/src/.libs/libyaml.a \
+		-DCMAKE_DISABLE_FIND_PACKAGE_Libsystemd=TRUE \
+		-DUSE_LIBIDN2=FALSE \
+		-DSTRPTIME_WORKS_EXITCODE=0 \
+		..
 
-getdns: getdns/stamp-h1 openssl-1.1 libyaml
-	$(MAKE) -C getdns
+getdns: openssl-1.1 libyaml getdns/build/Makefile
+	$(MAKE) -C getdns/build
 
 getdns-install:
 #	install -d $(INSTALLDIR)/getdns/usr/lib
@@ -1403,12 +1443,11 @@ getdns-install:
 #		ln -sf libgetdns.so.10.0.2 libgetdns.so.10 && \
 #		ln -sf libgetdns.so.10.0.2 libgetdns.so
 	install -d $(INSTALLDIR)/getdns/usr/sbin
-	install -D getdns/src/stubby $(INSTALLDIR)/getdns/usr/sbin/stubby
-	$(STRIP) -s $(INSTALLDIR)/getdns/usr/sbin/stubby
+	install -D getdns/build/stubby/stubby $(INSTALLDIR)/getdns/usr/sbin/stubby
+	$(STRIP) $(INSTALLDIR)/getdns/usr/sbin/stubby
 
 getdns-clean:
-	-@$(MAKE) -C getdns clean
-	@rm -rf getdns/stamp-h1 getdns/src/.libs getdns/src/tools/.libs
+	@rm -rf getdns/build
 
 haveged/stamp-h1:
 	cd $(TOP)/haveged && CC=$(CC) AR=$(AR) STRIP=$(CROSS_COMPILE)strip \
