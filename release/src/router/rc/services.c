@@ -1278,7 +1278,8 @@ void start_stubby(int force)
 				logmessage("stubby-proxy", "configured opportunistic mode");
 			}
 			fprintf(fp, "tls_min_version: GETDNS_TLS1_3\n");	// force TLS1.3
-			fprintf(fp, "tls_ciphersuites: \"TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256\"\n");	// set ciphers
+//			fprintf(fp, "tls_ciphersuites: \"TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256\"\n");	// set ciphers
+																																// not supported with OpenSSL api=1.0.0
 			if (nvram_match("dnssec_enable", "1") && nvram_match("stubby_dnssec", "1")) {
 				fprintf(fp, "dnssec: GETDNS_EXTENSION_TRUE\n");
 				logmessage("stubby-proxy", "DNSSEC enabled");
