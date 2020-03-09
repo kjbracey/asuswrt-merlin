@@ -17,7 +17,7 @@ IFLAGS  = -idirafter dummyinc
 CFLAGS	+= -O2 -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -W -Wshadow \
 	#-pedantic -Wconversion
 CFLAGS  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE=1 -D_LARGEFILE64_SOURCE=1 -D_LARGE_FILES=1
-CFLAGS  += -I$(SRCBASE)/shared/bcmwifi/include -DTYPEDEF_FLOAT_T
+CFLAGS  += -DTYPEDEF_FLOAT_T
 LDFLAGS = -ffunction-sections -fdata-sections -Wl,--gc-sections
 
 LIBS	=	-lcrypt -lnsl
@@ -26,46 +26,21 @@ LINK	=
 CFLAGS	+=	-I../shared
 ifeq ($(RTCONFIG_FTP_SSL),y)
 LIBS	=	-lnsl -pthread
-ifeq ($(RTCONFIG_OPENSSL11),y)
 OPENSSLDIR = ../openssl-1.1
-else
-OPENSSLDIR = ../openssl
-endif
 OPENSSLINC = $(OPENSSLDIR)/include
 LIBS	+=	-L$(OPENSSLDIR)/ -lssl -lcrypto
 CFLAGS	+=	-I$(OPENSSLINC)
 endif
 
 CFLAGS  += 	-I$(SRCBASE)/include -I$(TOP)/shared -I$(TOP)/libdisk
-LDFLAGS  +=	-L$(TOP)/nvram${BCMEX}${EX7} -lnvram -L$(TOP)/shared -lshared -L$(TOP)/libdisk -ldisk
-ifeq ($(RTCONFIG_HND_ROUTER),y)
-LDFLAGS += -L$(TOP)/wlcsm -lwlcsm
-endif
+LDFLAGS  +=	-L$(TOP)/nvram${BCMEX} -lnvram -L$(TOP)/shared -lshared -L$(TOP)/libdisk -ldisk
 ifeq ($(RTCONFIG_BCMARM),y)
-CFLAGS += -I$(SRCBASE)/common/include
+#CFLAGS += -I$(SRCBASE)/common/include
 LDFLAGS += -lgcc_s
 endif
 
 ifeq ($(RTCONFIG_QTN),y)
 LDFLAGS += -L$(TOP)/libqcsapi_client -lqcsapi_client
-endif
-
-ifeq ($(RTCONFIG_AMAS),y)
-LDFLAGS += -L$(TOP)/json-c/.libs -ljson-c
-ifeq ($(RTCONFIG_QCA),y)
-LDFLAGS += -lm
-endif
-endif
-
-ifeq ($(RTCONFIG_PERMISSION_MANAGEMENT),y)
-ifeq ($(RTCONFIG_QCA),y)
-LDFLAGS += -lpthread -ldl
-endif
-CFLAGS += -I$(TOP)/sqlCipher
-CFLAGS += -I$(TOP)/PMS_DBapis
-LDFLAGS += -L$(TOP)/openssl -lcrypto
-LDFLAGS += -L$(TOP)/sqlCipher/.libs -lsqlcipher
-LDFLAGS += -L$(TOP)/PMS_DBapis -lpms_sql
 endif
 
 OBJS	=	main.o utility.o prelogin.o ftpcmdio.o postlogin.o privsock.o \
@@ -81,7 +56,7 @@ OBJS	=	main.o utility.o prelogin.o ftpcmdio.o postlogin.o privsock.o \
 .c.o:
 	$(CC) -c $*.c $(CFLAGS) $(IFLAGS)
 
-vsftpd: $(OBJS) 
+vsftpd: $(OBJS)
 	$(CC) -o vsftpd $(OBJS) $(LINK) $(LDFLAGS) $(LIBS)
 
 install:
