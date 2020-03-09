@@ -1804,11 +1804,21 @@ void write_ftpd_conf()
 #if (!defined(LINUX30) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,36))
 	fprintf(fp, "use_sendfile=NO\n");
 #endif
+
 #ifdef RTCONFIG_IPV6
-	fprintf(fp, "listen%s=YES\n", ipv6_enabled() ? "_ipv6" : "");
+	if (ipv6_enabled()) {
+		fprintf(fp, "listen_ipv6=YES\n");
+		// vsftpd 3.x can't use both listen at same time.  We don't specify an interface, so
+		// the listen_ipv6 directive will also make vsftpd listen to ipv4 IPs
+		fprintf(fp, "listen=NO\n");
+	} else {
+		fprintf(fp, "listen=YES\n");
+	}
+
 #else
 	fprintf(fp, "listen=YES\n");
 #endif
+
 	fprintf(fp, "pasv_enable=YES\n");
 	fprintf(fp, "ssl_enable=NO\n");
 	fprintf(fp, "tcp_wrappers=NO\n");
