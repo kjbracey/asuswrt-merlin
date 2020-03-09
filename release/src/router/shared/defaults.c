@@ -17,20 +17,20 @@
 // stub for wlconf, etc.
 struct nvram_tuple router_defaults[] = {
 	// NVRAM for init_syspara: system paraamters getting from MFG/NVRAM Area
- 	//{ "boardflags", "" }, 
+ 	//{ "boardflags", "" },
 	//{ "productid", "" },
 	//{ "firmver", "" },
 	//{ "hardware_version", "" }, // bootloader and hardware version
-	//{ "et0macaddr", "" }, 
-	//{ "wl0macaddr", "" }, 
+	//{ "et0macaddr", "" },
+	//{ "wl0macaddr", "" },
 	//{ "wl1macaddr", "" },
 
 	// NVRAM for restore_defaults: system wide parameters
 	{ "nvramver", RTCONFIG_NVRAM_VER},
 	{ "restore_defaults",	"0"	},	// Set to 0 to not restore defaults on boot
-	{ "sw_mode", "1" 		}, 	// big switch for different mode 
+	{ "sw_mode", "1" 		}, 	// big switch for different mode
 	{ "preferred_lang", "EN"	},
-	// NVRAM from init_nvram: system wide parameters accodring to model and mode 
+	// NVRAM from init_nvram: system wide parameters accodring to model and mode
 	//{ "wan_ifnames", "" },
 	//{ "lan_ifnames", "" },
 	//{ "lan1_ifnames", "" },
@@ -44,7 +44,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "showloading_x", "0" },		//dummy var to force progress bar
     { "amng_custom", "" },          //dummy var for user added web pages
 
-	// NVRAM for switch	
+	// NVRAM for switch
 	{ "switch_stb_x", "0"}, 		// oleg patch
 	{ "switch_wantag", "none"},		//for IPTV/VoIP case
 	{ "switch_wan0tagid", "" },		//Wan Port
@@ -318,7 +318,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "wl_nas_dbg", "0", 0 },		/* Enable/Disable NAS Debugging messages */
 #endif
 
-	// ASUS used only?	
+	// ASUS used only?
 	{ "wl_nmode_x", 		"0"	},	/* 0/1/2, auto/nonly,bgmixed */
 #ifdef RTCONFIG_BCMWL6
 	{ "wl_bw",			"0"	},	/* 0/1/2/3 auto/20/40/80MHz */
@@ -439,7 +439,7 @@ struct nvram_tuple router_defaults[] = {
 #endif
 #endif
 
-// WPS 
+// WPS
 //	#if defined (W7_LOGO) || defined (WIFI_LOGO)
 //	{ "wps_enable", "1"},
 //	#else
@@ -558,7 +558,7 @@ struct nvram_tuple router_defaults[] = {
 //	{ "pktc_disable", 		"0"		},
 //#endif
 
-	// NVRAM for start_lan: 
+	// NVRAM for start_lan:
 // LAN H/W parameters
 	{ "lan_hwnames",		""		},	// LAN driver names (e.g. et0)
 	{ "lan_hwaddr",			""		},	// LAN interface MAC address
@@ -650,10 +650,10 @@ struct nvram_tuple router_defaults[] = {
 	{ "mr_enable_x", "0" }, // oleg patch
 	{ "mr_qleave_x", "0" },
 	{ "mr_altnet_x", "" },
-	
+
 	// Domain Name
 	{ "local_domain", "router.asus.com"},
-	
+
 	// NVRAM for switch control
 //#ifdef RTCONFIG_SWITCH_CONTROL_8367
 #ifdef RTCONFIG_RALINK
@@ -852,9 +852,9 @@ struct nvram_tuple router_defaults[] = {
 	{ "dsltmp_transmode", "atm"},	//atm,ptm for UI display
 
 // the following variables suppose can be removed
-	{ "dslx_nat", "1" },	
-	{ "dslx_upnp_enable", "1" },	
-	{ "dslx_link_enable", "1" },	
+	{ "dslx_nat", "1" },
+	{ "dslx_upnp_enable", "1" },
+	{ "dslx_link_enable", "1" },
 	{ "dslx_DHCPClient", "1" },
 	{ "dslx_dhcp_clientid", "" },	//Required by some ISP using RFC 1483 MER.
 	{ "dslx_ipaddr", "0.0.0.0"},	/* IP address */
@@ -862,19 +862,19 @@ struct nvram_tuple router_defaults[] = {
 	{ "dslx_gateway", "0.0.0.0"},	/* gateway */
 	{ "dslx_dnsenable", "1"},
 	{ "dslx_dns1", ""},
-	{ "dslx_dns2", ""},	
-// now use switch_stb_x	
+	{ "dslx_dns2", ""},
+// now use switch_stb_x
 	{ "dslx_pppoe_username", ""},
 	{ "dslx_pppoe_passwd", ""},
 	// this one is no longer to use
 	//{ "dslx_pppoe_dial_on_demand", ""},
 	{ "dslx_pppoe_idletime", "0"},
 	{ "dslx_pppoe_mtu", "1492"},
-	// this one is no longer to use	
+	// this one is no longer to use
 //	{ "dslx_pppoe_mru", ""},
 	{ "dslx_pppoe_service", ""},
 	{ "dslx_pppoe_ac", ""},
-	{ "dslx_pppoe_options", ""},	
+	{ "dslx_pppoe_options", ""},
 	{ "dslx_hwaddr", ""},
 #ifdef RTCONFIG_VDSL
 	{ "dslx_vdsl_target_snrm", "32767" },
@@ -882,7 +882,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "dslx_vdsl_rx_agc", "65535" },
 	{ "dslx_vdsl_upbo", "auto" },
 #endif
-//	
+//
 	{ "dsl_unit", "0"},
 	{ "dsl_subunit", "-1" },
 //
@@ -891,7 +891,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "dsl_vci", ""},
 	{ "dsl_encap", ""},
 	{ "dsl_proto", ""},
-	
+
 	/* Paul modify 2012/8/6, set default Service Category to UBR without PCR, with PCR, SCR and MBS set to 0. */
 	{ "dsl_svc_cat", "0"},
 	{ "dsl_pcr", "0"},
@@ -921,7 +921,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "dsl1_svc_cat", ""},
 	{ "dsl1_pcr", ""},
 	{ "dsl1_scr", ""},
-	{ "dsl1_mbs", ""},	
+	{ "dsl1_mbs", ""},
 //
 	{ "dsl2_enable", "0"},
 	{ "dsl2_vpi", ""},
@@ -931,7 +931,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "dsl2_svc_cat", ""},
 	{ "dsl2_pcr", ""},
 	{ "dsl2_scr", ""},
-	{ "dsl2_mbs", ""},	
+	{ "dsl2_mbs", ""},
 //
 	{ "dsl3_enable", "0"},
 	{ "dsl3_vpi", ""},
@@ -981,11 +981,11 @@ struct nvram_tuple router_defaults[] = {
 	{ "dsl7_svc_cat", ""},
 	{ "dsl7_pcr", ""},
 	{ "dsl7_scr", ""},
-	{ "dsl7_mbs", ""},	
+	{ "dsl7_mbs", ""},
 // number of PVC , program generated
 	{ "dslx_config_num", "0"},
 // for debug , program generated
-	{ "dslx_debug", "0"},	
+	{ "dslx_debug", "0"},
 
 #ifdef RTCONFIG_VDSL
 	{ "dsl8_enable", "0"},
@@ -1161,7 +1161,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "DSCP_fix_enable", "0" },
 	{ "ptcsrv_enable", "1" },	// ASUS protection server
 	{ "ntpdfilter_enable", "0" },	// redirect NTP requests
-	
+
 	// UrlList
 	{ "url_enable_x", "0"},
 	{ "url_date_x", "1111111"},
@@ -1320,6 +1320,9 @@ struct nvram_tuple router_defaults[] = {
 	{ "st_samba_workgroup", "WORKGROUP"},
 	{ "ftp_lang", "EN" },
 	{ "ftp_wanac", "0"},
+	{ "ftp_tls", "0" },
+	{ "ftp_pasvport", "57530" },
+
 
 //#ifdef RTCONFIG_WEBDAV
 	{ "enable_webdav", "0"}, // 0: Disable, 1: enable
@@ -1904,7 +1907,7 @@ struct nvram_tuple router_defaults[] = {
 #ifdef RTCONFIG_IPV6
 	// IPv6 parameters
 	{ "ipv6_service",	"disabled"	},	// disabled/staic6/dhcp6/6to4/6in4/6rd/other
-	{ "ipv6_ifdev",		"ppp"		},	
+	{ "ipv6_ifdev",		"ppp"		},
 	{ "ipv6_prefix",	""		},	// The global-scope IPv6 prefix to route/advertise
 	{ "ipv6_prefix_length",	"64"		},	// The bit length of the prefix. Used by dhcp6c. For radvd, /64 is always assumed.
 	{ "ipv6_slaid",		"0"		},	// The Site Level Aggregation ID prefix for local IPv6 subnets
