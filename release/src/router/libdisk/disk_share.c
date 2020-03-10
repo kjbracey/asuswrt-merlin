@@ -1005,66 +1005,66 @@ extern int add_folder(const char *const account, const char *const mount_path, c
 	int webdav_right;
 #endif
 	char *full_path;
-
+	
 	if (mount_path == NULL || strlen(mount_path) <= 0) {
 		usb_dbg("No input, \"mount_path\".\n");
-
+		
 		return -1;
 	}
 	if (folder == NULL || strlen(folder) <= 0) {
 		usb_dbg("No input, \"folder\".\n");
-
+		
 		return -1;
 	}
-
+	
 	// 1. test if creatting the folder
 	result = test_if_exist_share(mount_path, folder);
 	if (result != 0) {
 		usb_dbg("\"%s\" is already created in %s.\n", folder, mount_path);
-
+		
 		return -1;
 	}
-
+	
 	// 2. create the folder
 	len = strlen(mount_path)+strlen("/")+strlen(folder);
 	full_path = (char *)malloc(sizeof(char)*(len+1));
 	if (full_path == NULL) {
 		usb_dbg("Can't malloc \"full_path\".\n");
-
+		
 		return -1;
 	}
 	sprintf(full_path, "%s/%s", mount_path, folder);
 	full_path[len] = 0;
-
+	
 	umask(0000);
 	result = mkdir(full_path, 0777);
 	free(full_path);
 	if (result != 0) {
 		usb_dbg("To create \"%s\" is failed!\n", folder);
-
+		
 		return -1;
 	}
-
+	
 	// 3. add folder's right to every var file
 	result = get_account_list(&acc_num, &account_list);
 	if (result < 0) {
 		usb_dbg("Can't get the account list\n");
 		free_2_dimension_list(&acc_num, &account_list);
-
+		
 		return -1;
 	}
-
+	
 	len = strlen("*")+strlen(folder)+strlen("=");
 	target = (char *)malloc(sizeof(char)*(len+1));
 	if (target == NULL) {
 		usb_dbg("Can't allocate \"target\".\n");
 		free_2_dimension_list(&acc_num, &account_list);
-
+		
 		return -1;
 	}
 	sprintf(target, "*%s=", folder);
 	target[len] = 0;
-
+	
 	for (i = -1; i < acc_num; ++i) {
 		// 4. get the var file
 		if(i == -1) // share mode.
@@ -1105,7 +1105,7 @@ extern int add_folder(const char *const account, const char *const mount_path, c
 			continue;
 		}
 		free(var_info);
-
+		
 		// 7. add the folder's info in the var file
 		fp = fopen(var_file, "a+");
 		if (fp == NULL) {
@@ -1115,7 +1115,7 @@ extern int add_folder(const char *const account, const char *const mount_path, c
 			free(var_file);
 			return -1;
 		}
-
+		
 		// 8. get the default permission of all protocol.
 		if(i == -1 // share mode.
 				|| !strcmp(account_list[i], nvram_safe_get("http_username"))
@@ -1143,24 +1143,24 @@ extern int add_folder(const char *const account, const char *const mount_path, c
 			webdav_right = 0;
 #endif
 		}
-
+		
 #ifdef RTCONFIG_WEBDAV_OLD
 		fprintf(fp, "%s%d%d%d%d\n", target, samba_right, ftp_right, dms_right, webdav_right);
 #else
 		fprintf(fp, "%s%d%d%d\n", target, samba_right, ftp_right, dms_right);
 #endif
 		fclose(fp);
-
+		
 		// 9. set the check target of file.
 		set_file_integrity(var_file);
 		free(var_file);
 	}
 	free_2_dimension_list(&acc_num, &account_list);
 	free(target);
-
+	
 	// 10. add the folder's info in the folder list
 	initial_folder_list(mount_path);
-
+	
 	return 0;
 }
 
@@ -1173,7 +1173,7 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 	char *target;
 	FILE *fp;
 	char *full_path;
-
+	
 	if (mount_path == NULL || strlen(mount_path) <= 0) {
 		usb_dbg("No input, \"mount_path\".\n");
 		return -1;
@@ -1182,50 +1182,50 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 		usb_dbg("No input, \"folder\".\n");
 		return -1;
 	}
-
+	
 	// 1. test if deleting the folder
 	len = strlen(mount_path)+strlen("/")+strlen(folder);
 	full_path = (char *)malloc(sizeof(char)*(len+1));
 	if (full_path == NULL) {
 		usb_dbg("Can't malloc \"full_path\".\n");
-
+		
 		return -1;
 	}
 	sprintf(full_path, "%s/%s", mount_path, folder);
 	full_path[len] = 0;
-
+	
 	result = test_if_exist_share(mount_path, folder);
 	if (result == 0) {
 		result = check_if_dir_exist(full_path);
-
+		
 		if (result != 1) {
 			usb_dbg("\"%s\" isn't already existed in %s.\n", folder, mount_path);
 			free(full_path);
-
+			
 			return -1;
 		}
 	}
-
+	
 	// 2. delete the folder
 	result = delete_file_or_dir(full_path);
 	free(full_path);
 	if (result != 0) {
 		usb_dbg("To delete \"%s\" is failed!\n", folder);
-
+		
 		return -1;
 	}
-
+	
 	// 3. get the target which is deleted in every var file
 	len = strlen("*")+strlen(folder)+strlen("=");
 	target = (char *)malloc(sizeof(char)*(len+1));
 	if (target == NULL) {
 		usb_dbg("Can't allocate \"target\".\n");
-
+		
 		return -1;
 	}
 	sprintf(target, "*%s=", folder);
 	target[len] = 0;
-
+	
 	// 4. del folder's right to every var file
 	result = get_account_list(&acc_num, &account_list);
 	if (result < 0) {
@@ -1234,7 +1234,7 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 		free(target);
 		return -1;
 	}
-
+	
 	for (i = -1; i < acc_num; ++i) {
 		// 5. get the var file
 		if(i == -1) // share mode.
@@ -1247,7 +1247,7 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 			free(target);
 			return -1;
 		}
-
+		
 		// 6. check the file integrity.
 		if(!check_file_integrity(var_file)){
 			usb_dbg("Fail to check the file: %s.\n", var_file);
@@ -1263,7 +1263,7 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 				return -1;
 			}
 		}
-
+		
 		// 7. delete the content about the folder
 		var_info = read_whole_file(var_file);
 		if (var_info == NULL) {
@@ -1271,7 +1271,7 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 			free(var_file);
 			continue;
 		}
-
+		
 		follow_info = upper_strstr(var_info, target);
 		if (follow_info == NULL) {
 			if(i == -1)
@@ -1284,7 +1284,7 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 		}
 		backup = *follow_info;
 		*follow_info = 0;
-
+		
 		fp = fopen(var_file, "w");
 		if (fp == NULL) {
 			usb_dbg("Can't write \"%s\".\n", var_file);
@@ -1294,7 +1294,7 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 			continue;
 		}
 		fprintf(fp, "%s", var_info);
-
+		
 		*follow_info = backup;
 		while (*follow_info != 0 && *follow_info != '\n')
 			++follow_info;
@@ -1304,7 +1304,7 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 		}
 		fclose(fp);
 		free(var_info);
-
+		
 		// 8. set the check target of file.
 		set_file_integrity(var_file);
 		free(var_file);
@@ -1314,7 +1314,7 @@ extern int del_folder(const char *const mount_path, const char *const folder) {
 	
 	// 9. modify the folder's info in the folder list
 	initial_folder_list(mount_path);
-
+	
 	return 0;
 }
 
@@ -1361,22 +1361,22 @@ extern int mod_folder(const char *const mount_path, const char *const folder, co
 	}
 	sprintf(new_full_path, "%s/%s", mount_path, new_folder);
 	new_full_path[len] = 0;
-
+	
 	result = test_if_exist_share(mount_path, folder);
 	if (result == 0) {
 		result = check_if_dir_exist(full_path);
-
+		
 		if (result != 1) {
 			usb_dbg("\"%s\" isn't already existed in %s.\n", folder, mount_path);
 			free(full_path);
 			free(new_full_path);
 			return -1;
 		}
-
+		
 		// the folder is existed but not in .__folder_list.txt
 		add_folder(NULL, mount_path, folder);
 	}
-
+	
 	// 2. modify the folder
 	result = rename(full_path, new_full_path);
 	free(full_path);
@@ -1417,7 +1417,7 @@ extern int mod_folder(const char *const mount_path, const char *const folder, co
 	}
 	sprintf(new_target, "*%s=", new_folder);
 	new_target[len] = 0;
-
+	
 	for (i = -1; i < acc_num; ++i) {
 		// 5. get the var file
 		if(i == -1) // share mode.
@@ -1431,7 +1431,7 @@ extern int mod_folder(const char *const mount_path, const char *const folder, co
 			free(new_target);
 			return -1;
 		}
-
+		
 		// 6. check the file integrity.
 		if(!check_file_integrity(var_file)){
 			usb_dbg("Fail to check the file: %s.\n", var_file);
@@ -1448,7 +1448,7 @@ extern int mod_folder(const char *const mount_path, const char *const folder, co
 				return -1;
 			}
 		}
-
+		
 		// 7. check if the created target is exist in the var file
 		var_info = read_whole_file(var_file);
 		if (var_info == NULL) {
@@ -1459,7 +1459,7 @@ extern int mod_folder(const char *const mount_path, const char *const folder, co
 			free(var_file);
 			return -1;
 		}
-
+		
 		if ((follow_info = upper_strstr(var_info, target)) == NULL) {
 			usb_dbg("1. No \"%s\" in \"%s\"..\n", folder, var_file);
 			free_2_dimension_list(&acc_num, &account_list);
@@ -1487,17 +1487,17 @@ extern int mod_folder(const char *const mount_path, const char *const folder, co
 		*follow_info = 0;
 		fprintf(fp, "%s", var_info);
 		*follow_info = backup;
-
+		
 		// write the info before new_target
 		fprintf(fp, "%s", new_target);
-
+		
 		// write the info after target
 		follow_info += strlen(target);
 		fprintf(fp, "%s", follow_info);
-
+		
 		fclose(fp);
 		free(var_info);
-
+		
 		// 9. set the check target of file.
 		set_file_integrity(var_file);
 		free(var_file);
@@ -1505,10 +1505,10 @@ extern int mod_folder(const char *const mount_path, const char *const folder, co
 	free_2_dimension_list(&acc_num, &account_list);
 	free(target);
 	free(new_target);
-
+	
 	// 10. modify the folder's info in the folder list
 	initial_folder_list(mount_path);
-
+	
 	return 0;
 }
 
@@ -1516,14 +1516,14 @@ extern int test_if_exist_share(const char *const mount_path, const char *const f
 	int sh_num;
 	char **folder_list;
 	int result, i;
-
+	
 	result = get_folder_list(mount_path, &sh_num, &folder_list);
 	if (result < 0) {
 		usb_dbg("Can't read the folder list in %s.\n", mount_path);
 		free_2_dimension_list(&sh_num, &folder_list);
 		return 0;
 	}
-
+	
 	result = 0;
 	for (i = 0; i < sh_num; ++i)
 		if (!upper_strcmp(folder, folder_list[i])) {
@@ -1531,7 +1531,7 @@ extern int test_if_exist_share(const char *const mount_path, const char *const f
 			break;
 		}
 	free_2_dimension_list(&sh_num, &folder_list);
-
+	
 	return result;
 }
 
@@ -1539,28 +1539,28 @@ extern int test_if_exist_share(const char *const mount_path, const char *const f
 extern int how_many_layer(const char *basedir, char **mount_path, char **share) {
 	char *follow_info, *follow_info_end;
 	int layer = 0, len = 0;
-
+	
 	*mount_path = NULL;
 	*share = NULL;
-
+	
 	if (!strcmp(basedir, "/"))
 		return layer;
-
+	
 	len = strlen(basedir);
 	if (len > 1)
 		layer = 1;
-
+	
 	//if (basedir[len-1] == '/')
 	//	--layer;
-
+	
 	follow_info = (char *)basedir;
 	while (*follow_info != 0 && (follow_info = index(follow_info+1, '/')) != NULL)
 		++layer;
-
+	
 	if (layer >= MOUNT_LAYER) {
 		follow_info = (char *)(basedir+strlen(POOL_MOUNT_ROOT));
 		follow_info = index(follow_info+1, '/');
-
+		
 		if(mount_path != NULL){
 			if (follow_info == NULL)
 				len = strlen(basedir);
@@ -1573,7 +1573,7 @@ extern int how_many_layer(const char *basedir, char **mount_path, char **share) 
 			(*mount_path)[len] = 0;
 		}
 	}
-
+	
 	if (layer >= SHARE_LAYER && share != NULL) {
 		++follow_info;
 		follow_info_end = index(follow_info, '/');
@@ -1587,7 +1587,7 @@ extern int how_many_layer(const char *basedir, char **mount_path, char **share) 
 		strncpy(*share, follow_info, len);
 		(*share)[len] = 0;
 	}
-
+	
 	return layer;
 }
 
@@ -1723,11 +1723,11 @@ extern int add_account(const char *const account, const char *const password){
 		return 0;
 	}
 
-	for(follow_disk = disk_list; follow_disk != NULL; follow_disk = follow_disk->next){
+	for(follow_disk = disk_list; follow_disk != NULL; follow_disk = follow_disk->next){			
 		for(follow_partition = follow_disk->partitions; follow_partition != NULL; follow_partition = follow_partition->next){
 			if(follow_partition->mount_point == NULL)
 				continue;
-
+			
 			if(initial_var_file(account, follow_partition->mount_point) != 0)
 				usb_dbg("Can't initial \"%s\"'s file in %s.\n", account, follow_partition->mount_point);
 		}
@@ -1819,7 +1819,7 @@ extern int del_account(const char *const account){
 		return 0;
 	}
 
-	for(follow_disk = disk_list; follow_disk != NULL; follow_disk = follow_disk->next){
+	for(follow_disk = disk_list; follow_disk != NULL; follow_disk = follow_disk->next){			
 		for(follow_partition = follow_disk->partitions; follow_partition != NULL; follow_partition = follow_partition->next){
 			if(follow_partition->mount_point == NULL)
 				continue;
@@ -1971,7 +1971,7 @@ extern int mod_account(const char *const account, const char *const new_account,
 		return 0;
 	}
 
-	for(follow_disk = disk_list; follow_disk != NULL; follow_disk = follow_disk->next){
+	for(follow_disk = disk_list; follow_disk != NULL; follow_disk = follow_disk->next){			
 		for(follow_partition = follow_disk->partitions; follow_partition != NULL; follow_partition = follow_partition->next){
 			if(follow_partition->mount_point == NULL)
 				continue;
@@ -2037,7 +2037,7 @@ extern int test_if_exist_account(const char *const account) {
 	
 	if(account == NULL)
 		return 1;
-
+	
 	result = get_account_list(&acc_num, &account_list);
 	if (result < 0) {
 		usb_dbg("Can't get the account list.\n");

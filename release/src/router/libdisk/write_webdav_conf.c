@@ -332,7 +332,7 @@ int main(int argc, char *argv[]) {
 //	fprintf(fp, "	alias.url=(\"/webdav\"=>\"/mnt/\")\n");
 //	fprintf(fp, "   $HTTP[\"url\"]=~\"^/usbdisk($|/)\"{\n");
 
-	fprintf(fp, "   url.aicloud-auth-deny = (\"query_field.json\", \".html\")\n");
+	fprintf(fp, "   url.aicloud-auth-deny = (\"query_field.json\")\n");
 
 	fprintf(fp, "   $HTTP[\"url\"]=~\"^/%s($|/)\"{\n",get_productid());
     fprintf(fp, "       server.document-root = \"/\"\n");
@@ -506,7 +506,7 @@ WEBDAV_SETTING:
 	fprintf(fp, "   ssl.honor-cipher-order=\"enable\"\n");
 	//fprintf(fp, "   ssl.cipher-list=\"ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4\"\n");
 	fprintf(fp, "   ssl.cipher-list=\"ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:AES256-GCM-SHA384:AES256-SHA256:AES256-SHA:AES128-GCM-SHA256:AES128-SHA256:AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;\"\n");
-	fprintf(fp, "   url.aicloud-auth-deny = (\"query_field.json\", \".html\")\n");
+	fprintf(fp, "   url.aicloud-auth-deny = (\"query_field.json\")\n");
 	//fprintf(fp, "	alias.url=(\"/webdav\"=>\"/mnt/\")\n"); 
 //	fprintf(fp, "	$HTTP[\"url\"]=~\"^/usbdisk($|/)\"{\n");
 	fprintf(fp, "	$HTTP[\"url\"]=~\"^/%s($|/)\"{\n", get_productid());
