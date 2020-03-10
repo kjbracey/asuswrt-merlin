@@ -1776,6 +1776,10 @@ void write_ftpd_conf()
 	FILE *fp;
 	char maxuser[16];
 	int passive_port;
+#ifdef RTCONFIG_HTTPS
+	unsigned long long sn;
+	char t[32];
+#endif
 
 	/* write /etc/vsftpd.conf */
 	fp=fopen("/etc/vsftpd.conf", "w");
@@ -1864,6 +1868,27 @@ void write_ftpd_conf()
 		fprintf(fp, "xferlog_enable=YES\n");
 		fprintf(fp, "xferlog_file=/var/log/vsftpd.log\n");
 	}
+
+#ifdef RTCONFIG_HTTPS
+	if(nvram_get_int("ftp_tls")){
+		fprintf(fp, "ssl_enable=YES\n");
+		fprintf(fp, "rsa_cert_file=%s\n", "/etc/cert.pem");
+		fprintf(fp, "rsa_private_key_file=%s\n", "/etc/key.pem");
+
+		// Does a valid HTTPD cert exist?  If not, generate one.
+		if(!f_exists("/etc/cert.pem") || !f_exists("/etc/key.pem")) {
+			f_read("/dev/urandom", &sn, sizeof(sn));
+			sprintf(t, "%llu", sn & 0x7FFFFFFFFFFFFFFFULL);
+			nvram_set("https_crt_gen", "1");
+			nvram_set("https_crt_save", "1");
+			eval("gencert.sh", t);
+		}
+	} else {
+		fprintf(fp, "ssl_enable=NO\n");
+	}
+#else
+	fprintf(fp, "ssl_enable=NO\n");
+#endif	// HTTPS
 
 	append_custom_config("vsftpd.conf", fp);
 	fclose(fp);
