@@ -1245,6 +1245,8 @@ void start_stubby(int force)
 	char *stubby_lanip;
 	char *buf, *g, *p;
 	char *dotname, *ip4addr, *ip6addr, *tlsport, *authname, *tlsdigest, *tlspubkey, *dnssec, *nolog;
+	char buffer[256];
+	char *argv[6];
 
 	// Only start on first call or clock sync
 	ntp_sync = nvram_get_int("ntp_sync");
@@ -1362,14 +1364,27 @@ void start_stubby(int force)
 		run_postconf("stubby.postconf","/etc/stubby.yml");
 		chmod("/etc/stubby.yml", 0644);
 
-		rc = eval("stubby", "-g", "-v", nvram_safe_get("stubby_loglevel"), "-C", "/etc/stubby.yml", "-F", "/var/tmp/stubby/stubby.log");
+		rc = eval("stubby", "-g", "-v", nvram_safe_get("stubby_loglevel"), "-C", "/etc/stubby.yml", "-F", nvram_safe_get("stubby_logfile"));
 		logmessage("stubby-proxy", "start stubby (%d)", rc);
 	}
+
+	// Set up logfile cron job
+	argv[0] = "cru";
+	argv[1] = "a";
+	sprintf(&buffer[0], "StubbyLog");
+	argv[2] = &buffer[0];
+	sprintf(&buffer[strlen(&buffer[0])+1], "0 0 * * * /usr/sbin/check-log %s", nvram_safe_get("stubby_logfile"));
+	argv[3] = &buffer[strlen(&buffer[0])+1];
+	argv[4] = NULL;
+	_eval(argv, NULL, 0, NULL);
 
 }
 
 void stop_stubby(int force)
 {
+	char buffer[256];
+	char *argv[6];
+
 	if(!force && getpid() != 1){
 		notify_rc("stop_stubby");
 		return;
@@ -1379,6 +1394,14 @@ void stop_stubby(int force)
 	logmessage("stubby-proxy", "stop stubby");
 	time_valid = -1;
 	unlink("/var/run/stubby.pid");
+
+	// Remove logfile cron job
+	argv[0] = "cru";
+	argv[1] = "d";
+	sprintf(&buffer[0], "StubbyLog");
+	argv[2] = &buffer[0];
+	argv[3] = NULL;
+	_eval(argv, NULL, 0, NULL);
 
 #ifdef RTCONFIG_DNSMASQ
 	restart_dnsmasq(0);

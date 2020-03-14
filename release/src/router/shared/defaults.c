@@ -773,6 +773,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "stubby_nologs", "0"},			// show only non-logging servers
 	{ "stubby_csv","/rom/stubby-resolvers.csv"},	// list of DoT enabled resolvers
 	{ "stubby_dnssec", "0" },			// 1-use dnsmasq for stubby dnssec validation
+	{ "stubby_logfile", "/var/tmp/stubby/stubby.log" },
 #endif
 
 	// Override client DoH
