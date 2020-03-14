@@ -13,7 +13,7 @@ else
         RESOLVERS_PATH="/jffs/etc"
         RESOLVERS_FILE="${RESOLVERS_PATH}/stubby-resolvers.csv"
         RESOLVERS_FILE_TMP="${RESOLVERS_FILE}.tmp"
-        RESOLVERS_URL="https://api.onedrive.com/v1.0/shares/s!Ainhp1nBLzMJmWL_hiVwiQDPTcKU/root/content"	# stubby/stubby-resolvers.csv
+        RESOLVERS_URL="https://onedrive.live.com/download?cid=09332FC159A7E129&resid=9332FC159A7E129%214553&authkey=AJfTRCm21iM9XBY"	# stubby/stubby-resolvers.csv.txt
 
         mkdir -p "${RESOLVERS_PATH}"
 
@@ -29,7 +29,8 @@ fi
 nvram set stubby_csv="$RESOLVERS_FILE"
 nvram commit
 
-resolvcnt=$(grep -c -v "#" $RESOLVERS_FILE) # exclude commented lines
+sed -i '/^\"#/d' $RESOLVERS_FILE # exclude commented lines
+resolvcnt=$(wc -l < $RESOLVERS_FILE)
 let resolvcnt=$resolvcnt-1 # exclude header
 echo "Stubby resolvers update complete ($resolvcnt entries)" | logger -s -t "$scr_name"
 
