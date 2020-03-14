@@ -44,6 +44,9 @@ ifeq ($(RTCONFIG_DNSMASQ),y)
 	install -m 0755 updatehosts.sh $(INSTALLDIR)/usr/sbin
 endif
 
+# Utility to prune logs
+	install -m 0755 check-log $(INSTALLDIR)/usr/sbin
+
 # Utilites to move certs
 	install -m 0755 sshd2nvram $(INSTALLDIR)/usr/sbin
 	install -m 0755 sshd2jffs $(INSTALLDIR)/usr/sbin
