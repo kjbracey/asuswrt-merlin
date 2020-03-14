@@ -213,7 +213,7 @@ AC_C_BIGENDIAN([AC_DEFINE([WORDS_BIGENDIAN], 1)
 
 AC_CACHE_CHECK([for __builtin_bswap64],
 		nettle_cv_c_builtin_bswap64,
-[AC_TRY_COMPILE([
+[AC_TRY_LINK([
 #include <stdint.h>
 ],[
 uint64_t x = 17;
@@ -356,7 +356,7 @@ if test "x$ABI" != xstandard ; then
       # e.g., Fedora and Gentoo, adhere to this standard, while at
       # least Debian has decided to put 64-bit libraries in lib and
       # 32-bit libraries in lib32.
-      
+
       # We try to figure out the convention, except if we're cross
       # compiling. We use lib${ABI} if /usr/lib${ABI} exists and
       # appears to not be a symlink to a different name.
@@ -439,7 +439,7 @@ if test "x$enable_assembler" = xyes ; then
 	    NETTLE_CHECK_ARM_NEON
 
 	    asm_path="arm/v6 arm"
-      
+
 	    if test "x$enable_arm_neon" = xyes ; then
 	      asm_path="arm/neon $asm_path"
 	    fi
@@ -515,7 +515,7 @@ EOF
 	  break
 	fi
       done
-    done	
+    done
     for tmp_h in $asm_hogweed_optional_list ; do
       dnl Note extra pair of [] in sed expression
       tmp_b=`echo "$tmp_h" | sed 's/\.[[^.]]*$//'`
@@ -540,7 +540,7 @@ EOF
 	  break
 	fi
       done
-    done	
+    done
     if test -z "$asm_file_list"; then
       enable_assembler=no
       AC_MSG_WARN([No assembler files found.])
@@ -899,7 +899,7 @@ if test "x$enable_mini_gmp" = "xyes" ; then
 else
   IF_MINI_GMP='#'
 fi
-  
+
 AC_SUBST(IF_HOGWEED)
 AC_SUBST(IF_STATIC)
 AC_SUBST(IF_SHARED)
