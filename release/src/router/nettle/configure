@@ -6062,7 +6062,7 @@ uint64_t y = __builtin_bswap64(x);
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
+if ac_fn_c_try_link "$LINENO"; then :
   nettle_cv_c_builtin_bswap64=yes
 else
   nettle_cv_c_builtin_bswap64=no
