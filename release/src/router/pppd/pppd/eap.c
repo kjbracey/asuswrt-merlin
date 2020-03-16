@@ -268,7 +268,7 @@ eap_state *esp;
 	u_char *outp;
 
 	outp = outpacket_buf;
-    
+
 	MAKEHEADER(outp, PPP_EAP);
 
 	PUTCHAR(EAP_FAILURE, outp);
@@ -293,7 +293,7 @@ eap_state *esp;
 	u_char *outp;
 
 	outp = outpacket_buf;
-    
+
 	MAKEHEADER(outp, PPP_EAP);
 
 	PUTCHAR(EAP_SUCCESS, outp);
@@ -681,7 +681,7 @@ eap_state *esp;
 	}
 
 	outp = outpacket_buf;
-    
+
 	MAKEHEADER(outp, PPP_EAP);
 
 	PUTCHAR(EAP_REQUEST, outp);
@@ -1081,7 +1081,7 @@ int namelen;
 	int msglen;
 
 	outp = outpacket_buf;
-    
+
 	MAKEHEADER(outp, PPP_EAP);
 
 	PUTCHAR(EAP_RESPONSE, outp);
@@ -1117,7 +1117,7 @@ int lenstr;
 	int msglen;
 
 	outp = outpacket_buf;
-    
+
 	MAKEHEADER(outp, PPP_EAP);
 
 	PUTCHAR(EAP_RESPONSE, outp);
@@ -1148,7 +1148,7 @@ u_char *str;
 	int msglen;
 
 	outp = outpacket_buf;
-    
+
 	MAKEHEADER(outp, PPP_EAP);
 
 	PUTCHAR(EAP_RESPONSE, outp);
@@ -1421,7 +1421,7 @@ int len;
 		}
 
 		/* Not so likely to happen. */
-		if (vallen >= len + sizeof (rhostname)) {
+		if (len - vallen >= sizeof (rhostname)) {
 			dbglog("EAP: trimming really long peer name down");
 			BCOPY(inp + vallen, rhostname, sizeof (rhostname) - 1);
 			rhostname[sizeof (rhostname) - 1] = '\0';
@@ -1847,7 +1847,7 @@ int len;
 		}
 
 		/* Not so likely to happen. */
-		if (vallen >= len + sizeof (rhostname)) {
+		if (len - vallen >= sizeof (rhostname)) {
 			dbglog("EAP: trimming really long peer name down");
 			BCOPY(inp + vallen, rhostname, sizeof (rhostname) - 1);
 			rhostname[sizeof (rhostname) - 1] = '\0';
