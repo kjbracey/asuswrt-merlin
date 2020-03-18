@@ -7,7 +7,7 @@ if [ "$1" == "default" ]; then
         echo "Setting default list of public stubby resolvers..."
         RESOLVERS_PATH="/rom"
         RESOLVERS_FILE="${RESOLVERS_PATH}/stubby-resolvers.csv"
-        rm -f "$(nvram get stubby_csv)"
+        rm -f "$(nvram get stubby_csv)" > /dev/null 2>&1
 else
 
         RESOLVERS_PATH="/jffs/etc"
@@ -35,8 +35,7 @@ fi
 nvram set stubby_csv="$RESOLVERS_FILE"
 nvram commit
 
-sed -i '/^\"#/d' $RESOLVERS_FILE # exclude commented lines
-resolvcnt=$(wc -l < $RESOLVERS_FILE)
+resolvcnt=$(grep -c -v "^#" $RESOLVERS_FILE) # exclude commented lines
 let resolvcnt=$resolvcnt-1 # exclude header
 echo "Stubby resolvers update complete ($resolvcnt entries)" | logger -s -t "$scr_name"
 
