@@ -23,6 +23,12 @@ else
             echo "Download failed" | logger -s -t "$scr_name"
             exit 1
         fi
+		grep -i -q -e "Unknown Loc" -e "Error" $RESOLVERS_FILE_TMP > /dev/null 2>&1
+		if [ $? -eq 0 ]; then
+            echo "MS OneDrive could not locate the resolvers file" | logger -s -t "$scr_name"
+			rm -f "$RESOLVERS_FILE_TMP"
+            exit 1
+        fi
 		mv -f "$RESOLVERS_FILE_TMP" "$RESOLVERS_FILE" > /dev/null 2>&1
 fi
 
