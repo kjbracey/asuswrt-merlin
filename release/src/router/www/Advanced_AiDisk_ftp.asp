@@ -40,6 +40,7 @@ var PROTOCOL = "ftp";
 var NN_status = get_cifs_status();  // Network-Neighborhood
 var FTP_status = get_ftp_status(); // FTP
 var FTP_WAN_status = <% nvram_get("ftp_wanac"); %>;
+var FTP_TLS_status = <% nvram_get("ftp_tls"); %>;
 var AM_to_cifs = get_share_management_status("cifs");  // Account Management for Network-Neighborhood
 var AM_to_ftp = get_share_management_status("ftp");  // Account Management for FTP
 
@@ -425,7 +426,7 @@ function switchWanStatus(state){
 
 	showLoading();
 	document.form.ftp_wanac.value = state;
-	document.form.action_script.value = "restart_firewall";
+	document.form.action_script.value = "restart_firewall;restart_ftpsamba";
 	document.form.action_wait.value = "5";
 	document.form.flag.value = "nodetect";
 	document.form.action_mode.value = "apply";
