@@ -41,6 +41,8 @@ var NN_status = get_cifs_status();  // Network-Neighborhood
 var FTP_status = get_ftp_status(); // FTP
 var FTP_WAN_status = <% nvram_get("ftp_wanac"); %>;
 var FTP_TLS_status = <% nvram_get("ftp_tls"); %>;
+var FTP_port = <% nvram_get("vts_ftpport"); %>;
+var FTP_PASV_port = <% nvram_get("ftp_pasvport"); %>;
 var AM_to_cifs = get_share_management_status("cifs");  // Account Management for Network-Neighborhood
 var AM_to_ftp = get_share_management_status("ftp");  // Account Management for FTP
 
@@ -624,8 +626,10 @@ function unload_body(){
 
 function applyRule(){
     if(validForm()){
+		if((FTP_port != document.form.vts_ftpport.value) || (FTP_PASV_port != document.form.ftp_pasvport.value))
+			document.form.action_script.value = "restart_firewall;restart_ftpsamba";
         showLoading();
-				document.form.submit();
+		document.form.submit();
      }
 }
 
@@ -633,6 +637,16 @@ function validForm(){
 	if(!validate_range(document.form.st_max_user, 1, 10)){
 			document.form.st_max_user.focus();
 			document.form.st_max_user.select();
+			return false;
+	}
+	if(!validate_range(document.form.vts_ftpport, 1024, 65535)){
+			document.form.vts_ftpport.focus();
+			document.form.vts_ftpport.select();
+			return false;
+	}
+	if(!validate_range(document.form.ftp_pasvport, 1024, 65535)){
+			document.form.ftp_pasvport.focus();
+			document.form.ftp_pasvport.select();
 			return false;
 	}
 
@@ -752,6 +766,18 @@ function validForm(){
 							</script>
 							<span id="loginMethod" style="color:#FC0"></span>
 						</div>
+					</td>
+				</tr>
+				<tr>
+					<th><#IPConnection_VSList_ftpport#></th>
+					<td>
+						<input type="text" maxlength="5" name="vts_ftpport" class="input_6_table" value="<% nvram_get("vts_ftpport"); %>" onkeypress="return is_number(this,event);">
+					</td>
+				</tr>
+				<tr>
+					<th>Base FTP PASV port</th>
+					<td>
+						<input type="text" maxlength="5" name="ftp_pasvport" class="input_6_table" value="<% nvram_get("ftp_pasvport"); %>" onkeypress="return is_number(this,event);">
 					</td>
 				</tr>
 				<tr>

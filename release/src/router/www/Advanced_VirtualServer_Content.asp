@@ -9,7 +9,7 @@
 <link rel="shortcut icon" href="images/favicon.png">
 <link rel="icon" href="images/favicon.png">
 <title><#Web_Title#> - <#menu5_3_4#></title>
-<link rel="stylesheet" type="text/css" href="index_style.css"> 
+<link rel="stylesheet" type="text/css" href="index_style.css">
 <link rel="stylesheet" type="text/css" href="form_style.css">
 <script language="JavaScript" type="text/javascript" src="/state.js"></script>
 <script type="text/javascript" language="JavaScript" src="/help.js"></script>
@@ -76,24 +76,24 @@ function initial(){
 	show_menu();
 	loadAppOptions();
 	loadGameOptions();
-	showLANIPList();	
+	showLANIPList();
 	showvts_rulelist();
 	addOnlineHelp($("faq"), ["ASUSWRT", "port", "forwarding"]);
 
-	if(!parent.usb_support){
-		$('FTP_desc').style.display = "none";
-		document.form.vts_ftpport.parentNode.parentNode.style.display = "none";
-	}
+//	if(!parent.usb_support){
+//		$('FTP_desc').style.display = "none";
+//		document.form.vts_ftpport.parentNode.parentNode.style.display = "none";
+//	}
 }
 
 function isChange(){
-	if((document.form.vts_enable_x[0].checked == true && '<% nvram_get("vts_enable_x"); %>' == '0') || 
+	if((document.form.vts_enable_x[0].checked == true && '<% nvram_get("vts_enable_x"); %>' == '0') ||
 				(document.form.vts_enable_x[1].checked == true && '<% nvram_get("vts_enable_x"); %>' == '1')){
 		return true;
 	}
-	else if(document.form.vts_ftpport.value != '<% nvram_get("vts_ftpport"); %>'){
-		return true;
-	}
+//	else if(document.form.vts_ftpport.value != '<% nvram_get("vts_ftpport"); %>'){
+//		return true;
+//	}
 	else if(document.form.vts_rulelist.value != decodeURIComponent('<% nvram_char_to_ascii("","vts_rulelist"); %>')){
 		return true;
 	}
@@ -111,29 +111,29 @@ function extractValue(row, col){
 
 function applyRule(){
 //	cancel_Edit();
-	if(parent.usb_support){
-		if(!validate_number_range(document.form.vts_ftpport, 1, 65535)){
-			return false;	
-		}	
-	}	
-	
+//	if(parent.usb_support){
+//		if(!validate_number_range(document.form.vts_ftpport, 1, 65535)){
+//			return false;
+//		}
+//	}
+
 	var rule_num = $('vts_rulelist_table').rows.length;
 	var item_num = $('vts_rulelist_table').rows[0].cells.length;
 	var item_idx = [0,2,3,4,5,1];
 	var tmp_value = "";
 
 	for(i=0; i<rule_num; i++){
-		tmp_value += "<"		
+		tmp_value += "<"
 		for(j=0; j<Math.min(item_num-1, item_idx.length); j++){
-			tmp_value += extractValue(i, item_idx[j]);	
-			
-			if(j != item_num-2)	
+			tmp_value += extractValue(i, item_idx[j]);
+
+			if(j != item_num-2)
 				tmp_value += ">";
 		}
 	}
 
 	if(tmp_value == "<"+"<#IPConnection_VSList_Norule#>" || tmp_value == "<")
-		tmp_value = "";	
+		tmp_value = "";
 
 	document.form.vts_rulelist.value = tmp_value;
 
@@ -164,7 +164,7 @@ function loadGameOptions(){
 function change_wizard(o, id){
 	if(id == "KnownApps"){
 		$("KnownGames").value = 0;
-		
+
 		for(var i = 0; i < wItem.length; ++i){
 			if(wItem[i][0] != null && o.value == i){
 				if(wItem[i][2] == "TCP")
@@ -175,10 +175,10 @@ function change_wizard(o, id){
 					document.form.vts_proto_x_0.options[2].selected = 1;
 				else if(wItem[i][2] == "OTHER")
 					document.form.vts_proto_x_0.options[3].selected = 1;
-				
+
 				document.form.vts_ipaddr_x_0.value = client_ip;
 				document.form.vts_port_x_0.value = wItem[i][1];
-				document.form.vts_desc_x_0.value = wItem[i][0]+" Server";				
+				document.form.vts_desc_x_0.value = wItem[i][0]+" Server";
 				break;
 			}
 		}
@@ -187,16 +187,16 @@ function change_wizard(o, id){
 				if(!parent.usb_support){
 						document.form.vts_port_x_0.value = "21";
 				}
-				
+
 				document.form.vts_lport_x_0.value = "21";
 		}else{
 				document.form.vts_lport_x_0.value = "";
-		}	
+		}
 	}
 	else if(id == "KnownGames"){
 		document.form.vts_lport_x_0.value = "";
 		$("KnownApps").value = 0;
-		
+
 		for(var i = 0; i < wItem2.length; ++i){
 			if(wItem2[i][0] != null && o.value == i){
 				if(wItem2[i][2] == "TCP")
@@ -207,11 +207,11 @@ function change_wizard(o, id){
 					document.form.vts_proto_x_0.options[2].selected = 1;
 				else if(wItem2[i][2] == "OTHER")
 					document.form.vts_proto_x_0.options[3].selected = 1;
-				
+
 				document.form.vts_ipaddr_x_0.value = client_ip;
 				document.form.vts_port_x_0.value = wItem2[i][1];
 				document.form.vts_desc_x_0.value = wItem2[i][0];
-				
+
 				break;
 			}
 		}
@@ -228,7 +228,7 @@ function setClientIP(num){
 function showLANIPList(){
 	var code = "";
 	var show_name = "";
-	var client_list_array = '<% get_client_detail_info(); %>';	
+	var client_list_array = '<% get_client_detail_info(); %>';
 	var client_list_row = client_list_array.split('<');
 
 	for(var i = 1; i < client_list_row.length; i++){
@@ -245,16 +245,16 @@ function showLANIPList(){
 			code += ' </div></a>';
 		}
 	}
-	code +='<!--[if lte IE 6.5]><iframe class="hackiframe2"></iframe><![endif]-->';	
+	code +='<!--[if lte IE 6.5]><iframe class="hackiframe2"></iframe><![endif]-->';
 	$("ClientList_Block").innerHTML = code;
 }
 
 function pullLANIPList(obj){
-	
-	if(isMenuopen == 0){		
+
+	if(isMenuopen == 0){
 		obj.src = "/images/arrow-top.gif"
-		$("ClientList_Block").style.display = 'block';		
-		document.form.vts_ipaddr_x_0.focus();		
+		$("ClientList_Block").style.display = 'block';
+		document.form.vts_ipaddr_x_0.focus();
 		isMenuopen = 1;
 	}
 	else
@@ -277,19 +277,19 @@ function addRow(obj, head){
 		vts_rulelist_array += "<"
 	else
 		vts_rulelist_array += ">"
-			
+
 	vts_rulelist_array += obj.value;
 	obj.value = "";
 }
 
 function validForm(){
-	
+
 	if(!Block_chars(document.form.vts_desc_x_0, ["<" ,">" ,"'" ,"%"])){
-				return false;		
-	}	
+				return false;
+	}
 	if(!Block_chars(document.form.vts_port_x_0, ["<" ,">"])){
-				return false;		
-	}	
+				return false;
+	}
 
 	if(document.form.vts_proto_x_0.value=="OTHER"){
 		document.form.vts_lport_x_0.value = "";
@@ -300,29 +300,29 @@ function validForm(){
 	if(!check_multi_range(document.form.vts_port_x_0, 1, 65535, true)){
 		return false;
 	}
-	
+
 	if(document.form.vts_lport_x_0.value.length > 0
 			&& !validate_number_range(document.form.vts_lport_x_0, 1, 65535)){
-		return false;	
+		return false;
 	}
-	
+
 	if(document.form.vts_ipaddr_x_0.value==""){
 		alert("<#JS_fieldblank#>");
 		document.form.vts_ipaddr_x_0.focus();
-		document.form.vts_ipaddr_x_0.select();		
+		document.form.vts_ipaddr_x_0.select();
 		return false;
 	}
 	if(document.form.vts_port_x_0.value==""){
 		alert("<#JS_fieldblank#>");
 		document.form.vts_port_x_0.focus();
-		document.form.vts_port_x_0.select();		
+		document.form.vts_port_x_0.select();
 		return false;
 	}
 	if(!validate_multi_range(document.form.vts_port_x_0, 1, 65535)
-		|| !valid_IP_form(document.form.vts_ipaddr_x_0, 0)){			
-		return false;	
-	}			
-	
+		|| !valid_IP_form(document.form.vts_ipaddr_x_0, 0)){
+		return false;
+	}
+
 	return true;
 }
 
@@ -330,19 +330,19 @@ function addRow_Group(upper){
 	if(validForm()){
 		if('<% nvram_get("vts_enable_x"); %>' != "1")
 			document.form.vts_enable_x[0].checked = true;
-		
+
 		var rule_num = $('vts_rulelist_table').rows.length;
-		var item_num = $('vts_rulelist_table').rows[0].cells.length;	
+		var item_num = $('vts_rulelist_table').rows[0].cells.length;
 		if(rule_num >= upper){
 				alert("<#JS_itemlimit1#> " + upper + " <#JS_itemlimit2#>");
 				return;
-		}	
-		
+		}
+
 //Viz check same rule  //match(srource+out port+out_proto) is not accepted
 	 	if(item_num >=2){
  			for(i=0; i<rule_num; i++){
 				var proto_obj = document.getElementById('vts_rulelist_table').rows[i].cells[5];
-				if(entry_cmp(proto_obj.innerHTML.toLowerCase(), document.form.vts_proto_x_0.value.toLowerCase(), 3)==0 
+				if(entry_cmp(proto_obj.innerHTML.toLowerCase(), document.form.vts_proto_x_0.value.toLowerCase(), 3)==0
  				|| document.form.vts_proto_x_0.value == 'BOTH'
 				|| proto_obj.innerHTML == 'BOTH'){
 						var source = overlib_src[i];
@@ -356,13 +356,13 @@ function addRow_Group(upper){
 								alert("<#JS_duplicate#>");
 								document.form.vts_port_x_0.value =="";
 								document.form.vts_port_x_0.focus();
-								document.form.vts_port_x_0.select();							
+								document.form.vts_port_x_0.select();
 								return false;
 						}
- 				}	
- 			}				
- 		}
-			
+				}
+			}
+		}
+
 		addRow(document.form.vts_desc_x_0 ,1);
 		addRow(document.form.vts_port_x_0, 0);
 		addRow(document.form.vts_ipaddr_x_0, 0);
@@ -388,47 +388,47 @@ function addRow_Group(upper){
 function validate_multi_range(val, mini, maxi){
 	var rangere=new RegExp("^([0-9]{1,5})\:([0-9]{1,5})$", "gi");
 	if(rangere.test(val)){
-		
+
 		if(!validate_each_port(document.form.vts_port_x_0, RegExp.$1, mini, maxi) || !validate_each_port(document.form.vts_port_x_0, RegExp.$2, mini, maxi)){
-				return false;								
+				return false;
 		}else if(parseInt(RegExp.$1) >= parseInt(RegExp.$2)){
-				alert("<#JS_validport#>");	
-				return false;												
-		}else				
-			return true;	
+				alert("<#JS_validport#>");
+				return false;
+		}else
+			return true;
 	}else{
-		if(!validate_single_range(val, mini, maxi)){	
-					return false;											
+		if(!validate_single_range(val, mini, maxi)){
+					return false;
 				}
-				return true;								
-			}	
+				return true;
+			}
 }
 function validate_single_range(val, min, max) {
 	for(j=0; j<val.length; j++){		//is_number
-		if (val.charAt(j)<'0' || val.charAt(j)>'9'){			
+		if (val.charAt(j)<'0' || val.charAt(j)>'9'){
 			alert('<#JS_validrange#> ' + min + ' <#JS_validrange_to#> ' + max);
 			return false;
 		}
 	}
-	
-	if(val < min || val > max) {		//is_in_range		
+
+	if(val < min || val > max) {		//is_in_range
 		alert('<#JS_validrange#> ' + min + ' <#JS_validrange_to#> ' + max);
 		return false;
-	}else	
+	}else
 		return true;
-}	
+}
 var parse_port="";
 function check_multi_range(obj, mini, maxi, allow_range){
 	obj.value = document.form.vts_port_x_0.value.replace(/[-~]/gi,":");	// "~-" to ":"
 	var PortSplit = obj.value.split(",");
 	for(i=0;i<PortSplit.length;i++){
 		PortSplit[i] = PortSplit[i].replace(/(^\s*)|(\s*$)/g, ""); 		// "\space" to ""
-		PortSplit[i] = PortSplit[i].replace(/(^0*)/g, ""); 		// "^0" to ""	
-		
+		PortSplit[i] = PortSplit[i].replace(/(^0*)/g, ""); 		// "^0" to ""
+
 		if(PortSplit[i] == "" ||PortSplit[i] == 0){
 			alert("<#JS_ipblank1#>");
 			obj.focus();
-			obj.select();			
+			obj.select();
 			return false;
 		}
 		if(allow_range)
@@ -438,28 +438,28 @@ function check_multi_range(obj, mini, maxi, allow_range){
 			obj.focus();
 			obj.select();
 			return false;
-		}						
-		
+		}
+
 		if(i ==PortSplit.length -1)
 			parse_port = parse_port + PortSplit[i];
 		else
 			parse_port = parse_port + PortSplit[i] + ",";
-			
+
 	}
 	document.form.vts_port_x_0.value = parse_port;
 	parse_port ="";
-	return true;	
+	return true;
 }
 
 
 function edit_Row(r){
-	cancel_Edit();	
+	cancel_Edit();
 	var i=r.parentNode.parentNode.rowIndex;
-  	
+
 	document.form.vts_desc_x_0.value = $('vts_rulelist_table').rows[i].cells[0].innerHTML;
 	document.form.vts_target_x_0.value = $('vts_rulelist_table').rows[i].cells[1].innerHTML;
-	document.form.vts_port_x_0.value = $('vts_rulelist_table').rows[i].cells[2].innerHTML; 
-	document.form.vts_ipaddr_x_0.value = $('vts_rulelist_table').rows[i].cells[3].innerHTML; 
+	document.form.vts_port_x_0.value = $('vts_rulelist_table').rows[i].cells[2].innerHTML;
+	document.form.vts_ipaddr_x_0.value = $('vts_rulelist_table').rows[i].cells[3].innerHTML;
 	document.form.vts_lport_x_0.value = $('vts_rulelist_table').rows[i].cells[4].innerHTML;
 	document.form.vts_proto_x_0.value = $('vts_rulelist_table').rows[i].cells[5].innerHTML;
 
@@ -470,7 +470,7 @@ function edit_Row(r){
 	backup_proto = document.form.vts_proto_x_0.value;
 	backup_Target = document.form.vts_target_x_0.value;
 
-  del_Row(r);	
+  del_Row(r);
 }
 
 function cancel_Edit(){
@@ -487,20 +487,20 @@ function cancel_Edit(){
 function del_Row(r){
 	var i=r.parentNode.parentNode.rowIndex;
 	$('vts_rulelist_table').deleteRow(i);
-  
+
 	var vts_rulelist_value = "";
 	var item_idx = [0,2,3,4,5,1];
 	for(k=0; k<$('vts_rulelist_table').rows.length; k++){
 		for(j=0; j<$('vts_rulelist_table').rows[k].cells.length-1; j++){
-			if(j == 0)	
+			if(j == 0)
 				vts_rulelist_value += "<";
 			else
 				vts_rulelist_value += ">";
-				
-			vts_rulelist_value += extractValue(k, item_idx[j]);	
+
+			vts_rulelist_value += extractValue(k, item_idx[j]);
 		}
 	}
-	
+
 	vts_rulelist_array = vts_rulelist_value;
 	if(vts_rulelist_array == "")
 		showvts_rulelist();
@@ -517,7 +517,7 @@ function showvts_rulelist(){
 		for(var i = 1; i < vts_rulelist_row.length; i++){
 			overlib_desc[i] ="";
 			overlib_port[i] ="";
-			overlib_src[i] ="";			
+			overlib_src[i] ="";
 			code +='<tr id="row'+i+'">';
 			var vts_rulelist_col = vts_rulelist_row[i].split('>');
 			var desc = vts_rulelist_col[0];
@@ -560,7 +560,7 @@ function showvts_rulelist(){
  		}
  	}
 	code +='</table>';
-	$("vts_rulelist_Block").innerHTML = code;	     
+	$("vts_rulelist_Block").innerHTML = code;
 }
 
 function changeBgColor(obj, num){
@@ -594,19 +594,19 @@ function changeBgColor(obj, num){
 
 <table class="content" align="center" cellpadding="0" cellspacing="0" >
 	<tr>
-		<td width="17">&nbsp;</td>		
-		<td valign="top" width="202">				
-		<div  id="mainMenu"></div>	
-		<div  id="subMenu"></div>		
-		</td>				
-		
+		<td width="17">&nbsp;</td>
+		<td valign="top" width="202">
+		<div  id="mainMenu"></div>
+		<div  id="subMenu"></div>
+		</td>
+
     <td valign="top">
 	<div id="tabMenu" class="submenuBlock"></div>
-		<!--===================================Beginning of Main Content===========================================-->		
+		<!--===================================Beginning of Main Content===========================================-->
 <table width="98%" border="0" align="left" cellpadding="0" cellspacing="0">
 	<tr>
 		<td valign="top" >
-		
+
 <table width="760px" border="0" cellpadding="4" cellspacing="0" class="FormTitle" id="FormTitle">
 	<tbody>
 	<tr>
@@ -618,10 +618,10 @@ function changeBgColor(obj, num){
 			<div class="formfontdesc"><#IPConnection_VServerEnable_sectiondesc#></div>
 			<ul style="margin-left:-25px; *margin-left:10px;">
 				<div class="formfontdesc"><li><#FirewallConfig_Port80_itemdesc#></div>
-				<div class="formfontdesc" id="FTP_desc"><li><#FirewallConfig_FTPPrompt_itemdesc#></div>
-			</ul>	
-		</div>		
-			
+				<div class="formfontdesc" id="FTP_desc"><li><#FirewallConfig_FTPPrompt_itemdesc#>&nbsp; Please select a new port in FTP Share if also using the router FTP server.</div>
+			</ul>
+		</div>
+
 		<div class="formfontdesc" style="margin-top:-10px;">
 			<a id="faq" href="" target="_blank" style="font-family:Lucida Console;text-decoration:underline;"><#menu5_3_4#>&nbspFAQ</a>
 		</div>
@@ -640,15 +640,15 @@ function changeBgColor(obj, num){
 								<input type="radio" value="0" name="vts_enable_x" class="content_input_fd" onclick="return change_common_radio(this, 'IPConnection', 'vts_enable_x', '0')" <% nvram_match("vts_enable_x", "0", "checked"); %>><#checkbox_No#>
             	</td>
 		</tr>
-		  
+
 		<tr>
 			<th><#IPConnection_VSList_groupitemdesc#></th>
-			<td id="vts_rulelist">					
+			<td id="vts_rulelist">
 			  		<select name="KnownApps" id="KnownApps" class="input_option" onchange="change_wizard(this, 'KnownApps');">
 			  		</select>
 			</td>
 		</tr>
-		  
+
 		<tr>
 			<th><#IPConnection_VSList_gameitemdesc#></th>
 			<td id="VSGameList">
@@ -656,23 +656,23 @@ function changeBgColor(obj, num){
 						</select>
 			</td>
 		</tr>
-
+<!--
 		  <tr>
 				<th><#IPConnection_VSList_ftpport#></th>
 				<td>
 			  	<input type="text" maxlength="5" name="vts_ftpport" class="input_6_table" value="<% nvram_get("vts_ftpport"); %>" onkeypress="return is_number(this,event);">
 				</td>
 		  </tr>
+-->
+		</table>
 
-      	</table>			
-      	
 		<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" class="FormTable_table">
 			<thead>
 			<tr>
               		<td colspan="7"><#IPConnection_VSList_title#>&nbsp;(<#List_limit#>&nbsp;128)</td>
             	</tr>
  		  	</thead>
- 		  	
+
           		<tr>
 								<th><#BM_UserList1#></th>
 			<th><a class="hintstyle" href="javascript:void(0);" onClick="">Source IP</a></th>
@@ -681,8 +681,8 @@ function changeBgColor(obj, num){
             		<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(7,26);"><#IPConnection_VServerLPort_itemname#></a></th>
             		<th><#IPConnection_VServerProto_itemname#></th>
 								<th><#list_add_delete#></th>
-          		</tr>  
-          		        
+				</tr>
+
           		<tr>
   				<td style="width:150px">
   					<input type="text" maxlength="30" class="input_15_table" name="vts_desc_x_0" onKeyPress="return is_string(this, event)" autocorrect="off" autocapitalize="off"/>
@@ -714,27 +714,27 @@ function changeBgColor(obj, num){
 					<input type="button" class="add_btn" onClick="addRow_Group(128);" name="vts_rulelist2" value="">
 				</td>
 				</tr>
-				</table>		
-				
+				</table>
+
 				<div id="vts_rulelist_Block"></div>
-				
+
 				<div class="apply_gen">
 					<input name="button" type="button" class="button_gen" onclick="applyRule();" value="<#CTL_apply#>"/>
 				</div>
 
-		
+
 		</td>
 		</tr>
-	</tbody>	
-	
+	</tbody>
+
 	</table>
 </td>
-         
+
         </tr>
-      </table>				
-		<!--===================================Ending of Main Content===========================================-->		
+      </table>
+		<!--===================================Ending of Main Content===========================================-->
 	</td>
-		
+
     <td width="10" align="center" valign="top">&nbsp;</td>
 	</tr>
 </table>
