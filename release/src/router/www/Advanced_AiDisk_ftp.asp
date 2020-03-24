@@ -647,7 +647,7 @@ function unload_body(){
 
 function applyRule(){
     if(validForm()){
-		if((FTP_port != document.form.vts_ftpport.value) || (FTP_PASV_port != document.form.ftp_pasvport.value))
+		if((FTP_port != document.form.vts_ftpport.value) || (FTP_PASV_port != document.form.ftp_pasvport.value) || (FTP_TLS_status != document.form.ftp_tls.value))
 			document.form.action_script.value = "restart_firewall;restart_ftpsamba";
         showLoading();
 		document.form.submit();
