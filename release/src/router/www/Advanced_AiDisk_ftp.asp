@@ -45,6 +45,8 @@ var FTP_port = <% nvram_get("vts_ftpport"); %>;
 var FTP_PASV_port = <% nvram_get("ftp_pasvport"); %>;
 var AM_to_cifs = get_share_management_status("cifs");  // Account Management for Network-Neighborhood
 var AM_to_ftp = get_share_management_status("ftp");  // Account Management for FTP
+var vts_rulelist_array = "<% nvram_char_to_ascii("","vts_rulelist"); %>";
+var vts_enabled = <% nvram_get("vts_enable_x"); %>;
 
 var accounts = [<% get_all_accounts(); %>];
 
@@ -60,6 +62,7 @@ var ddns_enable = '<% nvram_get("ddns_enable_x"); %>';
 
 function initial(){
 	show_menu();
+	showFTPPort();
 	$("option5").innerHTML = '<table><tbody><tr><td><div id="index_img5"></div></td><td><div style="width:120px;"><#Menu_usb_application#></div></td></tr></tbody></table>';
 	$("option5").className = "m5_r";
 
@@ -193,6 +196,24 @@ function switchAppStatus(protocol){  // turn on/off the share
 				refreshpage();
 			}
 		break;
+	}
+}
+
+function showFTPPort(){
+	var vts_rulelist_row = decodeURIComponent(vts_rulelist_array).split('<');
+	$("vts_ftpport_entry").style.display = "none";
+
+	if((vts_rulelist_row.length == 1) || (vts_enabled == 0))
+		return;
+	else{
+		for(var i = 1; i < vts_rulelist_row.length; i++){
+			var vts_rulelist_col = vts_rulelist_row[i].split('>');
+			var dest_port = vts_rulelist_col[3];
+			if (dest_port == "21"){
+				$("vts_ftpport_entry").style.display = "";
+				return;
+			}
+		}
 	}
 }
 
@@ -768,7 +789,7 @@ function validForm(){
 						</div>
 					</td>
 				</tr>
-				<tr>
+				<tr id="vts_ftpport_entry">
 					<th><#IPConnection_VSList_ftpport#></th>
 					<td>
 						<input type="text" maxlength="5" name="vts_ftpport" class="input_6_table" value="<% nvram_get("vts_ftpport"); %>" onkeypress="return is_number(this,event);">
