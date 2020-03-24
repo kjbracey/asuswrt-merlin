@@ -64,6 +64,9 @@ var networkmap_fullscan = '<% nvram_match("networkmap_fullscan", "0", "done"); %
 var clients_info = getclients();
 var vts_rulelist_array = "<% nvram_char_to_ascii("","vts_rulelist"); %>";
 var ctf_disable = '<% nvram_get("ctf_disable"); %>';
+var ftp_enabled = '<% nvram_get("enable_ftp"); %>';
+var samba_enabled = '<% nvram_get("enable_samba"); %>';
+
 
 var backup_desc = "";
 var backup_port = "";
@@ -136,6 +139,9 @@ function applyRule(){
 		tmp_value = "";
 
 	document.form.vts_rulelist.value = tmp_value;
+
+	if(ftp_enabled == 1 || samba_enabled == 1)
+		document.form.action_script.value += ";restart_ftpsamba";
 
 	/* 2014.04 Viz: No need to reboot for ctf enable models.
 	if(ctf_disable == '0' && isChange()){
