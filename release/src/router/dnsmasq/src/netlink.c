@@ -1,4 +1,4 @@
-/* dnsmasq is Copyright (c) 2000-2018 Simon Kelley
+/* dnsmasq is Copyright (c) 2000-2020 Simon Kelley
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,12 @@
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 
+/* Blergh. Radv does this, so that's our excuse. */
+#ifndef SOL_NETLINK
+#define SOL_NETLINK 270
+#endif
+
+
 /* linux 2.6.19 buggers up the headers, patch it up here. */ 
 #ifndef IFA_RTA
 #  define IFA_RTA(r)  \
@@ -44,6 +50,7 @@ void netlink_init(void)
 {
   struct sockaddr_nl addr;
   socklen_t slen = sizeof(addr);
+  int opt = 1;
 
   addr.nl_family = AF_NETLINK;
   addr.nl_pad = 0;
@@ -72,6 +79,7 @@ void netlink_init(void)
     }
   
   if (daemon->netlinkfd == -1 || 
+      setsockopt(daemon->netlinkfd, SOL_NETLINK, NETLINK_NO_ENOBUFS, &opt, sizeof(opt)) == -1 ||
       getsockname(daemon->netlinkfd, (struct sockaddr *)&addr, &slen) == -1)
     die(_("cannot create netlink socket: %s"), NULL, EC_MISC);
    
@@ -351,21 +359,22 @@ static void nl_async(struct nlmsghdr *h)
       if (err->error != 0)
 	my_syslog(LOG_ERR, _("netlink returns error: %s"), strerror(-(err->error)));
     }
-  else if (h->nlmsg_pid == 0 && h->nlmsg_type == RTM_NEWROUTE) 
+  else if (h->nlmsg_pid == 0 && h->nlmsg_type == RTM_NEWROUTE)
     {
       /* We arrange to receive netlink multicast messages whenever the network route is added.
 	 If this happens and we still have a DNS packet in the buffer, we re-send it.
 	 This helps on DoD links, where frequently the packet which triggers dialling is
 	 a DNS query, which then gets lost. By re-sending, we can avoid the lookup
-	 failing. */ 
+	 failing. */
       struct rtmsg *rtm = NLMSG_DATA(h);
-      
-      if (rtm->rtm_type == RTN_UNICAST && rtm->rtm_scope == RT_SCOPE_LINK)
+
+      if (rtm->rtm_type == RTN_UNICAST && rtm->rtm_scope == RT_SCOPE_LINK &&
+	  (rtm->rtm_table == RT_TABLE_MAIN ||
+	   rtm->rtm_table == RT_TABLE_LOCAL))
 	queue_event(EVENT_NEWROUTE);
     }
-  else if (h->nlmsg_type == RTM_NEWADDR || h->nlmsg_type == RTM_DELADDR) 
+  else if (h->nlmsg_type == RTM_NEWADDR || h->nlmsg_type == RTM_DELADDR)
     queue_event(EVENT_NEWADDR);
 }
 #endif
 
-      

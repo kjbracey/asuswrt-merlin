@@ -1,4 +1,4 @@
-/* dnsmasq is Copyright (c) 2000-2018 Simon Kelley
+/* dnsmasq is Copyright (c) 2000-2020 Simon Kelley
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -93,10 +93,13 @@ int send_from(int fd, int nowild, char *packet, size_t len,
   
   while (retry_send(sendmsg(fd, &msg, 0)));
 
-  /* If interface is still in DAD, EINVAL results - ignore that. */
-  if (errno != 0 && errno != EINVAL)
+  if (errno != 0)
     {
-      my_syslog(LOG_ERR, _("failed to send packet: %s"), strerror(errno));
+#ifdef HAVE_LINUX_NETWORK
+      /* If interface is still in DAD, EINVAL results - ignore that. */
+      if (errno != EINVAL)
+	my_syslog(LOG_ERR, _("failed to send packet: %s"), strerror(errno));
+#endif
       return 0;
     }
   
@@ -125,7 +128,9 @@ static unsigned int search_servers(time_t now, union all_addr **addrpp, unsigned
       {
 	unsigned int sflag = serv->addr.sa.sa_family == AF_INET ? F_IPV4 : F_IPV6; 
 	*type = SERV_FOR_NODOTS;
-	if (serv->flags & SERV_NO_ADDR)
+	if ((serv->flags & SERV_NO_REBIND) && norebind)
+	  *norebind = 1;
+	else if (serv->flags & SERV_NO_ADDR)
 	  flags = F_NXDOMAIN;
 	else if (serv->flags & SERV_LITERAL_ADDRESS)
 	  { 
@@ -956,7 +961,7 @@ void reply_query(int fd, int family, time_t now)
       forward->sentto->edns_pktsz = SAFE_PKTSZ;
       forward->sentto->pktsz_reduced = now;
       prettyprint_addr(&forward->sentto->addr, daemon->addrbuff);
-      my_syslog(LOG_DEBUG, _("reducing DNS packet size for nameserver %s to %d"), daemon->addrbuff, SAFE_PKTSZ);
+      my_syslog(LOG_WARNING, _("reducing DNS packet size for nameserver %s to %d"), daemon->addrbuff, SAFE_PKTSZ);
     }
 
     

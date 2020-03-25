@@ -1,4 +1,4 @@
-/* dnsmasq is Copyright (c) 2000-2018 Simon Kelley
+/* dnsmasq is Copyright (c) 2000-2020 Simon Kelley
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -73,12 +73,6 @@ HAVE_BROKEN_RTC
    it viable to keep the lease file on a flash filesystem.
    NOTE: when enabling or disabling this, be sure to delete any old
    leases file, otherwise dnsmasq may get very confused.
-
-HAVE_LEASEFILE_EXPIRE
-   define this if you want to enable lease file update with expire
-   timeouts instead of expiry times or lease lengths, if HAVE_BROKEN_RTC
-   is also enabled. Lease file will be rewritten upon SIGUSR2 signal
-   reception and/or dnsmasq termination.
 
 HAVE_TFTP
    define this to get dnsmasq's built-in TFTP server.
@@ -165,7 +159,6 @@ RESOLVFILE
 */
 
 /* #define HAVE_BROKEN_RTC */
-/* #define HAVE_LEASEFILE_EXPIRE */
 
 /* The default set of options to build. Built with these options, dnsmasq
    has no library dependencies other than libc */
@@ -253,12 +246,10 @@ HAVE_SOCKADDR_SA_LEN
 #    define HAVE_GETOPT_LONG
 #endif
 #undef HAVE_SOCKADDR_SA_LEN
-#if defined(__UCLIBC_HAS_IPV6__) && defined(USE_IPV6)
+#if defined(__UCLIBC_HAS_IPV6__)
 #  ifndef IPV6_V6ONLY
 #    define IPV6_V6ONLY 26
 #  endif
-#elif !defined(NO_IPV6)
-#  define NO_IPV6
 #endif
 
 /* This is for glibc 2.x */

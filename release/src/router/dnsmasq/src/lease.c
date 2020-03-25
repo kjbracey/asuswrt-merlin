@@ -1,4 +1,4 @@
-/* dnsmasq is Copyright (c) 2000-2018 Simon Kelley
+/* dnsmasq is Copyright (c) 2000-2020 Simon Kelley
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -118,14 +118,12 @@ static int read_leases(time_t now, FILE *leasestream)
 
 	ei = atol(daemon->dhcp_buff3);
 
-#if defined(HAVE_BROKEN_RTC) || defined(HAVE_LEASEFILE_EXPIRE)
+#ifdef HAVE_BROKEN_RTC
 	if (ei != 0)
 	  lease->expires = (time_t)ei + now;
 	else
 	  lease->expires = (time_t)0;
-#ifdef HAVE_BROKEN_RTC
-        lease->length = ei;
-#endif
+	lease->length = ei;
 #else
 	/* strictly time_t is opaque, but this hack should work on all sane systems,
 	   even when sizeof(time_t) == 8 */
@@ -232,7 +230,7 @@ void lease_update_from_configs(void)
     if (lease->flags & (LEASE_TA | LEASE_NA))
       continue;
     else if ((config = find_config(daemon->dhcp_conf, NULL, lease->clid, lease->clid_len, 
-				   lease->hwaddr, lease->hwaddr_len, lease->hwaddr_type, NULL)) && 
+				   lease->hwaddr, lease->hwaddr_len, lease->hwaddr_type, NULL, NULL)) && 
 	     (config->flags & CONFIG_NAME) &&
 	     (!(config->flags & CONFIG_ADDR) || config->addr.s_addr == lease->addr.s_addr))
       lease_set_hostname(lease, config->hostname, 1, get_domain(lease->addr), NULL);
@@ -249,22 +247,6 @@ static void ourprintf(int *errp, char *format, ...)
     *errp = errno;
   va_end(ap);
 }
-
-#ifdef HAVE_LEASEFILE_EXPIRE
-void lease_flush_file(time_t now)
-{
-  static time_t flush_time = 0;
-
-  if (difftime(flush_time, now) < 0)
-    file_dirty = 1;
-
-  lease_prune(NULL, now);
-  lease_update_file(now);
-
-  if (file_dirty == 0)
-    flush_time = now;
-}
-#endif
 
 void lease_update_file(time_t now)
 {
@@ -287,15 +269,7 @@ void lease_update_file(time_t now)
 	    continue;
 #endif
 
-#ifdef HAVE_LEASEFILE_EXPIRE
-          ourprintf(&err, "%u ",
 #ifdef HAVE_BROKEN_RTC
-                    (lease->length == 0) ? 0 :
-#else
-                    (lease->expires == 0) ? 0 :
-#endif
-                    (unsigned int)difftime(lease->expires, now));
-#elif HAVE_BROKEN_RTC
 	  ourprintf(&err, "%u ", lease->length);
 #else
 	  ourprintf(&err, "%lu ", (unsigned long)lease->expires);
@@ -339,20 +313,12 @@ void lease_update_file(time_t now)
 	      if (!(lease->flags & (LEASE_TA | LEASE_NA)))
 		continue;
 
-#ifdef HAVE_LEASEFILE_EXPIRE
-	      ourprintf(&err, "%u ",
 #ifdef HAVE_BROKEN_RTC
-			(lease->length == 0) ? 0 :
-#else
-			(lease->expires == 0) ? 0 :
-#endif
-			(unsigned int)difftime(lease->expires, now));
-#elif defined(HAVE_BROKEN_RTC)
 	      ourprintf(&err, "%u ", lease->length);
 #else
 	      ourprintf(&err, "%lu ", (unsigned long)lease->expires);
 #endif
-
+    
 	      inet_ntop(AF_INET6, &lease->addr6, daemon->addrbuff, ADDRSTRLEN);
 	 
 	      ourprintf(&err, "%s%u %s ", (lease->flags & LEASE_TA) ? "T" : "",
@@ -870,7 +836,7 @@ void lease_set_expires(struct dhcp_lease *lease, unsigned int len, time_t now)
       dns_dirty = 1;
       lease->expires = exp;
 #ifndef HAVE_BROKEN_RTC
-      lease->flags |= LEASE_AUX_CHANGED;
+      lease->flags |= LEASE_AUX_CHANGED | LEASE_EXP_CHANGED;
       file_dirty = 1;
 #endif
     }
@@ -1170,7 +1136,8 @@ int do_script_run(time_t now)
   
   for (lease = leases; lease; lease = lease->next)
     if ((lease->flags & (LEASE_NEW | LEASE_CHANGED)) || 
-	((lease->flags & LEASE_AUX_CHANGED) && option_bool(OPT_LEASE_RO)))
+	((lease->flags & LEASE_AUX_CHANGED) && option_bool(OPT_LEASE_RO)) ||
+	((lease->flags & LEASE_EXP_CHANGED) && option_bool(OPT_LEASE_RENEW)))
       {
 #ifdef HAVE_SCRIPT
 	queue_script((lease->flags & LEASE_NEW) ? ACTION_ADD : ACTION_OLD, lease, 
@@ -1180,7 +1147,7 @@ int do_script_run(time_t now)
 	emit_dbus_signal((lease->flags & LEASE_NEW) ? ACTION_ADD : ACTION_OLD, lease,
 			 lease->fqdn ? lease->fqdn : lease->hostname);
 #endif
-	lease->flags &= ~(LEASE_NEW | LEASE_CHANGED | LEASE_AUX_CHANGED);
+	lease->flags &= ~(LEASE_NEW | LEASE_CHANGED | LEASE_AUX_CHANGED | LEASE_EXP_CHANGED);
 	
 	/* this is used for the "add" call, then junked, since they're not in the database */
 	free(lease->extradata);

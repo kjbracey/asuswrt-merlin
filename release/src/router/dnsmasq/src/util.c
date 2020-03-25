@@ -1,4 +1,4 @@
-/* dnsmasq is Copyright (c) 2000-2018 Simon Kelley
+/* dnsmasq is Copyright (c) 2000-2020 Simon Kelley
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -162,13 +162,11 @@ static int check_name(char *in)
    for the tighter criteria. */
 int legal_hostname(char *name)
 {
-  char c, *at;
+  char c;
   int first;
 
   if (!check_name(name))
     return 0;
-
-  at = strchr(name, '@');
 
   for (first = 1; (c = *name); name++, first = 0)
     /* check for legal char a-z A-Z 0-9 - _ . */
@@ -180,10 +178,6 @@ int legal_hostname(char *name)
 
       if (!first && (c == '-' || c == '_'))
 	continue;
-
-      /* relax name part */
-      if (at && (name <= at) && (c >= 33) && (c < 127))
-        continue;
       
       /* end of hostname part */
       if (c == '.')
@@ -530,20 +524,20 @@ void prettyprint_time(char *buf, unsigned int t)
 int parse_hex(char *in, unsigned char *out, int maxlen, 
 	      unsigned int *wildcard_mask, int *mac_type)
 {
-  int mask = 0, i = 0;
+  int done = 0, mask = 0, i = 0;
   char *r;
     
   if (mac_type)
     *mac_type = 0;
   
-  while (maxlen == -1 || i < maxlen)
+  while (!done && (maxlen == -1 || i < maxlen))
     {
       for (r = in; *r != 0 && *r != ':' && *r != '-' && *r != ' '; r++)
 	if (*r != '*' && !isxdigit((unsigned char)*r))
 	  return -1;
       
       if (*r == 0)
-	maxlen = i;
+	done = 1;
       
       if (r != in )
 	{
@@ -709,6 +703,47 @@ int read_write(int fd, unsigned char *packet, int size, int rw)
     }
      
   return 1;
+}
+
+/* close all fds except STDIN, STDOUT and STDERR, spare1, spare2 and spare3 */
+void close_fds(long max_fd, int spare1, int spare2, int spare3) 
+{
+  /* On Linux, use the /proc/ filesystem to find which files
+     are actually open, rather than iterate over the whole space,
+     for efficiency reasons. If this fails we drop back to the dumb code. */
+#ifdef HAVE_LINUX_NETWORK 
+  DIR *d;
+  
+  if ((d = opendir("/proc/self/fd")))
+    {
+      struct dirent *de;
+
+      while ((de = readdir(d)))
+	{
+	  long fd;
+	  char *e = NULL;
+	  
+	  errno = 0;
+	  fd = strtol(de->d_name, &e, 10);
+	  	  
+      	  if (errno != 0 || !e || *e || fd == dirfd(d) ||
+	      fd == STDOUT_FILENO || fd == STDERR_FILENO || fd == STDIN_FILENO ||
+	      fd == spare1 || fd == spare2 || fd == spare3)
+	    continue;
+	  
+	  close(fd);
+	}
+      
+      closedir(d);
+      return;
+  }
+#endif
+
+  /* fallback, dumb code. */
+  for (max_fd--; max_fd >= 0; max_fd--)
+    if (max_fd != STDOUT_FILENO && max_fd != STDERR_FILENO && max_fd != STDIN_FILENO &&
+	max_fd != spare1 && max_fd != spare2 && max_fd != spare3)
+      close(max_fd);
 }
 
 /* Basically match a string value against a wildcard pattern.  */
