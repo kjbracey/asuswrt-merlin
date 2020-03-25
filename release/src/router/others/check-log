@@ -9,14 +9,13 @@ LOGFILE="$1"
 if [ -f "$LOGFILE" ]; then
 	lines=$(wc -l < $LOGFILE)
 	if [ $lines -gt 100 ]; then
-		tail -n 100 > $LOGILE.tmp
-		mv -f $LOGFILE.tmp $LOGFILE
-		logger -t $scr_name "log: $LOGFILE has been pruned"
-	else
-		logger -t $scr_name "log: $LOGFILE does not need to be pruned"
+		echo "$(tail -n 100 $LOGFILE)" > $LOGFILE
+		logger -s -t $scr_name "log: $LOGFILE $lines total lines $((lines-100)) lines pruned"
+#	else
+#		logger -s -t $scr_name "log: $LOGFILE $lines total lines"
 	fi
 else
-	logger -t $scr_name "log: $LOGFILE not found"
+	logger -s -t $scr_name "log: $LOGFILE not found"
 fi
 
 exit 0
