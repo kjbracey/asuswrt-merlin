@@ -742,7 +742,12 @@ function validForm(){
 			</div>
 			<div style="margin:5px;"><img src="/images/New_ui/export/line_export.png"></div>
 
-			<div class="formfontdesc"><#FTP_desc#></div>
+			<div>
+				<div class="formfontdesc"><#FTP_desc#></div>
+				<ul style="margin-left:-25px; *margin-left:10px;">
+					<div class="formfontdesc"><li>Note: Access to the router FTP server from the LAN is always via port 21.</div>
+				</ul>
+			</div>
 
 			<table width="740px" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 				<tr>
@@ -790,9 +795,10 @@ function validForm(){
 					</td>
 				</tr>
 				<tr id="vts_ftpport_entry">
-					<th><#IPConnection_VSList_ftpport#></th>
+					<th>WAN&nbsp;<#IPConnection_VSList_ftpport#></th>
 					<td>
 						<input type="text" maxlength="5" name="vts_ftpport" class="input_6_table" value="<% nvram_get("vts_ftpport"); %>" onkeypress="return is_number(this,event);">
+						<span><br>A potential conflict has been detected with another FTP server accessed via the WAN.<br>Specify the external port for connecting to the router FTP server when there is a conflicting Port Forwarding entry.</span>
 					</td>
 				</tr>
 				<tr>
