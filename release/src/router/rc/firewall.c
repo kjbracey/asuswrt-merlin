@@ -1260,12 +1260,12 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 
 				if (strcmp(proto, "TCP") == 0 || strcmp(proto, "BOTH") == 0) {
 					fprintf(fp, "-A VSERVER %s -p tcp -m tcp --dport %s -j DNAT %s\n", srcips, c, dstips);
-					if (local_ftpport != 0 && local_ftpport != 21 && atoi(c) == 21)
+					if (local_ftpport != 0 && local_ftpport != 21 && atoi(c) == 21 && (nvram_get_int("ftp_wanac")))
 					{
 						fprintf(fp, "-A VSERVER %s -p tcp -m tcp --dport %d -j DNAT --to-destination %s:21\n", srcips, local_ftpport, lan_ip);
 #ifdef RTCONFIG_FTP
 						/* FTP TLS/PASV with other FTP server defined */
-						if ((nvram_get_int("enable_ftp")) && (nvram_get_int("ftp_wanac")) && (nvram_get_int("ftp_tls")))
+						if ((nvram_get_int("enable_ftp")) && (nvram_get_int("ftp_tls")))
 						{
 							fprintf(fp, "-A VSERVER %s -p tcp -m tcp --dport %d:%d -j DNAT --to-destination %s\n",
 							  srcips, passive_port, passive_port+30, nvram_safe_get("lan_ipaddr"));
@@ -1546,12 +1546,12 @@ void nat_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)	//
 
 				if (strcmp(proto, "TCP") == 0 || strcmp(proto, "BOTH") == 0) {
 					fprintf(fp, "-A VSERVER %s -p tcp -m tcp --dport %s -j DNAT %s\n", srcips, c, dstips);
-					if (local_ftpport != 0 && local_ftpport != 21 && atoi(c) == 21)
+					if (local_ftpport != 0 && local_ftpport != 21 && atoi(c) == 21 && (nvram_get_int("ftp_wanac")))
 					{
 						fprintf(fp, "-A VSERVER %s -p tcp -m tcp --dport %d -j DNAT --to-destination %s:21\n", srcips, local_ftpport, lan_ip);
 #ifdef RTCONFIG_FTP
 						/* FTP TLS/PASV with other FTP server defined */
-						if ((nvram_get_int("enable_ftp")) && (nvram_get_int("ftp_wanac")) && (nvram_get_int("ftp_tls")))
+						if ((nvram_get_int("enable_ftp")) && (nvram_get_int("ftp_tls")))
 						{
 							fprintf(fp, "-A VSERVER %s -p tcp -m tcp --dport %d:%d -j DNAT --to-destination %s\n",
 							  srcips, passive_port, passive_port+30, nvram_safe_get("lan_ipaddr"));
