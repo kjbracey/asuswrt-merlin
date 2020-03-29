@@ -3840,7 +3840,7 @@ ej_lan_ipv6_network(int eid, webs_t wp, int argc, char_t **argv)
 		} else {
 			char nvname[sizeof("ipv6_dnsXXX")];
 			char *next = ipv6_dns_str;
-	
+
 			ipv6_dns_str[0] = '\0';
 			for (i = 1; i <= 3; i++) {
 				snprintf(nvname, sizeof(nvname), "ipv6_dns%d", i);
@@ -6352,7 +6352,7 @@ static int ej_iptmon(int eid, webs_t wp, int argc, char **argv) {
 		fgets(sa, sizeof(sa), a); // network
 
 	while (fgets(sa, sizeof(sa), a)) {
-		if(sscanf(sa, 
+		if(sscanf(sa,
 			"ip = %s bytes_src = %llu %*u %*u %*u %*u packets_src = %*u %*u %*u %*u %*u bytes_dst = %llu %*u %*u %*u %*u packets_dst = %*u %*u %*u %*u %*u time = %*u",
 			ip, &tx, &rx) != 3 ) continue;
 		if (find_word(exclude, ip)) {
@@ -6426,7 +6426,7 @@ static int ej_iptraffic(int eid, webs_t wp, int argc, char **argv) {
 
 	fgets(sa, sizeof(sa), a); // network
 	while (fgets(sa, sizeof(sa), a)) {
-		if(sscanf(sa, 
+		if(sscanf(sa,
 			"ip = %s bytes_src = %llu %*u %*u %*u %*u packets_src = %*u %lu %lu %lu %*u bytes_dst = %llu %*u %*u %*u %*u packets_dst = %*u %lu %lu %lu %*u time = %*u",
 			ip, &tx_bytes, &tp_tcp, &tp_udp, &tp_icmp, &rx_bytes, &rp_tcp, &rp_udp, &rp_icmp) != 9 ) continue;
 		if (find_word(exclude, ip)) continue ;
@@ -6440,7 +6440,7 @@ static int ej_iptraffic(int eid, webs_t wp, int argc, char **argv) {
 				ct_tcp = ptr->tcp_conn;
 				ct_udp = ptr->udp_conn;
 			}
-			websWrite(wp, "%c['%s', %llu, %llu, %lu, %lu, %lu, %lu, %lu, %lu, %u, %u]", 
+			websWrite(wp, "%c['%s', %llu, %llu, %lu, %lu, %lu, %lu, %lu, %lu, %u, %u]",
 						comma, ip, rx_bytes, tx_bytes, rp_tcp, tp_tcp, rp_udp, tp_udp, rp_icmp, tp_icmp, ct_tcp, ct_udp);
 			comma = ',';
 		}
@@ -6860,7 +6860,7 @@ struct except_mime_handler except_mime_handlers[] = {
 	{ "*.tar", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "*.zip", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "*.ipk", MIME_EXCEPTION_NOAUTH_ALL},
-	
+
 	{ "gotoHomePage.htm", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "update_appstate.asp", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "update_applist.asp", MIME_EXCEPTION_NOAUTH_ALL},
@@ -7416,7 +7416,7 @@ int ej_get_folder_tree(int eid, webs_t wp, int argc, char **argv){
 			else
 				websWrite(wp, ", ");
 
-			websWrite(wp, "'%s#%u#%u'", follow_disk->tag, disk_count, partition_count);
+			websWrite(wp, "\"%s#%u#%u\"", follow_disk->tag, disk_count, partition_count);
 		}
 
 		if (layer > 0 && disk_count == disk_order)
@@ -7519,7 +7519,7 @@ int ej_get_share_tree(int eid, webs_t wp, int argc, char **argv){
 			else
 				websWrite(wp, ", ");
 
-			websWrite(wp, "'%s#%u#%u'", follow_disk->tag, disk_count, partition_count);
+			websWrite(wp, "\"%s#%u#%u\"", follow_disk->tag, disk_count, partition_count);
 		}
 
 		if (layer > 0 && disk_count == disk_order)
