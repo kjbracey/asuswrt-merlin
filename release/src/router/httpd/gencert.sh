@@ -12,6 +12,13 @@ else
 	OPENSSL=/usr/sbin/openssl
 fi
 
+if [ $(nvram get ntp_sync) = "1" ]
+then
+        DAYS=398
+else
+        DAYS=3653
+fi
+
 OPENSSLCNF="/etc/openssl.config.$PID"
 
 cp -L /etc/ssl/openssl.cnf $OPENSSLCNF
@@ -119,7 +126,7 @@ cd /etc
 # create the key
 $OPENSSL genpkey -out key.pem -algorithm rsa -pkeyopt rsa_keygen_bits:2048
 # create certificate request and sign it
-RANDFILE=/dev/urandom $OPENSSL req -new -x509 -key key.pem -sha256 -out cert.pem -days 3653 -config $OPENSSLCNF
+RANDFILE=/dev/urandom $OPENSSL req -new -x509 -key key.pem -sha256 -out cert.pem -days $DAYS -config $OPENSSLCNF
 
 #	openssl x509 -in /etc/cert.pem -text -noout
 
