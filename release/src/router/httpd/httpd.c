@@ -1155,12 +1155,12 @@ handle_request(void)
 		skip_auth = 0;
 	}
 
+	nvram_set("httpd_handle_request", url);
+	//nvram_set_int("httpd_handle_request_fromapp", fromapp);
+
 	for (handler = &mime_handlers[0]; handler->pattern; handler++) {
 		if (match(handler->pattern, url))
 		{
-			nvram_set("httpd_handle_request", url);
-			//nvram_set_int("httpd_handle_request_fromapp", fromapp);
-
 			if (handler->auth) {
 				if (skip_auth) {
 					//skip
@@ -1296,6 +1296,7 @@ handle_request(void)
 
 		}
 	}
+	nvram_set("httpd_last_request", url);
 	nvram_unset("httpd_handle_request");
 	//nvram_unset("httpd_handle_request_fromapp");
 }
