@@ -1,5 +1,5 @@
 /*******************************************************************
- * You shouldn't edit this file unless you know you need to. 
+ * You shouldn't edit this file unless you know you need to.
  * This file is only included from options.h
  *******************************************************************/
 
@@ -7,7 +7,9 @@
 #define DROPBEAR_VERSION "2019.78"
 #endif
 
+#ifndef LOCAL_IDENT
 #define LOCAL_IDENT "SSH-2.0-dropbear_" DROPBEAR_VERSION
+#endif
 #define PROGNAME "dropbear"
 
 /* Spec recommends after one hour or 1 gigabyte of data. One hour
@@ -78,7 +80,7 @@
 /* success/failure defines */
 #define DROPBEAR_SUCCESS 0
 #define DROPBEAR_FAILURE -1
- 
+
 #define DROPBEAR_PASSWORD_ENV "DROPBEAR_PASSWORD"
 
 #define DROPBEAR_NGROUP_MAX 1024
@@ -113,7 +115,7 @@
 #define DROPBEAR_MD5_HMAC 0
 #endif
 
-/* Twofish counter mode is disabled by default because it 
+/* Twofish counter mode is disabled by default because it
 has not been tested for interoperability with other SSH implementations.
 If you test it please contact the Dropbear author */
 #ifndef DROPBEAR_TWOFISH_CTR
@@ -125,7 +127,7 @@ If you test it please contact the Dropbear author */
 
 /* Debian doesn't define this in system headers */
 #if !defined(LTM_DESC) && (DROPBEAR_ECC)
-#define LTM_DESC 
+#define LTM_DESC
 #endif
 
 #define DROPBEAR_ECC_256 (DROPBEAR_ECC)
@@ -197,7 +199,7 @@ If you test it please contact the Dropbear author */
 
 #define DROPBEAR_MAX_CLI_PASS 1024
 
-#define DROPBEAR_MAX_CLI_INTERACT_PROMPTS 80 /* The number of prompts we'll 
+#define DROPBEAR_MAX_CLI_INTERACT_PROMPTS 80 /* The number of prompts we'll
 												accept for keyb-interactive
 												auth */
 
@@ -219,7 +221,7 @@ If you test it please contact the Dropbear author */
 
 #define ENABLE_CONNECT_UNIX ((DROPBEAR_CLI_AGENTFWD) || (DROPBEAR_USE_PRNGD))
 
-/* if we're using authorized_keys or known_hosts */ 
+/* if we're using authorized_keys or known_hosts */
 #define DROPBEAR_KEY_LINES ((DROPBEAR_CLIENT) || (DROPBEAR_SVR_PUBKEY_AUTH))
 
 /* Changing this is inadvisable, it appears to have problems
@@ -326,7 +328,7 @@ If you test it please contact the Dropbear author */
 #    define DROPBEAR_MSAN 1
 #  endif
 #endif
-#ifndef DROPBEAR_MSAN 
+#ifndef DROPBEAR_MSAN
 #define DROPBEAR_MSAN 0
 #endif
 
