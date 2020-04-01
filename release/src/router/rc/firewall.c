@@ -4533,6 +4533,43 @@ mangle_setting(char *wan_if, char *wan_ip, char *lan_if, char *lan_ip, char *log
 #endif
 	}
 
+	/* Several ISPs restrict Internet sharing by checking TTL value,
+	 * i.e allow Phones/Tablets only. Fix WAN outgoing packets with
+	 * router's TTL, default is 64  */
+	if (nvram_get_int("ttl_spoof_enable")) {
+		char value[sizeof("255")];
+		int wan_ttl = 0;
+
+		if (f_read_string("/proc/sys/net/ipv4/ip_default_ttl", value, sizeof(value)) > 0)
+			wan_ttl = atoi(value);
+		snprintf(value, sizeof(value), "%d", wan_ttl);
+
+		if (wan_ttl > 1) {
+			eval("iptables", "-t", "mangle", "-A", "FORWARD", "-o", wan_if,
+			    "-m", "ttl", "--ttl-gt", "30",
+			    "-m", "ttl", "--ttl-lt", "254",
+			    "-j", "TTL", "--ttl-set", value);
+		}
+		eval("iptables", "-t", "mangle", "-A", "FORWARD", "-o", wan_if,
+		    "-m", "ttl", "--ttl-eq", "254",
+		    "-j", "TTL", "--ttl-set", "255");
+#ifdef RTCONFIG_IPV6
+		if (ipv6_enabled() && *wan6face) {
+			int wan_hlim = ipv6_getconf(wan6face, "hop_limit") ? : ipv6_getconf("default", "hop_limit");
+			if (wan_hlim > 1) {
+				snprintf(value, sizeof(value), "%d", wan_hlim);
+				eval("ip6tables", "-t", "mangle", "-A", "FORWARD", "-o", wan6face,
+				     "-m", "hl", "--hl-gt", "30",
+				     "-m", "hl", "--hl-lt", "254",
+				     "-j", "HL", "--hl-set", value);
+			}
+			eval("ip6tables", "-t", "mangle", "-A", "FORWARD", "-o", wan6face,
+			     "-m", "hl", "--hl-eq", "254",
+			     "-j", "HL", "--hl-set", "255");
+		}
+#endif
+	}
+
 #ifdef CONFIG_BCMWL5
 	/* mark connect to bypass CTF */
 	if(nvram_match("ctf_disable", "0")) {
@@ -4681,6 +4718,43 @@ mangle_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)
 				eval("ip6tables", "-t", "mangle", "-A", "PREROUTING", "-i", wan_if, "-m", "hl", "--hl-eq", "1", "-j", "HL", "--hl-set", "64");
 #endif
 		}
+	}
+
+	/* Several ISPs restrict Internet sharing by checking TTL value,
+	 * i.e allow Phones/Tablets only. Fix WAN outgoing packets with
+	 * router's TTL, default is 64  */
+	if (nvram_get_int("ttl_spoof_enable")) {
+		char value[sizeof("255")];
+		int wan_ttl = 0;
+
+		if (f_read_string("/proc/sys/net/ipv4/ip_default_ttl", value, sizeof(value)) > 0)
+			wan_ttl = atoi(value);
+		snprintf(value, sizeof(value), "%d", wan_ttl);
+
+		if (wan_ttl > 1) {
+			eval("iptables", "-t", "mangle", "-A", "FORWARD", "-o", wan_if,
+			    "-m", "ttl", "--ttl-gt", "30",
+			    "-m", "ttl", "--ttl-lt", "254",
+			    "-j", "TTL", "--ttl-set", value);
+		}
+		eval("iptables", "-t", "mangle", "-A", "FORWARD", "-o", wan_if,
+		    "-m", "ttl", "--ttl-eq", "254",
+		    "-j", "TTL", "--ttl-set", "255");
+#ifdef RTCONFIG_IPV6
+		if (ipv6_enabled() && *wan6face) {
+			int wan_hlim = ipv6_getconf(wan6face, "hop_limit") ? : ipv6_getconf("default", "hop_limit");
+			if (wan_hlim > 1) {
+				snprintf(value, sizeof(value), "%d", wan_hlim);
+				eval("ip6tables", "-t", "mangle", "-A", "FORWARD", "-o", wan6face,
+				     "-m", "hl", "--hl-gt", "30",
+				     "-m", "hl", "--hl-lt", "254",
+				     "-j", "HL", "--hl-set", value);
+			}
+			eval("ip6tables", "-t", "mangle", "-A", "FORWARD", "-o", wan6face,
+			     "-m", "hl", "--hl-eq", "254",
+			     "-j", "HL", "--hl-set", "255");
+		}
+#endif
 	}
 
 #ifdef CONFIG_BCMWL5
@@ -4919,7 +4993,7 @@ int start_firewall(int wanunit, int lanunit)
 	}
 #endif
 
-	if(nvram_match("ttl_inc_enable", "1"))
+	if(nvram_match("ttl_inc_enable", "1") || nvram_get_int("ttl_spoof_enable"))
 	{
 		modprobe("xt_HL");
 		modprobe("xt_hl");
@@ -5214,7 +5288,7 @@ int start_firewall(int wanunit, int lanunit)
 	}
 #endif
 
-	if(nvram_match("ttl_inc_enable", "0"))
+	if(nvram_match("ttl_inc_enable", "0") || nvram_match("ttl_spoof_enable", "0"))
 	{
 		modprobe_r("xt_HL");
 		modprobe_r("xt_hl");

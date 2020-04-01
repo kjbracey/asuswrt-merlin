@@ -394,7 +394,7 @@ GEN_CONF:
 				if (nvram_get_int("wl_dfs_enable") == 1) {
 					if (((get_model() == MODEL_RTAC66U) &&
 						(nvram_match(strcat_r(prefix, "country_code", tmp), "EU")) &&
-						(nvram_match(strcat_r(prefix, "country_rev", tmp), "31")) && 
+						(nvram_match(strcat_r(prefix, "country_rev", tmp), "31")) &&
 						(nvram_get_int("wl1_dfs") == 1)) ||
 					    ((get_model() == MODEL_RTN66U) &&
 						(nvram_match(strcat_r(prefix, "country_code", tmp), "EU")) &&
@@ -1090,6 +1090,20 @@ void ipv6_sysconf(const char *ifname, const char *name, int value)
 	snprintf(path, sizeof(path), "/proc/sys/net/ipv6/conf/%s/%s", ifname, name);
 	snprintf(sval, sizeof(sval), "%d", value);
 	f_write_string(path, sval, 0, 0);
+}
+
+int ipv6_getconf(const char *ifname, const char *name)
+{
+	char path[PATH_MAX], sval[16];
+
+	if (ifname == NULL || name == NULL)
+		return 0;
+
+	snprintf(path, sizeof(path), "/proc/sys/net/ipv6/conf/%s/%s", ifname, name);
+	if (f_read_string(path, sval, sizeof(sval)) <= 0)
+		return 0;
+
+	return atoi(sval);
 }
 
 void set_default_accept_ra(int flag)

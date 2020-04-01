@@ -1,7 +1,7 @@
 var productid = '<#Web_Title2#>';
 helpcontent[0] = new Array("",
 							 "<#WLANConfig11b_SSID_itemdesc#>",
-						   "<#WLANConfig11b_x_BlockBCSSID_itemdesc#>",						   
+						   "<#WLANConfig11b_x_BlockBCSSID_itemdesc#>",
 						   "<#WLANConfig11b_Channel_itemdesc#>",
 						   "<#WLANConfig11b_x_Mode_itemdesc2#>",
 						   "<#WLANConfig11b_AuthenticationMethod_itemdesc#>",
@@ -38,7 +38,7 @@ helpcontent[2] = new Array("",
 helpcontent[3] = new Array("",
 						   "<#WLANConfig11b_x_RadioEnable_itemdesc#>",
 						   "<#WLANConfig11b_x_RadioEnableDate_itemdesc#><p><a href='/Main_LogStatus_Content.asp' target='_blank'><#General_x_SystemTime_itemname#><#btn_go#></a></p>",
-						   "<#WLANConfig11b_x_RadioEnableTime_itemdesc#><p><a href='/Main_LogStatus_Content.asp' target='_blank'><#General_x_SystemTime_itemname#><#btn_go#></a></p>",						   
+						   "<#WLANConfig11b_x_RadioEnableTime_itemdesc#><p><a href='/Main_LogStatus_Content.asp' target='_blank'><#General_x_SystemTime_itemname#><#btn_go#></a></p>",
 						   "",
 						   "<#WLANConfig11b_x_IsolateAP_itemdesc#>",
 						   "<#WLANConfig11b_DataRateAll_itemdesc#>",
@@ -55,7 +55,7 @@ helpcontent[3] = new Array("",
 						   "<#WLANConfig11b_x_APSD_itemdesc#>",
 						   "<#WLANConfig11b_x_DLS_itemdesc#>",
 						   "[n Only]: <#WLANConfig11b_x_HT_OpMode_itemdesc#>",
-						   "<#WLANConfig11n_PremblesType_itemdesc#>",	
+						   "<#WLANConfig11n_PremblesType_itemdesc#>",
 						   "<#WLANConfig11b_x_EnhanInter_itemdesc#>", //21
 						   "<#WLANConfig11b_x_IgmpSnEnable_itemdesc#>",
 						   "<#WLANConfig11b_x_SchedEnable_itemdesc#>",
@@ -169,7 +169,8 @@ helpcontent[8] = new Array("",
 						   "Some ISPs incorrectly filter the DSCP priority, resulting in reduced performance on wireless connectons.  Enabling this option forces a correct DSCP value to be used.",
 						   "Automatically blocks repeated attempts from the same IP address to the Telnet/SSH ports.  If you are using a third-party router addon that provides similar protection, you may want to disable this option.",
 						   "Adjusts the number of buffers and thresholds used for managing TCP and UDP traffic.",
-						   "Redirects all NTP requests from the local LAN to the router SNTP server.");
+						   "Redirects all NTP requests from the local LAN to the router SNTP server.",
+						   "Several ISPs restrict Internet sharing by checking TTL value, i.e allow Phones/Tablets only. Fix WAN outgoing packets with router's TTL, default is 64");
 helpcontent[9] = new Array("",
 						   "<#FirewallConfig_URLActiveDate_itemdesc#>",
 						   "<#FirewallConfig_URLActiveTime_itemdesc#>");
@@ -257,7 +258,7 @@ helpcontent[21] = new Array("",
 							"<#HSDPAConfig_username_itemdesc#>",
 							"<#HSDPAConfig_password_itemdesc#>",
 							"<#HSDPAConfig_usbadaptor_itemdesc#>");
-							
+
 helpcontent[22] = new Array("",
 							"<#OP_GW_desc#>",
 							"<#OP_GW_desc#>",
@@ -269,7 +270,7 @@ helpcontent[23] = new Array("",
 							"<#statusTitle_Internet#>",
 							"<#statusTitle_USB_Disk#>",
 							"<#statusTitle_Printer#>");
-// QIS 
+// QIS
 helpcontent[24] = new Array("",
 							"<#IPConnection_x_DNSServer1_itemdesc#>",			//7,13
 							"<#IPConnection_x_DNSServer2_itemdesc#>",			//7,14
@@ -279,7 +280,7 @@ helpcontent[24] = new Array("",
 							"<#LANHostConfig_SubnetMask_itemdesc#>",			//4,2
 							"<#LANHostConfig_x_Password_itemdesc#>",			//11,4
 							"<#qis_pppoe_help1#>",												//7,27
-							"<#qis_wireless_help1#>",											//0,22	
+							"<#qis_wireless_help1#>",											//0,22
 							"<#qis_wireless_help2#>");										//0,23
 //ADSL
 helpcontent[25] = new Array("",
@@ -290,14 +291,14 @@ helpcontent[25] = new Array("",
 							"This item allows you to tweak the Tx Power of VDSL. Reduce Tx Power(-1 dB ~ -7 dB) would increase the downstream performance(reduce more Tx Power leads to higher downstream data rate), but will impact upstream and vice versa.",
 							"This item configures Rx AGC(Auto Gain Control) GAIN for VDSL, if tweak the Stability Adjustment (VDSL) setting still could not get desired downstream speed, then could try to set Rx AGC GAIN Adjustment to High Performance mode. However if your VDSL connection is unstable and has some CRC then could set to Stable mode.",
 							"This item allows you to control whether to Enable/Disable UPBO(Upstream Power Back Off) for VDSL. DSLAM could use UPBO to reduce the Tx Power of your xDSL modem router, in some cases abnormal UPBO control from DSLAM could leads to sync up issue(such as not enough Tx Power to sync with minimum rate). Thus with this feature now you could disable UPBO and won’t get affected by DSLAM setting.");
-							
+
 //DualWAN
 helpcontent[26] = new Array("",
 							"<#dualwan_pingtime_desc#>",
 							"<#dualwan_pingtime_target#>",
 							"<#dualwan_pingtime_interval#>",
 							"<#dualwan_pingtime_delay#>",
-							"<#dualwan_pingtime_upper#>", 
+							"<#dualwan_pingtime_upper#>",
 							"Once switched to secondary wan, firmware can still detect the primary wan. When primary wan keep IP over the set value (Interval+delay)*failback count, the connection switched back to primary wan.");
 
 //OpenVPN

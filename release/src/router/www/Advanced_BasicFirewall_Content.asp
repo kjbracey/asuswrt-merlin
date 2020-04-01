@@ -9,7 +9,7 @@
 <link rel="shortcut icon" href="images/favicon.png">
 <link rel="icon" href="images/favicon.png">
 <title><#Web_Title#> - <#menu5_1_1#></title>
-<link rel="stylesheet" type="text/css" href="index_style.css"> 
+<link rel="stylesheet" type="text/css" href="index_style.css">
 <link rel="stylesheet" type="text/css" href="form_style.css">
 <script language="JavaScript" type="text/javascript" src="/state.js"></script>
 <script language="JavaScript" type="text/javascript" src="/general.js"></script>
@@ -125,20 +125,20 @@ function done_validating(action){
 <table class="content" align="center" cellpadding="0" cellspacing="0">
   <tr>
 	<td width="17">&nbsp;</td>
-	
+
 	<!--=====Beginning of Main Menu=====-->
 	<td valign="top" width="202">
 	  <div id="mainMenu"></div>
 	  <div id="subMenu"></div>
 	</td>
-		
+
     <td valign="top">
 	<div id="tabMenu" class="submenuBlock"></div>
-		<!--===================================Beginning of Main Content===========================================-->		
+		<!--===================================Beginning of Main Content===========================================-->
 <table width="98%" border="0" align="left" cellpadding="0" cellspacing="0">
 	<tr>
 		<td valign="top" >
-		
+
 <table width="760px" border="0" cellpadding="5" cellspacing="0" class="FormTitle" id="FormTitle">
 <tbody>
 	<tr>
@@ -163,7 +163,7 @@ function done_validating(action){
 								<input type="radio" value="1" name="fw_dos_x" class="input" onClick="return change_common_radio(this, 'FirewallConfig', 'fw_dos_x', '1')" <% nvram_match("fw_dos_x", "1", "checked"); %>><#checkbox_Yes#>
 								<input type="radio" value="0" name="fw_dos_x" class="input" onClick="return change_common_radio(this, 'FirewallConfig', 'fw_dos_x', '0')" <% nvram_match("fw_dos_x", "0", "checked"); %>><#checkbox_No#>
 							</td>
-						</tr>	
+						</tr>
 						<!-- 2008.03 James. patch for Oleg's patch. } -->
           	<tr>
           		<th align="right"><a class="hintstyle" href="javascript:void(0);" onClick="openHint(8,1);"><#FirewallConfig_WanLanLog_itemname#></a></th>
@@ -175,14 +175,14 @@ function done_validating(action){
                 			<option value="both" <% nvram_match("fw_log_x", "both","selected"); %>>Both</option>
               		</select>
             	</td>
-          	</tr>					
+          	</tr>
           	<!-- Viz 2012.08.14 move to System page tr>
             	<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(8,2);"><#FirewallConfig_x_WanWebEnable_itemname#></a></th>
             	<td>
               		<input type="radio" value="1" name="misc_http_x" class="input" onClick="hideport(1);return change_common_radio(this, 'FirewallConfig', 'misc_http_x', '1')" <% nvram_match("misc_http_x", "1", "checked"); %>><#checkbox_Yes#>
               		<input type="radio" value="0" name="misc_http_x" class="input" onClick="hideport(0);return change_common_radio(this, 'FirewallConfig', 'misc_http_x', '0')" <% nvram_match("misc_http_x", "0", "checked"); %>><#checkbox_No#>
             	</td>
-          	</tr>   					
+          	</tr>
           	<tr id="accessfromwan_port">
             	<th align="right"><a class="hintstyle" href="javascript:void(0);" onClick="openHint(8,3);"><#FirewallConfig_x_WanWebPort_itemname#></a></th>
             	<td>
@@ -211,6 +211,13 @@ function done_validating(action){
 								<input type="radio" value="1" name="ttl_inc_enable" class="input" onClick="return change_common_radio(this, 'FirewallConfig', 'ttl_inc_enable', '1')" <% nvram_match("ttl_inc_enable", "1", "checked"); %>><#checkbox_Yes#>
 								<input type="radio" value="0" name="ttl_inc_enable" class="input" onClick="return change_common_radio(this, 'FirewallConfig', 'ttl_inc_enable', '0')" <% nvram_match("ttl_inc_enable", "0", "checked"); %>><#checkbox_No#>
 			</td>
+		</tr>
+		<tr>
+			<th align="right"><a class="hintstyle" href="javascript:void(0);" onClick="openHint(8,14);">Spoof LAN TTL Value</a></th>
+				<td>
+								<input type="radio" value="1" name="ttl_spoof_enable" class="input" onClick="return change_common_radio(this, 'FirewallConfig', 'ttl_spoof_enable', '1')" <% nvram_match("ttl_spoof_enable", "1", "checked"); %>><#checkbox_Yes#>
+								<input type="radio" value="0" name="ttl_spoof_enable" class="input" onClick="return change_common_radio(this, 'FirewallConfig', 'ttl_spoof_enable', '0')" <% nvram_match("ttl_spoof_enable", "0", "checked"); %>><#checkbox_No#>
+				</td>
 		</tr>
 		<tr>
 			<th align="right"><a class="hintstyle" href="javascript:void(0);" onClick="openHint(8,10);">Enable DSCP override</a></th>
@@ -251,41 +258,41 @@ function done_validating(action){
 									<option value="2" <% nvram_match("st_webdav_mode", "2", "selected"); %>>BOTH</option>
 								</select>
 							</td>
-						</tr>  
-	
+						</tr>
+
 	        	<tr id="webdav_http_port_tr" style="display:none;">
 	          	<th width="40%">Cloud Disk Port (HTTP):</th>
 							<td>
 								<input type="text" name="webdav_http_port" class="input_6_table" maxlength="5" value="<% nvram_get("webdav_http_port"); %>" onKeyPress="return is_number(this, event);">
 							</td>
 						</tr>
-	
+
 	        	<tr id="webdav_https_port_tr" style="display:none;">
 	          	<th width="40%">Cloud Disk Port (HTTPS):</th>
 							<td>
 								<input type="text" name="webdav_https_port" class="input_6_table" maxlength="5" value="<% nvram_get("webdav_https_port"); %>" onKeyPress="return is_number(this, event);">
 							</td>
 						</tr>
-      
+
         	</table>
 
             <div class="apply_gen">
             	<input name="button" type="button" class="button_gen" onclick="applyRule();" value="<#CTL_apply#>"/>
-            </div>        
-        
+            </div>
+
         </td>
 	</tr>
-</tbody>	
+</tbody>
 
 </table>
 </td>
 </form>
 
         </tr>
-      </table>				
-		<!--===================================Ending of Main Content===========================================-->		
+      </table>
+		<!--===================================Ending of Main Content===========================================-->
 	</td>
-		
+
     <td width="10" align="center" valign="top">&nbsp;</td>
 	</tr>
 </table>

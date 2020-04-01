@@ -437,7 +437,7 @@ int do_ping_detect(int wan_unit){
 	if (!strcmp(wan_iface, "\0"))
 		return 0;
 
-	sprintf(cmd, "ping -c 1 -W 4 -I %s %s >/dev/null && touch %s", wan_iface, wandog_target, PING_RESULT_FILE);
+	sprintf(cmd, "ping -c 1 -W 4 -s 32 %s -I %s %s >/dev/null && touch %s", nvram_get_int("ttl_spoof_enable") ? "" : "-t128", wan_iface, wandog_target, PING_RESULT_FILE);
 	system(cmd);
 
 	if(check_if_file_exist(PING_RESULT_FILE)){
@@ -602,52 +602,52 @@ int passivesock(char *service, int protocol_num, int qlen){
 	//struct servent *pse;
 	struct sockaddr_in sin;
 	int s, type, on;
-	
+
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = INADDR_ANY;
-	
+
 	// map service name to port number
 	if((sin.sin_port = htons((u_short)atoi(service))) == 0){
 		perror("cannot get service entry");
-		
+
 		return -1;
 	}
-	
+
 	if(protocol_num == IPPROTO_UDP)
 		type = SOCK_DGRAM;
 	else
 		type = SOCK_STREAM;
-	
+
 	s = socket(PF_INET, type, protocol_num);
 	if(s < 0){
 		perror("cannot create socket");
-		
+
 		return -1;
 	}
-	
+
 	on = 1;
 	if(setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on)) < 0){
 		perror("cannot set socket's option: SO_REUSEADDR");
 		close(s);
-		
+
 		return -1;
 	}
-	
+
 	if(bind(s, (struct sockaddr *)&sin, sizeof(sin)) < 0){
 		perror("cannot bind port");
 		close(s);
-		
+
 		return -1;
 	}
-	
+
 	if(type == SOCK_STREAM && listen(s, qlen) < 0){
 		perror("cannot listen to port");
 		close(s);
-		
+
 		return -1;
 	}
-	
+
 	return s;
 }
 
@@ -683,7 +683,7 @@ int check_ppp_exist(){
 		}
 	}
 	closedir(dir);
-	
+
 	return 0;
 }
 
@@ -1035,12 +1035,12 @@ int build_socket(char *http_port, char *dns_port, int *hd, int *dd){
 		csprintf("Fail to socket for httpd port: %s.\n", http_port);
 		return -1;
 	}
-	
+
 	if((*dd = passivesock(dns_port, IPPROTO_UDP, 10)) < 0){
 		csprintf("Fail to socket for DNS port: %s.\n", dns_port);
 		return -1;
 	}
-	
+
 	return 0;
 }
 
@@ -1102,7 +1102,7 @@ void send_page(int wan_unit, int sfd, char *file_dest, char *url){
 		sprintf(buf, "%s%s%s%s%s%s%d%s%d%s%s" ,buf , "Connection: close\r\n", "Location:", (nvram_get_int("login_port")==nvram_get_int("https_lanport") ? "https://" : ((nvram_get_int("http_enable")+1)&1 ? "http://" : "https://")), dut_addr, ":", (nvram_get_int("login_port") ? : nvram_get_int("http_lanport")), "/error_page.htm?flag=", disconn_case[wan_unit], "\r\nContent-Type: text/plain\r\n", "\r\n<html></html>\r\n");
 #ifdef RTCONFIG_WIRELESSREPEATER
 	else
-		sprintf(buf, "%s%s%s%s%s%s%d%s", buf, "Connection: close\r\n", "Location:", (nvram_get_int("login_port")==nvram_get_int("https_lanport") ? "https://" : ((nvram_get_int("http_enable")+1)&1 ? "http://" : "https://")), dut_addr, ":", (nvram_get_int("login_port") ? : nvram_get_int("http_lanport")), "/index.asp\r\nContent-Type: text/plain\r\n\r\n<html></html>\r\n"); 
+		sprintf(buf, "%s%s%s%s%s%s%d%s", buf, "Connection: close\r\n", "Location:", (nvram_get_int("login_port")==nvram_get_int("https_lanport") ? "https://" : ((nvram_get_int("http_enable")+1)&1 ? "http://" : "https://")), dut_addr, ":", (nvram_get_int("login_port") ? : nvram_get_int("http_lanport")), "/index.asp\r\nContent-Type: text/plain\r\n\r\n<html></html>\r\n");
 #endif
 
 #ifdef NO_IOS_DETECT_INTERNET
@@ -1116,24 +1116,24 @@ void parse_dst_url(char *page_src){
 	int i, j;
 	char dest[PATHLEN], host[64];
 	char host_strtitle[7], *hp;
-	
+
 	j = 0;
 	memset(dest, 0, sizeof(dest));
 	memset(host, 0, sizeof(host));
 	memset(host_strtitle, 0, sizeof(host_strtitle));
-	
+
 	for(i = 0; i < strlen(page_src); ++i){
 		if(i >= PATHLEN)
 			break;
-		
+
 		if(page_src[i] == ' ' || page_src[i] == '?'){
 			dest[j] = '\0';
 			break;
 		}
-		
+
 		dest[j++] = page_src[i];
 	}
-	
+
 	host_strtitle[0] = '\n';
 	host_strtitle[1] = 'H';
 	host_strtitle[2] = 'o';
@@ -1141,30 +1141,30 @@ void parse_dst_url(char *page_src){
 	host_strtitle[4] = 't';
 	host_strtitle[5] = ':';
 	host_strtitle[6] = ' ';
-	
+
 	if((hp = strstr(page_src, host_strtitle)) != NULL){
 		hp += 7;
 		j = 0;
 		for(i = 0; i < strlen(hp); ++i){
 			if(i >= 64)
 				break;
-			
+
 			if(hp[i] == '\r' || hp[i] == '\n'){
 				host[j] = '\0';
 				break;
 			}
-			
+
 			host[j++] = hp[i];
 		}
 	}
-	
+
 	memset(dst_url, 0, sizeof(dst_url));
 	sprintf(dst_url, "%s/%s", host, dest);
 }
 
 void parse_req_queries(char *content, char *lp, int len, int *reply_size){
 	int i, rn;
-	
+
 	rn = *(reply_size);
 	for(i = 0; i < len; ++i){
 		content[rn+i] = lp[i];
@@ -1173,32 +1173,32 @@ void parse_req_queries(char *content, char *lp, int len, int *reply_size){
 			break;
 		}
 	}
-	
+
 	if(i >= len)
 		return;
-	
+
 	content[rn+i] = lp[i];
 	content[rn+i+1] = lp[i+1];
 	content[rn+i+2] = lp[i+2];
 	content[rn+i+3] = lp[i+3];
 	i += 4;
-	
+
 	*reply_size += i;
 }
 
 void handle_http_req(int sfd, char *line){
 	int len;
-	
+
 	if(!strncmp(line, "GET /", 5)){
 		parse_dst_url(line+5);
-		
+
 		len = strlen(dst_url);
 		if((dst_url[len-4] == '.') &&
 				(dst_url[len-3] == 'i') &&
 				(dst_url[len-2] == 'c') &&
 				(dst_url[len-1] == 'o')){
 			close_socket(sfd, T_HTTP);
-			
+
 			return;
 		}
 
@@ -1213,12 +1213,12 @@ void handle_dns_req(int sfd, char *line, int maxlen, struct sockaddr *pcliaddr, 
 	dns_response_packet d_reply;
 	int reply_size;
 	char reply_content[MAXLINE];
-	
+
 	reply_size = 0;
 	memset(reply_content, 0, MAXLINE);
 	memset(&d_req, 0, sizeof(d_req));
 	memcpy(&d_req.header, line, sizeof(d_req.header));
-	
+
 	// header
 	memcpy(&d_reply.header, &d_req.header, sizeof(dns_header));
 	d_reply.header.flag_set.flag_num = htons(0x8580);
@@ -1226,15 +1226,15 @@ void handle_dns_req(int sfd, char *line, int maxlen, struct sockaddr *pcliaddr, 
 	d_reply.header.answer_rrs = htons(0x0001);
 	memcpy(reply_content, &d_reply.header, sizeof(d_reply.header));
 	reply_size += sizeof(d_reply.header);
-	
+
 	reply_content[5] = 1;	// Questions
 	reply_content[7] = 1;	// Answer RRS
 	reply_content[9] = 0;	// Authority RRS
 	reply_content[11] = 0;	// Additional RRS
-	
+
 	// queries
 	parse_req_queries(reply_content, line+sizeof(dns_header), maxlen-sizeof(dns_header), &reply_size);
-	
+
 	// answers
 	d_reply.answers.name = htons(0xc00c);
 	d_reply.answers.type = htons(0x0001);
@@ -1242,16 +1242,16 @@ void handle_dns_req(int sfd, char *line, int maxlen, struct sockaddr *pcliaddr, 
 	//d_reply.answers.ttl = htonl(0x00000001);
 	d_reply.answers.ttl = htonl(0x00000000);
 	d_reply.answers.data_len = htons(0x0004);
-	
+
 	char query_name[PATHLEN];
 	int len, i;
-	
+
 	strncpy(query_name, line+sizeof(dns_header)+1, PATHLEN);
 	len = strlen(query_name);
 	for(i = 0; i < len; ++i)
 		if(query_name[i] < 32)
 			query_name[i] = '.';
-	
+
 	if(!upper_strcmp(query_name, router_name)){
 #ifdef RTCONFIG_WIRELESSREPEATER
 		if(nvram_get_int("sw_mode") == SW_MODE_REPEATER && nvram_match("lan_proto", "dhcp") && nvram_get_int("lan_state_t") != LAN_STATE_CONNECTED)
@@ -1262,22 +1262,22 @@ void handle_dns_req(int sfd, char *line, int maxlen, struct sockaddr *pcliaddr, 
 	}
 	else
 		d_reply.answers.addr = htonl(0x0a000001);	// 10.0.0.1
-	
+
 	memcpy(reply_content+reply_size, &d_reply.answers, sizeof(d_reply.answers));
 	reply_size += sizeof(d_reply.answers);
-	
+
 	sendto(sfd, reply_content, reply_size, 0, pcliaddr, clen);
 }
 
 void run_http_serv(int sockfd){
 	ssize_t n;
 	char line[MAXLINE];
-	
+
 	memset(line, 0, sizeof(line));
-	
+
 	if((n = read(sockfd, line, MAXLINE)) == 0){	// client close
 		close_socket(sockfd, T_HTTP);
-		
+
 		return;
 	}
 	else if(n < 0){
@@ -1297,10 +1297,10 @@ void run_dns_serv(int sockfd){
 	char line[MAXLINE];
 	struct sockaddr_in cliaddr;
 	int clilen = sizeof(cliaddr);
-	
+
 	memset(line, 0, MAXLINE);
 	memset(&cliaddr, 0, clilen);
-	
+
 	if((n = recvfrom(sockfd, line, MAXLINE, 0, (struct sockaddr *)&cliaddr, &clilen)) == 0)	// client close
 		return;
 	else if(n < 0){
@@ -1453,7 +1453,7 @@ void record_conn_status(int wan_unit){
 	}
 
 	// save new wan start time
-	if(conn_wanup 
+	if(conn_wanup
 		// && ((wan_unit == current_wan_unit)
 //#ifdef RTCONFIG_DUALWAN
 //		|| ((!strcmp(dualwan_mode, "lb") && (wan_unit == WAN_UNIT_FIRST))))
@@ -1727,7 +1727,7 @@ int wanduck_main(int argc, char *argv[]){
 			delay_detect = 0;
 		}
 
-		// To check the phy connection of the standby line. 
+		// To check the phy connection of the standby line.
 		for(wan_unit = WAN_UNIT_FIRST; wan_unit < WAN_UNIT_MAX; ++wan_unit){
 			conn_state[wan_unit] = if_wan_phyconnected(wan_unit);
 		}
@@ -1913,7 +1913,7 @@ int wanduck_main(int argc, char *argv[]){
 				delay_detect = 0;
 			}
 
-			// To check the phy connection of the standby line. 
+			// To check the phy connection of the standby line.
 			for(wan_unit = WAN_UNIT_FIRST; wan_unit < WAN_UNIT_MAX; ++wan_unit){
 				conn_state[wan_unit] = if_wan_phyconnected(wan_unit);
 			}
@@ -2008,7 +2008,7 @@ int wanduck_main(int argc, char *argv[]){
 				delay_detect = 0;
 			}
 
-			// To check the phy connection of the standby line. 
+			// To check the phy connection of the standby line.
 			for(wan_unit = WAN_UNIT_FIRST; wan_unit < WAN_UNIT_MAX; ++wan_unit){
 				conn_state[wan_unit] = if_wan_phyconnected(wan_unit);
 			}
@@ -2355,7 +2355,7 @@ int wanduck_main(int argc, char *argv[]){
 #ifndef RTCONFIG_DUALWAN
 						if (nvram_match("dsltmp_adslsyncsts","up") && usb_switched_back_dsl == 1){
 							csprintf("\n# wanduck: usb_switched_back_dsl: 1.\n");
-							link_wan[WAN_UNIT_SECOND] = CONNED; 
+							link_wan[WAN_UNIT_SECOND] = CONNED;
 							max_disconn_count = max_wait_time/scan_interval;
 							usb_switched_back_dsl = 0;
 						}
@@ -2497,7 +2497,7 @@ WANDUCK_SELECT:
 				maxfd = cur_sockfd;
 			if(fd_i > maxi)
 				maxi = fd_i;
-			
+
 			if(--nready <= 0)
 				continue;	// no more readable descriptors
 		}

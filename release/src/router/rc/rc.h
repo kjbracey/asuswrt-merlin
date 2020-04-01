@@ -760,6 +760,7 @@ extern void stop_dhcp6s(void);
 extern void start_ipv6(void);
 extern void stop_ipv6(void);
 extern void ipv6_sysconf(const char *ifname, const char *name, int value);
+extern int ipv6_getconf(const char *ifname, const char *name);
 #endif
 extern int wps_band_radio_off(int wps_band);
 #ifdef CONFIG_BCMWL5
