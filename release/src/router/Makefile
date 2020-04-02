@@ -502,6 +502,7 @@ define CMAKE_CrossOptions
 	)
 endef
 
+obj-y += openssl-1.1 # include for all builds
 obj-y += haveged
 ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
 obj-y += libnfnetlink
@@ -1215,16 +1216,16 @@ openssl-clean:
 openssl-install:
 	[ ! -f openssl/Makefile ] || install -D openssl/libcrypto.so.1.0.0 $(INSTALLDIR)/openssl/usr/lib/libcrypto.so.1.0.0
 	[ ! -f openssl/Makefile ] || $(STRIP) $(INSTALLDIR)/openssl/usr/lib/libcrypto.so.1.0.0
-	[ ! -f openssl/Makefile ] || cd $(INSTALLDIR)/openssl/usr/lib && rm -f libcrypto.so && ln -sf libcrypto.so.1.0.0 libcrypto.so
+#	[ ! -f openssl/Makefile ] || cd $(INSTALLDIR)/openssl/usr/lib && rm -f libcrypto.so && ln -sf libcrypto.so.1.0.0 libcrypto.so
 
 	[ ! -f openssl/Makefile ] || install -D openssl/apps/openssl $(INSTALLDIR)/openssl/usr/sbin/openssl
 	[ ! -f openssl/Makefile ] || $(STRIP) $(INSTALLDIR)/openssl/usr/sbin/openssl
 	[ ! -f openssl/Makefile ] || chmod 0500 $(INSTALLDIR)/openssl/usr/sbin/openssl
 
-ifeq ($(or $(RTCONFIG_WEBDAV),$(RTCONFIG_FTP_SSL),$(RTCONFIG_OPENVPN),$(RTCONFIG_HTTPS)),y)
+ifeq ($(RTCONFIG_WEBDAV),y)
 	[ ! -f openssl/Makefile ] || install -D openssl/libssl.so.1.0.0 $(INSTALLDIR)/openssl/usr/lib/libssl.so.1.0.0
 	[ ! -f openssl/Makefile ] || $(STRIP) $(INSTALLDIR)/openssl/usr/lib/libssl.so.1.0.0
-	[ ! -f openssl/Makefile ] || cd $(INSTALLDIR)/openssl/usr/lib && rm -f libssl.so && ln -sf libssl.so.1.0.0 libssl.so
+#	[ ! -f openssl/Makefile ] || cd $(INSTALLDIR)/openssl/usr/lib && rm -f libssl.so && ln -sf libssl.so.1.0.0 libssl.so
 endif
 	[ ! -f openssl/Makefile ] || install -D -m 0500 httpd/gencert.sh $(INSTALLDIR)/openssl/usr/sbin/gencert.sh
 
@@ -1252,12 +1253,12 @@ openssl-1.1-install:
 	if [ -f openssl-1.1/Makefile ] ; then \
 		install -D openssl-1.1/libcrypto.so.1.1 $(INSTALLDIR)/openssl-1.1/usr/lib/libcrypto.so.1.1 ; \
 		install -D openssl-1.1/libssl.so.1.1 $(INSTALLDIR)/openssl-1.1/usr/lib/libssl.so.1.1 ; \
-		$(STRIP) $(INSTALLDIR)/openssl-1.1/usr/lib/libssl.so.1.1 ; \
-		cd $(INSTALLDIR)/openssl/usr/lib/openssl11 && rm -f libssl.so && ln -sf libssl.so.1.1 libssl.so ; \
-		$(STRIP) $(INSTALLDIR)/openssl-1.1/usr/lib/libcrypto.so.1.1 ; \
-		cd $(INSTALLDIR)/openssl/usr/lib/openssl11 && rm -f libcrypto.so && ln -sf libcrypto.so.1.1 libcrypto.so ; \
 		install -D openssl-1.1/apps/openssl $(INSTALLDIR)/openssl/usr/sbin/openssl11 ; \
+		$(STRIP) $(INSTALLDIR)/openssl-1.1/usr/lib/libcrypto.so.1.1 ; \
+		$(STRIP) $(INSTALLDIR)/openssl-1.1/usr/lib/libssl.so.1.1 ; \
 		$(STRIP) $(INSTALLDIR)/openssl/usr/sbin/openssl11 ; \
+		cd $(INSTALLDIR)/openssl-1.1/usr/lib && rm -f libcrypto.so && ln -sf libcrypto.so.1.1 libcrypto.so ; \
+		cd $(INSTALLDIR)/openssl-1.1/usr/lib && rm -f libssl.so && ln -sf libssl.so.1.1 libssl.so ; \
 		chmod 0500 $(INSTALLDIR)/openssl/usr/sbin/openssl11 ; \
 	fi
 
