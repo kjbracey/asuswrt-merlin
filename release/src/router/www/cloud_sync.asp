@@ -9,7 +9,7 @@
 <link rel="shortcut icon" href="images/favicon.png">
 <link rel="icon" href="images/favicon.png">
 <title><#Web_Title#> - <#menu3#></title>
-<link rel="stylesheet" type="text/css" href="index_style.css"> 
+<link rel="stylesheet" type="text/css" href="index_style.css">
 <link rel="stylesheet" type="text/css" href="form_style.css">
 <script type="text/javascript" src="/state.js"></script>
 <script type="text/javascript" src="/popup.js"></script>
@@ -24,7 +24,7 @@
 <style type="text/css">
 /* folder tree */
 .mask_bg{
-	position:absolute;	
+	position:absolute;
 	margin:auto;
 	top:0;
 	left:0;
@@ -39,7 +39,7 @@
 	overflow:hidden;
 }
 .mask_floder_bg{
-	position:absolute;	
+	position:absolute;
 	margin:auto;
 	top:0;
 	left:0;
@@ -126,7 +126,7 @@
 }
 
 .invitepopup_bg{
-	position:absolute;	
+	position:absolute;
 	margin: auto;
 	top: 0;
 	left: 0;
@@ -179,8 +179,8 @@ var curRule = -1;
 var enable_cloudsync = '<% nvram_get("enable_cloudsync"); %>';
 var cloud_sync =decodeURIComponent('<% nvram_char_to_ascii("","cloud_sync"); %>');
 /* type>user>password>url>rule>dir>enable */
-var cloud_synclist_array = cloud_sync.replace(/>/g, "&#62").replace(/</g, "&#60"); 
-var cloud_synclist_all = new Array(); 
+var cloud_synclist_array = cloud_sync.replace(/>/g, "&#62").replace(/</g, "&#60");
+var cloud_synclist_all = new Array();
 var showEditTable = 0;
 var isonEdit = -1;
 var rulenum;
@@ -192,7 +192,7 @@ var PROTOCOL = "cifs";
 window.onresize = cal_panel_block;
 
 function initial(){
-	show_menu();	
+	show_menu();
 	showAddTable();
 	document.aidiskForm.protocol.value = PROTOCOL;
 	initial_dir();
@@ -224,19 +224,19 @@ function showInvitation(){
 		htmlCode += "<tr height='40px'><td width='30%'>Descript</td><td style='font-weight:bolder;'>" + decode_array[0] + "</td></tr>";
 		htmlCode += "<tr height='40px'><td width='30%'>Rule</td><td style='font-weight:bolder;'>" + parseRule(decode_array[2]) + "</td></tr>";
 		htmlCode += "<tr height='40px'><td width='30%'>Destination</td><td style='font-weight:bolder;'>" + decode_array[1] + "</td></tr>";
-		
+
 		htmlCode += "<tr height='40px'><td width='30%'>Local path</td><td>";
 		htmlCode += "<input type='text' id='PATH_rs' class='input_20_table' style='margin-left:0px;height:23px;' name='cloud_dir' value='' onclick=''/>";
 		htmlCode += "<input name='button' type='button' class='button_gen_short' style='margin-left:5px;' onclick='get_disk_tree();$(\"folderTree_panel\").style.marginLeft+=30;' value='Browser'/>";
 		htmlCode += "</td></tr>";
-		
+
 		if(decode_array[3] != ""){
 			htmlCode += "<tr id='verification' height='40px'><td width='30%'>Verification</td><td><input id='veriCode' type='text' onkeypress='return is_number(this,event)' class='input_6_table' style='margin-left:0px;' maxlength='4' value=''>";
 			htmlCode += "<span style='color:#FC0;display:none;margin-left:5px;' id='codeHint'>Invalid verification code!</span></td></tr>";
 		}
 
 		htmlCode += "</table>";
-	
+
 		$("invitationInfo").innerHTML = htmlCode;
 		$j("#invitation").fadeIn(300);
 		$j("#invitationBg").fadeIn(300);
@@ -271,7 +271,7 @@ function confirm_invitation(){
 			return false;
 		}
 	}
-	
+
 	if($("PATH_rs")){
 		if($("PATH_rs").value == ""){
 			alert("<#JS_Shareblanktest#>");
@@ -281,7 +281,7 @@ function confirm_invitation(){
 
 		if($("PATH_rs").value.search("/tmp") != 0){
 			$("PATH_rs").value = "/tmp" + $("PATH_rs").value;
-		}		
+		}
 	}
 
 	if(cloud_sync != "")
@@ -291,7 +291,7 @@ function confirm_invitation(){
 	cloud_sync.replace(":/", "/");
 
 	document.enableform.cloud_sync.value = cloud_sync;
-	document.enableform.cloud_sync.disabled = false;	
+	document.enableform.cloud_sync.disabled = false;
 	document.enableform.enable_cloudsync.value = 1;
 	showLoading();
 	document.enableform.submit();
@@ -309,10 +309,10 @@ function initial_dir(){
 
 function initial_dir_status(data){
 	if(data != "" && data.length != 2){
-		eval("var default_dir=" + data);
+		var default_dir = eval('data');
 		document.form.cloud_dir.value = "/mnt/" + default_dir.substr(0, default_dir.indexOf("#")) + "/MySyncFolder";
 	}
-	else{	
+	else{
 		$("noUSB").style.display = "";
 		disk_flag=1;
 	}
@@ -323,23 +323,23 @@ function addRow(obj, head){
 		cloud_synclist_array += "&#62";
 	else
 		cloud_synclist_array += "&#60";
-			
+
 	cloud_synclist_array += obj.value;
 	obj.value = "";
 }
 
-function addRow_Group(upper){ 
+function addRow_Group(upper){
 	var rule_num = $('cloud_synclist_table').rows.length;
 	var item_num = $('cloud_synclist_table').rows[0].cells.length;
-	
+
 	if(rule_num >= upper){
 		alert("<#JS_itemlimit1#> " + upper + " <#JS_itemlimit2#>");
-		return false;	
-	}							
-	Do_addRow_Group();		
+		return false;
+	}
+	Do_addRow_Group();
 }
 
-function Do_addRow_Group(){		
+function Do_addRow_Group(){
 	addRow(document.form.cloud_sync_type ,1);
 	addRow(document.form.cloud_sync_username, 0);
 	addRow(document.form.cloud_sync_password, 0);
@@ -357,7 +357,7 @@ function edit_Row(r){
 
 function del_Row(_rulenum){
 	var cloud_synclist_row;
-	cloud_synclist_array = cloud_sync.replace(/>/g, "&#62").replace(/</g, "&#60"); 
+	cloud_synclist_array = cloud_sync.replace(/>/g, "&#62").replace(/</g, "&#60");
 	cloud_synclist_row = cloud_synclist_array.split('&#60');
 	cloud_synclist_row[_rulenum-1] = "";
 	cloud_synclist_array = "";
@@ -410,7 +410,7 @@ function showcloud_synclist(){
 				hasWebStorageAcc = true;
 				cloud_synclist_all[i] = cloud_synclist_col;
 				for(var j = 0; j < cloud_synclist_col.length; j++){
-					if(j == 2 || j == 3){ 
+					if(j == 2 || j == 3){
 						continue;
 					}
 					else{
@@ -421,7 +421,7 @@ function showcloud_synclist(){
 								code +='<td width="'+wid[j]+'%"><span style="display:none">'+ cloud_synclist_col[j] +'</span><span style="font-size:16px;font-family: Calibri;font-weight: bolder;text-decoration:underline; cursor:pointer"  onclick="isonEdit='+rulenum+';showEditTable=1;showAddTable('+rulenum+');" title='+cloud_synclist_col[j]+'>'+ cloud_synclist_col[j].substring(0, 17) +'...</span></td>';
 							else
 								code +='<td width="'+wid[j]+'%"><span style="display:none">'+ cloud_synclist_col[j] +'</span><span style="font-size:16px;font-family: Calibri;font-weight: bolder;text-decoration:underline; cursor:pointer"  onclick="isonEdit='+rulenum+';showEditTable=1;showAddTable('+rulenum+');">'+ cloud_synclist_col[j] +'</span></td>';
-						}	
+						}
 						else if(j == 4){
 							curRule = cloud_synclist_col[j];
 							if(cloud_synclist_col[j] == 2)
@@ -439,11 +439,11 @@ function showcloud_synclist(){
 							if(dir_temp[dir_temp.length-1].length > 21){
 								dir_path = "/" + dir_temp[3] + "/" +dir_temp[4].substring(0,18) + "...";
 								code +='<td width="'+wid[j]+'%"><span style="display:none;">'+ cloud_synclist_col[j] +'</span><span style="word-break:break-all;" title='+cloud_synclist_col[j].substr(8, cloud_synclist_col[j].length)+'>'+ dir_path +'</span></td>';
-							}	
+							}
 							else{
 								dir_path = cloud_synclist_col[j].substr(8, cloud_synclist_col[j].length);
 								code +='<td width="'+wid[j]+'%"><span style="display:none;">'+ cloud_synclist_col[j] +'</span><span style="word-break:break-all;" >'+ dir_path +'</span></td>';
-							}		
+							}
 						}
 					}
 				}
@@ -466,7 +466,7 @@ function showcloud_synclist(){
 					}
 					else if(j == 5)
 						code +='<td width="'+wid[j]+'%"><span style="display:none;">'+ cloud_synclist_col[j] +'</span><span style="word-break:break-all;">'+ cloud_synclist_col[j].substr(4, cloud_synclist_col[j].length) +'</span></td>';
-				}				
+				}
 				code +='<td width="'+wid[j]+'%" id="rsStatus_'+rsnum+'">Waiting...</td>';
 				code += '<td width="10%"><input class="remove_btn" onclick="del_Row('+rulenum+');" value=""/></td>';
 				rsnum++;
@@ -490,7 +490,7 @@ var captcha_flag = 0;
 function updateCloudStatus(){
     $j.ajax({
     	url: '/cloud_status.asp',
-    	dataType: 'script', 
+    	dataType: 'script',
 
     	error: function(xhr){
       		updateCloudStatus();
@@ -522,9 +522,9 @@ function updateCloudStatus(){
 								$("status_image").firstChild.className="status_png_Img_R_ok";
 							}else{
 								$("status_image").firstChild.className="status_png_Img_LR_ok";
-							}	
+							}
 						}
-	
+
 						// handle msg
 						var _cloud_msg = "";
 						if(cloud_obj != ""){
@@ -538,9 +538,9 @@ function updateCloudStatus(){
 								if(captcha_flag == 0){
 									showEditTable = 1;
 									showAddTable(1);
-									$('captcha_tr').style.display = "";															
-									autoFocus('captcha_field');	
-									$('captcha_iframe').src= CAPTCHA_URL;						
+									$('captcha_tr').style.display = "";
+									autoFocus('captcha_field');
+									$('captcha_iframe').src= CAPTCHA_URL;
 									captcha_flag = 1;
 								}
 							}
@@ -549,14 +549,14 @@ function updateCloudStatus(){
 						else{
 							_cloud_msg += "<#aicloud_no_record#>";
 						}
-	
+
 						// handle status
 						var _cloud_status;
 						if(cloud_status != "")
 							_cloud_status = cloud_status;
 						else
 							_cloud_status = "";
-	
+
 						$("cloudStatus").innerHTML = '<div style="text-decoration:underline; cursor:pointer" onmouseout="return nd();" onclick="return overlib(\''+ _cloud_msg +'\');">'+ _cloud_status +'</div>';
 					}
 
@@ -584,9 +584,9 @@ function updateCloudStatus(){
 								$("rsstatus_image_"+rs_rulenum).firstChild.className="rsstatus_png_Img_R_ok";
 							}else{
 								$("rsstatus_image_"+rs_rulenum).firstChild.className="rsstatus_png_Img_LR_ok";
-							}	
+							}
 						}
-	
+
 						// handle msg
 						var _rs_msg = "";
 						if(rs_obj != ""){
@@ -601,7 +601,7 @@ function updateCloudStatus(){
 						else{
 							_rs_msg += "<#aicloud_no_record#>";
 						}
-	
+
 						// handle status
 						$("rsStatus_"+rs_rulenum).innerHTML = '<div style="text-decoration:underline; cursor:pointer" onmouseout="return nd();" onclick="return overlib(\''+ _rs_msg +'\');">'+ rs_status +'</div>';
 					}
@@ -635,7 +635,7 @@ function validform(){
 		alert("<#cloud_list_password#>");
 		return false;
 	}*/
-	
+
 	if(document.form.cloud_dir.value.split("/").length < 4 || document.form.cloud_dir.value == ''){
 		alert("<#ALERT_OF_ERROR_Input10#>");
 		return false;
@@ -647,14 +647,14 @@ function applyRule(){
 	if(validform()){
 		var cloud_synclist_row;
 		var cloud_synclist_col;
-		var cloud_synclist_array_tmp = cloud_sync; 
+		var cloud_synclist_array_tmp = cloud_sync;
 
 		if(isonEdit != -1){
 			cloud_synclist_row = cloud_synclist_array_tmp.split('<');
 			cloud_synclist_row[isonEdit-1] = "";
 
 			// rebuild cloud_synclist_array_tmp
-			cloud_synclist_array_tmp = "";		
+			cloud_synclist_array_tmp = "";
 			for(var i=0; i<cloud_synclist_row.length; i++){
 				if(cloud_synclist_row[i] == "")
 					continue;
@@ -663,7 +663,7 @@ function applyRule(){
 				cloud_synclist_array_tmp += cloud_synclist_row[i];
 			}
 		}
-		
+
 		if(cloud_sync != ""){
 			cloud_synclist_row = cloud_synclist_array_tmp.split('<');
 			for(i=0;i< cloud_synclist_row.length;i++){
@@ -671,7 +671,7 @@ function applyRule(){
 				if(document.form.cloud_username.value == cloud_synclist_col[1])
 					cloud_synclist_array_tmp = "";
 				else
-					cloud_synclist_array_tmp += '<';			
+					cloud_synclist_array_tmp += '<';
 			}
 		}
 
@@ -680,7 +680,7 @@ function applyRule(){
 		else
 			cloud_synclist_array_tmp += '0>'+document.form.cloud_username.value+'>'+document.form.cloud_password.value+'>'+document.form.security_code_field.value +'#'+ document.form.captcha_field.value+'>'+document.form.cloud_rule.value+'>'+"/tmp"+document.form.cloud_dir.value+'>1';
 
-		
+
 		showcloud_synclist();
 		document.form.cloud_sync.value = cloud_synclist_array_tmp;
 		document.form.cloud_username.value = '';
@@ -719,7 +719,7 @@ function showAddTable(r){
 		}
 		else{
 			$("creatBtn").style.display = "none";
-			$("applyBtn").style.display = "none";			
+			$("applyBtn").style.display = "none";
 		}
 	}
 }
@@ -729,7 +729,7 @@ var folderlist = new Array();
 function get_disk_tree(){
 	if(disk_flag == 1){
 		alert('<#no_usb_found#>');
-		return false;	
+		return false;
 	}
 	cal_panel_block();
 	$j("#folderTree_panel").fadeIn(300);
@@ -743,7 +743,7 @@ function get_layer_items(layer_order){
     			;
     		},
     		success: function(){
-				get_tree_items(treeitems);					
+				get_tree_items(treeitems);
   			}
 		});
 }
@@ -755,15 +755,15 @@ function get_tree_items(treeitems){
 	for(var j=0;j<treeitems.length;j++){ // To hide folder 'Download2' & 'asusware'
 		array_temp_split[j] = treeitems[j].split("#");
 		if( array_temp_split[j][0].match(/^Download2$/) || array_temp_split[j][0].match(/^asusware$/)	){
-			continue;					
+			continue;
 		}
-		
+
 		array_temp.push(treeitems[j]);
 	}
 	this.Items = array_temp;
 	if(this.Items && this.Items.length >= 0){
 		BuildTree();
-	}	
+	}
 }
 function BuildTree(){
 	var ItemText, ItemSub, ItemIcon;
@@ -779,10 +779,10 @@ function BuildTree(){
 		var Item_size = 0;
 		Item_size = this.Items[i].length;
 		if(Item_size > 3){
-			var temp_array = new Array(3);	
-			
+			var temp_array = new Array(3);
+
 			temp_array[2] = this.Items[i][Item_size-1];
-			temp_array[1] = this.Items[i][Item_size-2];			
+			temp_array[1] = this.Items[i][Item_size-2];
 			temp_array[0] = "";
 			for(var j = 0; j < Item_size-2; ++j){
 				if(j != 0)
@@ -790,7 +790,7 @@ function BuildTree(){
 				temp_array[0] += this.Items[i][j];
 			}
 			this.Items[i] = temp_array;
-		}	
+		}
 		ItemText = (this.Items[i][0]).replace(/^[\s]+/gi,"").replace(/[\s]+$/gi,"");
 		ItemBarCode = this.FromObject+"_"+(this.Items[i][1]).replace(/^[\s]+/gi,"").replace(/[\s]+$/gi,"");
 		ItemSub = parseInt((this.Items[i][2]).replace(/^[\s]+/gi,"").replace(/[\s]+$/gi,""));
@@ -803,16 +803,16 @@ function BuildTree(){
 		}
 		else
 			short_ItemText = ItemText;
-		
+
 		shown_ItemText = showhtmlspace(short_ItemText);
-		
+
 		if(layer == 1)
 			ItemIcon = 'disk';
 		else if(layer == 2)
 			ItemIcon = 'part';
 		else
 			ItemIcon = 'folders';
-		
+
 		SubClick = ' onclick="GetFolderItem(this, ';
 		if(ItemSub <= 0){
 			SubClick += '0);"';
@@ -822,7 +822,7 @@ function BuildTree(){
 			SubClick += '1);"';
 			isSubTree = 's';
 		}
-		
+
 		if(i == this.Items.length-1){
 			vertline = '';
 			isSubTree += '1';
@@ -831,21 +831,21 @@ function BuildTree(){
 			vertline = ' background="/images/Tree/vert_line.gif"';
 			isSubTree += '0';
 		}
-		
+
 		if(layer == 2 && isSubTree == 'n1'){	// Uee to rebuild folder tree if disk without folder, Jieming add at 2012/08/29
-			document.aidiskForm.test_flag.value = 1;			
+			document.aidiskForm.test_flag.value = 1;
 		}
-		
+
 		TempObject +='<table class="tree_table" id="bug_test">';
 		TempObject +='<tr>';
 		// the line in the front.
 		TempObject +='<td class="vert_line">';
 		TempObject +='<img id="a'+ItemBarCode+'" onclick=\'$("d'+ItemBarCode+'").onclick();\' class="FdRead" src="/images/Tree/vert_line_'+isSubTree+'0.gif">';
 		TempObject +='</td>';
-	
+
 		if(layer == 3){
 			/*a: connect_line b: harddisc+name  c:harddisc  d:name e: next layer forder*/
-			TempObject +='<td>';		
+			TempObject +='<td>';
 			TempObject +='<img id="c'+ItemBarCode+'" onclick=\'$("d'+ItemBarCode+'").onclick();\' src="/images/New_ui/advancesetting/'+ItemIcon+'.png">';
 			TempObject +='</td>';
 			TempObject +='<td>';
@@ -895,7 +895,7 @@ function get_layer(barcode){
 	while(barcode.indexOf('_') != -1){
 		barcode = barcode.substring(barcode.indexOf('_'), barcode.length);
 		++layer;
-		barcode = barcode.substring(1);		
+		barcode = barcode.substring(1);
 	}
 	return layer;
 }
@@ -909,12 +909,12 @@ function build_array(obj,layer){
 			layer3_path = "/" + obj.title;
 			while(layer3_path.indexOf("&nbsp;") != -1)
 				layer3_path = layer3_path.replace("&nbsp;"," ");
-				
+
 			if(obj.id.length >8)
 				layer2_path = "/" + $(obj.id.substring(0,obj.id.length-3)).innerHTML;
 			else
 				layer2_path = "/" + $(obj.id.substring(0,obj.id.length-2)).innerHTML;
-			
+
 			while(layer2_path.indexOf("&nbsp;") != -1)
 				layer2_path = layer2_path.replace("&nbsp;"," ");
 		}
@@ -934,9 +934,9 @@ function build_array(obj,layer){
 function GetFolderItem(selectedObj, haveSubTree){
 	var barcode, layer = 0;
 	showClickedObj(selectedObj);
-	barcode = selectedObj.id.substring(1);	
+	barcode = selectedObj.id.substring(1);
 	layer = get_layer(barcode);
-	
+
 	if(layer == 0)
 		alert("Machine: Wrong");
 	else if(layer == 1){
@@ -946,7 +946,7 @@ function GetFolderItem(selectedObj, haveSubTree){
 		$('createFolderBtn').className = "createFolderBtn";
 		$('deleteFolderBtn').className = "deleteFolderBtn";
 		$('modifyFolderBtn').className = "modifyFolderBtn";
-		
+
 		$('createFolderBtn').onclick = function(){};
 		$('deleteFolderBtn').onclick = function(){};
 		$('modifyFolderBtn').onclick = function(){};
@@ -958,7 +958,7 @@ function GetFolderItem(selectedObj, haveSubTree){
 		$('createFolderBtn').className = "createFolderBtn_add";
 		$('deleteFolderBtn').className = "deleteFolderBtn";
 		$('modifyFolderBtn').className = "modifyFolderBtn";
-		$('createFolderBtn').onclick = function(){popupWindow('OverlayMask','/aidisk/popCreateFolder.asp');};		
+		$('createFolderBtn').onclick = function(){popupWindow('OverlayMask','/aidisk/popCreateFolder.asp');};
 		$('deleteFolderBtn').onclick = function(){};
 		$('modifyFolderBtn').onclick = function(){};
 		document.aidiskForm.layer_order.disabled = "disabled";
@@ -971,7 +971,7 @@ function GetFolderItem(selectedObj, haveSubTree){
 		$('createFolderBtn').className = "createFolderBtn";
 		$('deleteFolderBtn').className = "deleteFolderBtn_add";
 		$('modifyFolderBtn').className = "modifyFolderBtn_add";
-		$('createFolderBtn').onclick = function(){};		
+		$('createFolderBtn').onclick = function(){};
 		$('deleteFolderBtn').onclick = function(){popupWindow('OverlayMask','/aidisk/popDeleteFolder.asp');};
 		$('modifyFolderBtn').onclick = function(){popupWindow('OverlayMask','/aidisk/popModifyFolder.asp');};
 		document.aidiskForm.layer_order.disabled = "disabled";
@@ -984,7 +984,7 @@ function GetFolderItem(selectedObj, haveSubTree){
 function showClickedObj(clickedObj){
 	if(this.lastClickedObj != 0)
 		this.lastClickedObj.className = "lastfolderClicked";  //this className set in AiDisk_style.css
-	
+
 	clickedObj.className = "folderClicked";
 	this.lastClickedObj = clickedObj;
 }
@@ -992,26 +992,26 @@ function GetTree(layer_order, v){
 	if(layer_order == "0"){
 		this.FromObject = layer_order;
 		$('d'+layer_order).innerHTML = '<span class="FdWait">. . . . . . . . . .</span>';
-		setTimeout('get_layer_items("'+layer_order+'", "gettree")', 1);		
+		setTimeout('get_layer_items("'+layer_order+'", "gettree")', 1);
 		return;
 	}
-	
+
 	if($('a'+layer_order).className == "FdRead"){
 		$('a'+layer_order).className = "FdOpen";
-		$('a'+layer_order).src = "/images/Tree/vert_line_s"+v+"1.gif";		
-		this.FromObject = layer_order;		
+		$('a'+layer_order).src = "/images/Tree/vert_line_s"+v+"1.gif";
+		this.FromObject = layer_order;
 		$('e'+layer_order).innerHTML = '<img src="/images/Tree/folder_wait.gif">';
 		setTimeout('get_layer_items("'+layer_order+'", "gettree")', 1);
 	}
 	else if($('a'+layer_order).className == "FdOpen"){
 		$('a'+layer_order).className = "FdClose";
-		$('a'+layer_order).src = "/images/Tree/vert_line_s"+v+"0.gif";		
+		$('a'+layer_order).src = "/images/Tree/vert_line_s"+v+"0.gif";
 		$('e'+layer_order).style.position = "absolute";
 		$('e'+layer_order).style.visibility = "hidden";
 	}
 	else if($('a'+layer_order).className == "FdClose"){
 		$('a'+layer_order).className = "FdOpen";
-		$('a'+layer_order).src = "/images/Tree/vert_line_s"+v+"1.gif";		
+		$('a'+layer_order).src = "/images/Tree/vert_line_s"+v+"1.gif";
 		$('e'+layer_order).style.position = "";
 		$('e'+layer_order).style.visibility = "";
 	}
@@ -1038,18 +1038,18 @@ function cal_panel_block(){
 		winWidth = window.innerWidth;
 	else if ((document.body) && (document.body.clientWidth))
 		winWidth = document.body.clientWidth;
-		
+
 	if (document.documentElement  && document.documentElement.clientHeight && document.documentElement.clientWidth){
 		winWidth = document.documentElement.clientWidth;
 	}
 
-	if(winWidth >1050){	
-		winPadding = (winWidth-1050)/2;	
+	if(winWidth >1050){
+		winPadding = (winWidth-1050)/2;
 		winWidth = 1105;
 		blockmarginLeft= (winWidth*0.25)+winPadding;
 	}
 	else if(winWidth <=1050){
-		blockmarginLeft= (winWidth)*0.25+document.body.scrollLeft;	
+		blockmarginLeft= (winWidth)*0.25+document.body.scrollLeft;
 
 	}
 
@@ -1073,7 +1073,7 @@ function refresh_captcha(){
 
 	<body onload="initial();" onunload="return unload_body();">
 	<div id="TopBanner"></div>
-	
+
 <div id="invitationBg" class="invitepopup_bg">
 	<div id="invitation" class="panel_folder" style="margin-top:30px;">
 		<table>
@@ -1084,7 +1084,7 @@ function refresh_captcha(){
 			</tr>
 		</table>
 		<div id="invitationInfo" class="folder_tree" style="word-break:break-all;z-index:999;"></div>
-		<div style="background-image:url(images/Tree/bg_02.png);background-repeat:no-repeat;height:90px;">		
+		<div style="background-image:url(images/Tree/bg_02.png);background-repeat:no-repeat;height:90px;">
 			<input class="button_gen" type="button" style="margin-left:27%;margin-top:18px;" onclick="cancel_invitation();" value="<#CTL_Cancel#>">
 			<input class="button_gen" type="button"  onclick="confirm_invitation();" value="<#CTL_ok#>">
 		</div>
@@ -1109,7 +1109,7 @@ function refresh_captcha(){
 			</div>
 		</td></tr></table>
 		<div id="e0" class="folder_tree"></div>
-	<div style="background-image:url(images/Tree/bg_02.png);background-repeat:no-repeat;height:90px;">		
+	<div style="background-image:url(images/Tree/bg_02.png);background-repeat:no-repeat;height:90px;">
 		<input class="button_gen" type="button" style="margin-left:27%;margin-top:18px;" onclick="cancel_folderTree();" value="<#CTL_Cancel#>">
 		<input class="button_gen" type="button"  onclick="confirm_folderTree();" value="<#CTL_ok#>">
 	</div>
@@ -1188,19 +1188,19 @@ function refresh_captcha(){
 											$j('#radio_smartSync_enable').iphoneSwitch('<% nvram_get("enable_cloudsync"); %>',
 												function() {
 													document.enableform.enable_cloudsync.value = 1;
-													showLoading();	
+													showLoading();
 													document.enableform.submit();
 												},
 												function() {
 													document.enableform.enable_cloudsync.value = 0;
-													showLoading();	
-													document.enableform.submit();	
+													showLoading();
+													document.enableform.submit();
 												},
 												{
 													switch_on_container_path: '/switcherplugin/iphone_switch_container_off.png'
 												}
 											);
-										</script>			
+										</script>
 										</div>
 
 									</td>
@@ -1208,7 +1208,7 @@ function refresh_captcha(){
 									<td>
 										<div style="padding:10px;width:95%;font-style:italic;font-size:14px;word-break:normal;">
 												<#smart_sync1#><br />
-												<#smart_sync2#>											
+												<#smart_sync2#>
 										</div>
 									</td>
 								</tr>
@@ -1220,7 +1220,7 @@ function refresh_captcha(){
 	   					<tr>
 	   						<td colspan="6" id="cloud_synclist"><#aicloud_cloud_list#></td>
 	   					</tr>
-	  					</thead>		  
+	  					</thead>
 
     					<tr>
       					<th width="10%"><#Provider#></th>
@@ -1232,7 +1232,7 @@ function refresh_captcha(){
     					</tr>
 
 						</table>
-	
+
 						<div id="cloud_synclist_Block">
 							<table width="99%" cellspacing="0" cellpadding="4" align="center" class="list_table" id="cloud_synclist_table">
 								<tbody>
@@ -1248,7 +1248,7 @@ function refresh_captcha(){
 	   					<tr>
 	   						<td colspan="6" id="cloud_synclist"><#aicloud_cloud_list#></td>
 	   					</tr>
-	  					</thead>		  
+	  					</thead>
 
 							<tr>
 							<th width="30%" style="height:40px;font-family: Calibri;font-weight: bolder;">
@@ -1259,25 +1259,25 @@ function refresh_captcha(){
 								<div style="font-size:18px;font-weight: bolder;margin-left: 45px;margin-top: -27px;font-family: Calibri;">ASUS WebStorage</div>
 							</td>
 							</tr>
-				            
+
 						  <tr>
 							<th width="30%" style="font-family: Calibri;font-weight: bolder;">
 								<#AiDisk_Account#>
-							</th>			
+							</th>
 							<td>
 							  <input type="text" maxlength="32" class="input_30_table" style="height: 23px;" id="cloud_username" name="cloud_username" value="" onKeyPress="">
 							</td>
-						  </tr>	
+						  </tr>
 
 						  <tr>
 							<th width="30%" style="font-family: Calibri;font-weight: bolder;">
 								<#PPPConnection_Password_itemname#>
-							</th>			
+							</th>
 							<td>
 								<input id="cloud_password" name="cloud_password" type="password" readonly autocapitalization="off" onBlur="switchType(this, false);" onFocus="switchType(this, true); $(this).removeAttribute('readonly');" maxlength="25" class="input_30_table" style="height: 23px;" value="">
 							</td>
-						  </tr>						  				
-					  				
+						  </tr>
+
 						  <tr>
 							<th width="30%" style="font-family: Calibri;font-weight: bolder;">
 								Folder
@@ -1298,7 +1298,7 @@ function refresh_captcha(){
 									<option value="0"><#Cloudsync_Rule_sync#></option>
 									<option value="1"><#Cloudsync_Rule_dl#></option>
 									<option value="2"><#Cloudsync_Rule_ul#></option>
-								</select>			
+								</select>
 							</td>
 						  </tr>
 						  <tr>
@@ -1312,24 +1312,24 @@ function refresh_captcha(){
 						  <tr height="45px;" id="captcha_tr" style="display:none;">
 							<th width="30%" style="font-family: Calibri;font-weight: bolder;">
 								Captcha
-							</th>			
+							</th>
 							<td style="height:85px;">
 								<div style="height:25px;"><input id="captcha_field" name="captcha_field" type="text" maxlength="6" class="input_32_table" style="height: 23px;width:100px;margin-top:8px;" ></div>
-								<div id="captcha_hint" style="color:#FC0;height:25px;margin-top:10px;">Please input the captcha</div>						
+								<div id="captcha_hint" style="color:#FC0;height:25px;margin-top:10px;">Please input the captcha</div>
 								<div>
 									<iframe id="captcha_iframe" frameborder="0" scrolling="no" src="" style="width:230px;height:80px;*width:210px;*height:87px;margin:-60px 0 0 160px;*margin-left:165px;"></iframe>
 								</div>
-								<div style="color:#FC0;text-decoration:underline;height:35px;margin:-35px 0px 0px 380px;cursor:pointer" onclick="refresh_captcha();"><#CTL_refresh#></div>   
+								<div style="color:#FC0;text-decoration:underline;height:35px;margin:-35px 0px 0px 380px;cursor:pointer" onclick="refresh_captcha();"><#CTL_refresh#></div>
 							</td>
 						  </tr>
-						</table>	
-					
+						</table>
+
    					<table width="98%" border="1" align="center" cellpadding="4" cellspacing="0" class="FormTable_table" id="cloudmessageTable" style="margin-top:7px;display:none;">
 	  					<thead>
 	   					<tr>
 	   						<td colspan="6" id="cloud_synclist">Cloud Message</td>
 	   					</tr>
-	  					</thead>		  
+	  					</thead>
 							<tr>
 								<td>
 									<textarea style="width:99%; border:0px; font-family:'Courier New', Courier, mono; font-size:13px;background:#475A5F;color:#FFFFFF;" cols="63" rows="25" readonly="readonly" wrap=off ></textarea>
@@ -1348,10 +1348,10 @@ function refresh_captcha(){
 	  				</div>
 
 					  </td>
-					</tr>				
-					</tbody>	
-				  </table>		
-	
+					</tr>
+					</tbody>
+				  </table>
+
 					</td>
 				</tr>
 			</table>

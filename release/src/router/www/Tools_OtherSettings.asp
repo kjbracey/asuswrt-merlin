@@ -119,7 +119,7 @@ function initial() {
 
 	document.aidiskForm.protocol.value = PROTOCOL;
 	initial_dir();
-	check_dir_path();
+//	check_dir_path();
 }
 
 function initial_dir(){
@@ -128,13 +128,13 @@ function initial_dir(){
 	var type = "General";
 
 	url += "?motion=gettree&layer_order=" + __layer_order + "&t=" + Math.random();
-	$j.get(url,function(data){initial_dir_status();});
+	$j.get(url,function(data){initial_dir_status(data);});
 }
 
 function initial_dir_status(data){
 	if(data != "" && data.length != 2){
 		get_layer_items("0");
-		eval("var default_dir=" + data);
+		var default_dir = eval('data');
 	} else {
 		showhide("pathPicker", 0);
 		disk_flag=1;

@@ -107,7 +107,7 @@ function initial_dir(){
 function initial_dir_status(data){
 	if(data != "" && data.length != 2){
 		get_layer_items("0");
-		eval("var default_dir=" + data);
+		var default_dir = eval('data');
 	}
 	else {
 		$("EditExports").style.display = "none";
