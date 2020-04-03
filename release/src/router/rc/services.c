@@ -904,6 +904,16 @@ void start_dnsmasq(int force)
 			stubby_lanip = "127.0.0.1";
 			fprintf(fp, "server=%s#%d\n", stubby_lanip, nvram_get_int("stubby_port"));
 		}
+
+		// apply NextDNS parms
+		if (strstr(nvram_safe_get("stubby_dns"), "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
+//			fprintf(fp, "add-cpe-id=%s\n", nvram_safe_get("nextdns_id"));
+			if (nvram_get_int("nextdns_analytics")) {
+				fprintf(fp, "add-mac\n");
+				fprintf(fp, "add-subnet=32,128\n");
+			}
+		}
+
 	}
 #endif
 #endif
@@ -1325,8 +1335,13 @@ void start_stubby(int force)
 						fprintf(fp, "  - address_data: %s\n", ip4addr);
 					if ((strlen(tlsport) > 0) && (strcmp(tlsport, "853") != 0))
 						fprintf(fp, "    tls_port: %s\n", tlsport);
-					if (strlen(authname) > 0)
-						fprintf(fp, "    tls_auth_name: \"%s\"\n", authname);
+					if (strlen(authname) > 0) {
+						if (strstr(dotname, "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
+							snprintf(tmp, sizeof(tmp), "%s.%s", nvram_safe_get("nextdns_id"), authname);
+							fprintf(fp, "    tls_auth_name: \"%s\"\n", tmp);
+						} else
+							fprintf(fp, "    tls_auth_name: \"%s\"\n", authname);
+					}
 					if (strlen(tlspubkey) > 0) {
 						fprintf(fp, "    tls_pubkey_pinset:\n");
 						fprintf(fp, "      - digest: \"%s\"\n", tlsdigest);
@@ -1343,8 +1358,13 @@ void start_stubby(int force)
 						fprintf(fp, "  - address_data: %s\n", ip6addr);
 					if ((strlen(tlsport) > 0) && (strcmp(tlsport, "853") != 0))
 						fprintf(fp, "    tls_port: %s\n", tlsport);
-					if (strlen(authname) > 0)
-						fprintf(fp, "    tls_auth_name: \"%s\"\n", authname);
+					if (strlen(authname) > 0) {
+						if (strstr(dotname, "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
+							snprintf(tmp, sizeof(tmp), "%s.%s", nvram_safe_get("nextdns_id"), authname);
+							fprintf(fp, "    tls_auth_name: \"%s\"\n", tmp);
+						} else
+							fprintf(fp, "    tls_auth_name: \"%s\"\n", authname);
+					}
 					if (strlen(tlspubkey) > 0) {
 						fprintf(fp, "    tls_pubkey_pinset:\n");
 						fprintf(fp, "      - digest: \"%s\"\n", tlsdigest);

@@ -1996,6 +1996,16 @@ void write_vpn_dnsmasq_config(FILE* f)
 							stubby_lanip = "127.0.0.1";
 							fprintf(f, "server=%s#%d\n", stubby_lanip, nvram_get_int("stubby_port"));
 						}
+
+						// apply NextDNS parms
+						if (strstr(nvram_safe_get("stubby_dns"), "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
+//							fprintf(f, "add-cpe-id=%s\n", nvram_safe_get("nextdns_id"));
+							if (nvram_get_int("nextdns_analytics")) {
+								fprintf(f, "add-mac\n");
+								fprintf(f, "add-subnet=32,128\n");
+							}
+						}
+
 					}
 					break;
 				}
@@ -2059,6 +2069,16 @@ void write_vpn_dnsmasq_config(FILE* f)
 				stubby_lanip = "127.0.0.1";
 				fprintf(f, "server=%s#%d\n", stubby_lanip, nvram_get_int("stubby_port"));
 			}
+
+			// apply NextDNS parms
+			if (strstr(nvram_safe_get("stubby_dns"), "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
+//				fprintf(f, "add-cpe-id=%s\n", nvram_safe_get("nextdns_id"));
+				if (nvram_get_int("nextdns_analytics")) {
+					fprintf(f, "add-mac\n");
+					fprintf(f, "add-subnet=32,128\n");
+				}
+			}
+
 		}
 #endif
 	}
