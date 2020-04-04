@@ -908,9 +908,12 @@ void start_dnsmasq(int force)
 		// apply NextDNS parms
 		if (strstr(nvram_safe_get("stubby_dns"), "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
 //			fprintf(fp, "add-cpe-id=%s\n", nvram_safe_get("nextdns_id"));
-			if (nvram_get_int("nextdns_analytics")) {
+			if (nvram_get_int("nextdns_analytics") && !nvram_get_int("nextdns_analytics_x"))
+				logmessage("dnsmasq", "NextDNS analytics disabled due to multiple providers");
+			if (nvram_get_int("nextdns_analytics_x")) {
 				fprintf(fp, "add-mac\n");
 				fprintf(fp, "add-subnet=32,128\n");
+				logmessage("dnsmasq", "NextDNS analytics enabled");
 			}
 		}
 
@@ -1322,6 +1325,7 @@ void start_stubby(int force)
 			fprintf(fp, "  - 0::1@%d\n", nvram_get_int("stubby_port"));
 
 		//processor selected servers
+		nvram_set_int("nextdns_analytics_x", nvram_get_int("nextdns_analytics"));
 		fprintf(fp, "upstream_recursive_servers:\n");
 		g = buf = strdup(nvram_safe_get("stubby_dns"));
 		while (g) {
@@ -1339,8 +1343,10 @@ void start_stubby(int force)
 						if (strstr(dotname, "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
 							snprintf(tmp, sizeof(tmp), "%s.%s", nvram_safe_get("nextdns_id"), authname);
 							fprintf(fp, "    tls_auth_name: \"%s\"\n", tmp);
-						} else
+						} else {
 							fprintf(fp, "    tls_auth_name: \"%s\"\n", authname);
+							nvram_set_int("nextdns_analytics_x", 0);
+						}
 					}
 					if (strlen(tlspubkey) > 0) {
 						fprintf(fp, "    tls_pubkey_pinset:\n");
@@ -1362,8 +1368,10 @@ void start_stubby(int force)
 						if (strstr(dotname, "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
 							snprintf(tmp, sizeof(tmp), "%s.%s", nvram_safe_get("nextdns_id"), authname);
 							fprintf(fp, "    tls_auth_name: \"%s\"\n", tmp);
-						} else
+						} else {
 							fprintf(fp, "    tls_auth_name: \"%s\"\n", authname);
+							nvram_set_int("nextdns_analytics_x", 0);
+						}
 					}
 					if (strlen(tlspubkey) > 0) {
 						fprintf(fp, "    tls_pubkey_pinset:\n");

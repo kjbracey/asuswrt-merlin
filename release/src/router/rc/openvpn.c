@@ -2000,9 +2000,12 @@ void write_vpn_dnsmasq_config(FILE* f)
 						// apply NextDNS parms
 						if (strstr(nvram_safe_get("stubby_dns"), "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
 //							fprintf(f, "add-cpe-id=%s\n", nvram_safe_get("nextdns_id"));
-							if (nvram_get_int("nextdns_analytics")) {
+							if (nvram_get_int("nextdns_analytics") && !nvram_get_int("nextdns_analytics_x"))
+								logmessage("dnsmasq", "NextDNS analytics disabled due to multiple providers");
+							if (nvram_get_int("nextdns_analytics_x")) {
 								fprintf(f, "add-mac\n");
 								fprintf(f, "add-subnet=32,128\n");
+								logmessage("dnsmasq", "NextDNS analytics enabled");
 							}
 						}
 
@@ -2073,12 +2076,14 @@ void write_vpn_dnsmasq_config(FILE* f)
 			// apply NextDNS parms
 			if (strstr(nvram_safe_get("stubby_dns"), "NextDNS") && (strlen(nvram_safe_get("nextdns_id")) > 0)) {
 //				fprintf(f, "add-cpe-id=%s\n", nvram_safe_get("nextdns_id"));
-				if (nvram_get_int("nextdns_analytics")) {
+				if (nvram_get_int("nextdns_analytics") && !nvram_get_int("nextdns_analytics_x"))
+					logmessage("dnsmasq", "NextDNS analytics disabled due to multiple providers");
+				if (nvram_get_int("nextdns_analytics_x")) {
 					fprintf(f, "add-mac\n");
 					fprintf(f, "add-subnet=32,128\n");
+					logmessage("dnsmasq", "NextDNS analytics enabled");
 				}
 			}
-
 		}
 #endif
 	}
