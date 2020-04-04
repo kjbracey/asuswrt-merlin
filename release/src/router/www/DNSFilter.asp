@@ -10,7 +10,7 @@
 <link rel="shortcut icon" href="images/favicon.png">
 <link rel="icon" href="images/favicon.png">
 <link rel="stylesheet" type="text/css" href="ParentalControl.css">
-<link rel="stylesheet" type="text/css" href="index_style.css"> 
+<link rel="stylesheet" type="text/css" href="index_style.css">
 <link rel="stylesheet" type="text/css" href="form_style.css">
 <link rel="stylesheet" type="text/css" href="usp_style.css">
 <link rel="stylesheet" type="text/css" href="/calendar/fullcalendar.css">
@@ -49,13 +49,13 @@ function initial(){
 	show_menu();
 	show_footer();
 
-	if(!ParentalCtrl2_support){		
+	if(!ParentalCtrl2_support){
 		$('FormTitle').style.webkitBorderRadius = "3px";
 		$('FormTitle').style.MozBorderRadius = "3px";
-		$('FormTitle').style.BorderRadius = "3px";	
+		$('FormTitle').style.BorderRadius = "3px";
 	}
-	
-	gen_mainTable();	
+
+	gen_mainTable();
 	showLANIPList();
 
 	// dnsfilter_enable_x 0: disable, 1: enable, show mainTable & Protection level when enable, otherwise hide it
@@ -77,7 +77,7 @@ function setClientIP(devname, macaddr){
 function showLANIPList(){
 	var code = "";
 	var show_name = "";
-	var client_list_array = '<% get_client_detail_info(); %>';	
+	var client_list_array = '<% get_client_detail_info(); %>';
 	var client_list_row = client_list_array.split('<');
 
 	for(var i = 1; i < client_list_row.length; i++){
@@ -92,12 +92,12 @@ function showLANIPList(){
 		else {
 			var macname = client_list_col[3].replace(/:/g,"-");
 			code += '<a><div onmouseover="over_var=1;" onmouseout="over_var=0;" onclick="setClientIP(\''+macname+'\', \''+client_list_col[3]+'\');"><strong>'+client_list_col[2]+'</strong> ';
-		}	
+		}
 		if(show_name && show_name.length > 0)
 			code += '( '+show_name+')';
 		code += ' </div></a>';
 	}
-	code +='<!--[if lte IE 6.5]><iframe class="hackiframe2"></iframe><![endif]-->';	
+	code +='<!--[if lte IE 6.5]><iframe class="hackiframe2"></iframe><![endif]-->';
 	$("ClientList_Block_PC").innerHTML = code;
 }
 
@@ -122,6 +122,7 @@ function hideClients_Block(){
 	//valid_IP_form(document.form.rule_devname, 0);
 }
 
+//see services.c for array mode assignments
 function gen_modeselect(name, value, onchange){
 	var code = "";
 	code +='<select class="input_option" name="'+name+'" value="'+value+'" onchange="'+onchange+'">';
@@ -129,12 +130,18 @@ function gen_modeselect(name, value, onchange){
 	code +='<option value="11"'+(value == 11 ? "selected" : "")+'>Router</option>';
 	code +='<option value="1"'+(value == 1 ? "selected" : "")+'>OpenDNS Home</option>';
 	code +='<option value="7"'+(value == 7 ? "selected" : "")+'>OpenDNS Family</option>';
-	code +='<option value="2"'+(value == 2 ? "selected" : "")+'>Norton Safe</option>';
-	code +='<option value="3"'+(value == 3 ? "selected" : "")+'>Norton Family</option>';
-	code +='<option value="4"'+(value == 4 ? "selected" : "")+'>Norton Children</option>';
+//	code +='<option value="2"'+(value == 2 ? "selected" : "")+'>Norton Safe</option>';
+//	code +='<option value="3"'+(value == 3 ? "selected" : "")+'>Norton Family</option>';
+//	code +='<option value="4"'+(value == 4 ? "selected" : "")+'>Norton Children</option>';
 	code +='<option value="5"'+(value == 5 ? "selected" : "")+'>Yandex Safe</option>';
 	code +='<option value="6"'+(value == 6 ? "selected" : "")+'>Yandex Family</option>';
 	code +='<option value="12"'+(value == 12? "selected" : "")+'>Comodo Secure DNS</option>';
+	code +='<option value="17"'+(value == 17? "selected" : "")+'>Cloudflare Malware</option>';
+	code +='<option value="18"'+(value == 18? "selected" : "")+'>Cloudflare Adult</option>';
+	code +='<option value="13"'+(value == 13? "selected" : "")+'>Quad9</option>';
+	code +='<option value="14"'+(value == 14? "selected" : "")+'>CleanBrowsing Security</option>';
+	code +='<option value="15"'+(value == 15? "selected" : "")+'>CleanBrowsing Adult</option>';
+	code +='<option value="16"'+(value == 16? "selected" : "")+'>CleanBrowsing Family</option>';
 	code +='<option value="8"'+(value == 8 ? "selected" : "")+'>Custom 1</option>';
 	code +='<option value="9"'+(value == 9 ? "selected" : "")+'>Custom 2</option>';
 	code +='<option value="10"'+(value == 10 ? "selected" : "")+'>Custom 3</option>';
@@ -371,22 +378,14 @@ function changeRow_main(r){
 					<td style="font-style: italic;font-size: 14px;">
 						<div>
 							<p>DNS-based filtering lets you protect specific LAN devices
-							against harmful online content.  The following filtering services
-							are currently supported (some of which offer multiple levels of
-							protection):
-							<ul>
-								<li><a target="_blank" style="font-weight: bolder; cursor:pointer;text-decoration: underline;" href="http://www.opendns.com/home-internet-security/">OpenDNS</a>
-								<ul><li>Home = Regular OpenDNS server (manually configurable through their portal)
-								<li>Family = Family Shield (pre-configured to block adult content)</ul>
-								<li><a target="_blank" style="font-weight: bolder; cursor:pointer;text-decoration: underline;" href="https://dns.norton.com/">Norton Connect Safe</a> (for home usage only)
-								<ul><li>Safe = Malicious content<li>Family = Malicious + Sexual content<li>Children = Malicious + Sexual + Mature content</ul>
-								<li><a target="_blank" style="font-weight: bolder; cursor:pointer;text-decoration: underline;" href="http://dns.yandex.com"><#YandexDNS#></a>
-								<ul><li>Safe = Malicious content<li>Family = Malicious + Sexual content</ul>
-								<li><a target="_blank" style="font-weight: bolder; cursor:pointer;text-decoration: underline;" href="http://www.comodo.com/secure-dns/">Comodo Secure DNS</a>
-								<ul><li>Protects against malicious content</ul>
-							</ul>
-							<br>"No Filtering" will disable/bypass the filter, and "Router" will force clients to use the DNS provided
-							    by the router's DHCP server (or, the router itself if it's not defined).
+							against harmful online content by forcing all DNS queries to go through a specified DNS service that blocks malware and/or adult content
+							before your browser ever has a chance to load it.</p>
+							<br>
+							<p>DNS filtering may also be used to force the use of a DNS server required by a specific client.</p>
+							<br>
+							<p>"No Filtering" will disable/bypass the filter, and "Router" will force clients to use the DNS provided
+							by the router's DHCP server (or, the router itself if it's not defined).</p>
+							<br>
 						</div>
 					</td>
 				</tr>
@@ -432,12 +431,18 @@ function changeRow_main(r){
 							<option value="11" <% nvram_match("dnsfilter_mode", "11", "selected"); %>>Router</option>
 							<option value="1" <% nvram_match("dnsfilter_mode", "1", "selected"); %>>OpenDNS Home</option>
 							<option value="7" <% nvram_match("dnsfilter_mode", "7", "selected"); %>>OpenDNS Family</option>
-							<option value="2" <% nvram_match("dnsfilter_mode", "2", "selected"); %>>Norton Safe</option>
-							<option value="3" <% nvram_match("dnsfilter_mode", "3", "selected"); %>>Norton Family</option>
-							<option value="4" <% nvram_match("dnsfilter_mode", "4", "selected"); %>>Norton Children</option>
+<!--							<option value="2" <% nvram_match("dnsfilter_mode", "2", "selected"); %>>Norton Safe</option> -->
+<!--							<option value="3" <% nvram_match("dnsfilter_mode", "3", "selected"); %>>Norton Family</option> -->
+<!--							<option value="4" <% nvram_match("dnsfilter_mode", "4", "selected"); %>>Norton Children</option> -->
 							<option value="5" <% nvram_match("dnsfilter_mode", "5", "selected"); %>>Yandex Safe</option>
 							<option value="6" <% nvram_match("dnsfilter_mode", "6", "selected"); %>>Yandex Family</option>
 							<option value="12" <% nvram_match("dnsfilter_mode", "12", "selected"); %>>Comodo Secure DNS</option>
+							<option value="17" <% nvram_match("dnsfilter_mode", "17", "selected"); %>>Cloudflare Malware</option>
+							<option value="18" <% nvram_match("dnsfilter_mode", "18", "selected"); %>>Cloudflare Adult</option>
+							<option value="13" <% nvram_match("dnsfilter_mode", "13", "selected"); %>>Quad9</option>
+							<option value="14" <% nvram_match("dnsfilter_mode", "14", "selected"); %>>Cleanbrowsing Security</option>
+							<option value="15" <% nvram_match("dnsfilter_mode", "15", "selected"); %>>CleanBrowsing Adult</option>
+							<option value="16" <% nvram_match("dnsfilter_mode", "16", "selected"); %>>CleanBrowsing Family</option>
 							<option value="8" <% nvram_match("dnsfilter_mode", "8", "selected"); %>>Custom 1</option>
 							<option value="9" <% nvram_match("dnsfilter_mode", "9", "selected"); %>>Custom 2</option>
 							<option value="10" <% nvram_match("dnsfilter_mode", "10", "selected"); %>>Custom 3</option>
@@ -488,7 +493,7 @@ function changeRow_main(r){
       </table>
 		<!--===================================Ending of Main Content===========================================-->
 	</td>
-		
+
     <td width="10" align="center" valign="top">&nbsp;</td>
 	</tr>
 </table>

@@ -7051,23 +7051,31 @@ void restart_cstats(void)
 const char *dns_filter(int mode)
 {
 	char *dnsptr;
+	size_t size;
 	static const char *server[] = {
-		"",			/* 0: Unfiltered (handled separately below) */
+		"",					/* 0: Unfiltered (handled separately below) */
 		"208.67.222.222",	/* 1: OpenDNS */
-                "199.85.126.10",	/* 2: Norton Connect Safe A (Security) */
-		"199.85.126.20",	/* 3: Norton Connect Safe B (Security + Adult) */
-		"199.85.126.30",	/* 4: Norton Connect Safe C (Sec. + Adult + Violence */
+		"",					/* 2: Norton Connect Safe A (Security) */
+		"",					/* 3: Norton Connect Safe B (Security + Adult) */
+		"",					/* 4: Norton Connect Safe C (Sec. + Adult + Violence */
 		"77.88.8.88",		/* 5: Secure Mode safe.dns.yandex.ru */
 		"77.88.8.7",		/* 6: Family Mode family.dns.yandex.ru */
 		"208.67.222.123",	/* 7: OpenDNS Family Shield */
-		"",			/* 8: Custom1 */
-		"",			/* 9: Custom2 */
-		"",			/* 10: Custom3 */
-		"",			/* 11: Router */
-		"8.26.56.26"		/* 12: Comodo Secure DNS */
+		"",					/* 8: Custom1 */
+		"",					/* 9: Custom2 */
+		"",					/* 10: Custom3 */
+		"",					/* 11: Router */
+		"8.26.56.26",		/* 12: Comodo Secure DNS */
+		"9.9.9.9",			/* 13: Quad9 */
+		"185.228.168.9",	/* 14: CleanBrowsing Security */
+		"185.228.168.10",	/* 15: CleanBrowsing Adult */
+		"185.228.168.168",	/* 16: CleanBrowsing Family */
+		"1.1.1.2",			/* 17: Cloudflare Malware */
+		"1.1.1.3"			/* 18: Cloudflare Malware + Adult */
         };
 
-	if (mode > 11) mode = 0;
+	size = sizeof(server)/sizeof(char*);
+	if (mode < 0 || mode > ((int)size-1)) mode = 0;
 
 	// Unfiltered - don't return anything, the calling function should take care of handling it
         // (currently, dnsfilter_settings() will simply not enforce anything, as if dnsfilter was disabled)
