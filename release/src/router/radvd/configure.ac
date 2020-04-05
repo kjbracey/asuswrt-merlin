@@ -1,9 +1,9 @@
 dnl
 dnl
 dnl   Authors:
-dnl    Lars Fenneberg		<lf@elemental.net>	 
+dnl    Lars Fenneberg		<lf@elemental.net>
 dnl
-dnl   This software is Copyright 1996-2000 by the above mentioned author(s), 
+dnl   This software is Copyright 1996-2000 by the above mentioned author(s),
 dnl   All Rights Reserved.
 dnl
 dnl   The license which is distributed with this software in the file COPYRIGHT
@@ -12,7 +12,7 @@ dnl   may request it from <reubenhwk@gmail.com>.
 dnl
 dnl
 
-dnl If adding rcX to version, be sure to separate with a '-' 
+dnl If adding rcX to version, be sure to separate with a '-'
 AC_INIT(radvd, [2.18])
 AC_CONFIG_SRCDIR(radvd.c)
 AC_CANONICAL_SYSTEM
@@ -37,11 +37,11 @@ case "$target" in
 		AC_MSG_RESULT([bsd44 (darwin)])
                 arch=bsd44
         ;;
-        *)      
+        *)
 		AC_MSG_RESULT(unknown: $target)
 		AC_MSG_ERROR(
 [currently only Linux and BSD 4.4 with NRLs IPv6 code are
-supported. If you have such a system and it is not guessed correctly 
+supported. If you have such a system and it is not guessed correctly
 you must specify it with --target on the configure command line])
         ;;
 esac
@@ -49,6 +49,9 @@ esac
 dnl Determine CC and preset CFLAGS
 AC_PROG_CC_C99
 AC_PROG_RANLIB
+
+AC_ARG_WITH([stack-protector], AS_HELP_STRING([--without-stack-protector], [Build without -fstack-protector]),[],[with_stack_protector=yes])
+AM_CONDITIONAL(HAVE_STACK_PROTECTOR, test x"$with_stack_protector" = xyes)
 
 AC_ARG_WITH([check], AS_HELP_STRING([--without-check], [Build without check unit testing framework]),[],[with_check=no])
 AS_IF([test "x$with_check" = "xyes"], [
@@ -172,13 +175,13 @@ AC_HEADER_TIME
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_MSG_CHECKING(whether struct sockaddr_in6 has sin6_scope_id)
 AC_TRY_COMPILE([#include <sys/types.h>
-#include <netinet/in.h>], [static struct sockaddr_in6 ac_sin6; int ac_size = 
+#include <netinet/in.h>], [static struct sockaddr_in6 ac_sin6; int ac_size =
 sizeof (ac_sin6.sin6_scope_id);], [AC_MSG_RESULT(yes); AC_DEFINE([HAVE_SIN6_SCOPE_ID],
 1, [whether struct sockaddr_in6 has sin6_scope_id])],
 AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING(whether struct in6_addr has u6_addrXX and defines s6_addrXX)
-AC_TRY_COMPILE([#include <netinet/in.h>], [static struct in6_addr in6_u; 
+AC_TRY_COMPILE([#include <netinet/in.h>], [static struct in6_addr in6_u;
 int u =  in6_u.s6_addr16;], [AC_MSG_RESULT(yes); AC_DEFINE([HAVE_IN6_ADDR_S6_ADDR],
 1, [whether struct in6_addr has u6_addrXX and defines s6_addrXX])],
 AC_MSG_RESULT(no))
