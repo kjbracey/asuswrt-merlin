@@ -1956,7 +1956,7 @@ radvd/stamp-h1:
 	cd radvd && autoreconf -fi && \
 	CFLAGS="-Os $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections $(EXTRALDFLAGS)" \
-	$(CONFIGURE) --prefix="" --disable-dependency-tracking \
+	$(CONFIGURE) --prefix="" --disable-dependency-tracking $(if $(RTCONFIG_BCMARM),,--without-stack-protector) \
 	DAEMON_CFLAGS="-I$(TOP)/libdaemon" \
 	DAEMON_LIBS="-ldaemon -L$(TOP)/libdaemon/libdaemon/.libs $(EXTRALDFLAGS2) $(if $(RTCONFIG_QTN),-L$(TOP)/libqcsapi_client -lqcsapi_client)"
 	-@$(MAKE) -C radvd clean
