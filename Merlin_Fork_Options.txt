@@ -29,7 +29,7 @@ Enable Comcast DSCP fix
 Display Traffic Monitor graphs in
 Mb/s (default is KB/s)
 
-        Can be set in gui:      Yes (Tools/Other Settings/Traffic Monitor graph units)  
+        Can be set in gui:      Yes (Tools/Other Settings/Traffic Monitor graph units)
         Enable via NVRAM:       nvram set rstats_units=1
                                 nvram commit
 
@@ -63,7 +63,7 @@ remote monitoring
         Routers Supported:      All
         Released:               Update-08 (NVRAM) Update-15 (GUI)
         Reboot Required:        Yes
-        Notes:                  This will include the full header (including hostname and priority level) in the 
+        Notes:                  This will include the full header (including hostname and priority level) in the
                                         syslogd output to enable remote monitoring
 ----------------------------------------------------------------------------------------------------------------
 Save HTTPS certificate
@@ -76,12 +76,12 @@ Save HTTPS certificate
         Released:               Update-11
         Reboot Required:        Yes
         Notes:                  If you are using HTTPS validation, the security certificate is regenerated at every
-                                  boot, requiring you to install a new certificate in your browser.  This 
-                                  option saves the certificate across reboots negating the need to reinstall 
-                                  in your browser. 
+                                  boot, requiring you to install a new certificate in your browser.  This
+                                  option saves the certificate across reboots negating the need to reinstall
+                                  in your browser.
 ----------------------------------------------------------------------------------------------------------------
 Filter IPv6 Neighbor Solicitation
-        
+
         Can be set in gui:      Yes (Firewall/General/Filter IPv6 Neighbor Solicitation)
         Enable via NVRAM:       ipv6_neighsol_drop=1 (1=Yes, 0=No)
                                 nvram commit
@@ -90,7 +90,7 @@ Filter IPv6 Neighbor Solicitation
         Routers Supported:      All
         Released:               Update-11
         Reboot Required:        No
-        Notes:                  Control iptables rule dropping IPv6 neighbor solicitation requests 
+        Notes:                  Control iptables rule dropping IPv6 neighbor solicitation requests
 ----------------------------------------------------------------------------------------------------------------
 CROND logging options
 
@@ -104,7 +104,7 @@ CROND logging options
         Notes:                  Setting cron_loglevel=N sets the logging level to N
 ----------------------------------------------------------------------------------------------------------------
 Scan media files at every boot
-        
+
         Can be set in gui:      Yes (USB Applications/Servers Center/Media Server/Scan media files at every boot)
         Enable via NVRAM:       nvram set dms_scan=1
                                 nvram commit
@@ -115,7 +115,7 @@ Scan media files at every boot
         Notes:                  Setting to No will only scan media files when a change is detected
 ----------------------------------------------------------------------------------------------------------------
 Enable IPv6 MTU Advertisement
-        
+
         Can be set in gui:      Yes (IPv6/Enable IPv6 MTU Advertisement)
         Enable via NVRAM:       nvram set ipv6_radvd_mtu=1 (0 to disable)
                                 nvram commit
@@ -126,7 +126,7 @@ Enable IPv6 MTU Advertisement
         Notes:                  Default is to enable advertisement for IPv6 on all connection types
 ----------------------------------------------------------------------------------------------------------------
 Advertise Router as IPv6 DNS Server
-        
+
         Can be set in gui:      Yes (IPv6/Advertise router as DNS server)
         Enable via NVRAM:       nvram set ipv6_dns_router=1
                                 nvram commit
@@ -137,7 +137,7 @@ Advertise Router as IPv6 DNS Server
         Notes:                  Enable IPv6 DNS lookups to be cached by dnsmasq
 ----------------------------------------------------------------------------------------------------------------
 Stealth Mode - Show power status only
-        
+
         Can be set in gui:      Yes (Tools/Other Settings/Stealth Mode/Show power status only)
         Enable via NVRAM:       nvram set led_disable=2
                                 nvram commit
@@ -149,7 +149,7 @@ Stealth Mode - Show power status only
         Notes:                  Show only the power status led
 ----------------------------------------------------------------------------------------------------------------
 HTTP Lan Port
-        
+
         Can be set in gui:      Yes (Administration/System/HTTP Lan Port)
         Enable via NVRAM:       No, nvram variable http_lanport must be set thru gui
 
@@ -157,11 +157,11 @@ HTTP Lan Port
         Released:               Update-14
         Reboot Required:        Yes
         Notes:                  Changes HTTP port for gui access from default port 80
-                                Reset to default of 80 before loading firmware which does not support 
+                                Reset to default of 80 before loading firmware which does not support
                                   changing of the port
 ----------------------------------------------------------------------------------------------------------------
 QOS SFQ limit
-        
+
         Can be set in gui:      No
         Enable via NVRAM:       nvram set qos_sfql=[0,off-default  1,auto  2-127,value]
                                 nvram commit
@@ -174,7 +174,7 @@ QOS SFQ limit
                                 A value of 2-127 sets this value as the packet limit
 ----------------------------------------------------------------------------------------------------------------
 SNTP Server
-        
+
         Can be set in gui:      Yes (Administration/System/Enable router as local SNTP server)
         Enable via NVRAM:       nvram set ntpd_server=1
                                 nvram commit
@@ -187,18 +187,18 @@ SNTP Server
                                 User 'router.asus.com' as your SNTP server
 ----------------------------------------------------------------------------------------------------------------
 Networkmap UNIX/Linux Clients as PC
-        
+
         Can be set in gui:      No setting required
         Enable via NVRAM:       No setting required
 
         Routers Supported:      All
         Released:               Update-15
         Reboot Required:        No
-        Notes:                  You must install SAMBA and winbind on the client for the client to be 
+        Notes:                  You must install SAMBA and winbind on the client for the client to be
                                   recognized as a PC
 ----------------------------------------------------------------------------------------------------------------
 Disable Avahi (mDNS) Reflector
-        
+
         Can be set in gui:      No
         Enable via NVRAM:       nvram set mdns_reflector=0
                                 nvram commit
@@ -210,7 +210,7 @@ Disable Avahi (mDNS) Reflector
         Notes:                  Changes the default state of the Avahi reflector to disabled
 ----------------------------------------------------------------------------------------------------------------
 Enable logging of successful NTP updates
-        
+
         Can be set in gui:      No
         Enable via NVRAM:       nvram set ntp_log=0
                                 nvram commit
@@ -222,7 +222,7 @@ Enable logging of successful NTP updates
                                 This option enables logging of successful updates
 ----------------------------------------------------------------------------------------------------------------
 Set NTP update interval
-        
+
         Can be set in gui:      Yes (Administration/System/Router NTP update interval (hours))
         Enable via NVRAM:       nvram set ntp_update=[interval in hours]
                                 nvram commit
@@ -341,8 +341,8 @@ Ability to set the Site Level Aggregation identifier (sla-id)
         Routers Supported:      All
         Released:               Update-19
         Reboot Required:        Yes
-        Notes:                  Sets which prefix out of the delegation to use. This is 2^sla-id. If you have a /48, 
-                                  valid values would be 2^16 or 0-65535. 
+        Notes:                  Sets which prefix out of the delegation to use. This is 2^sla-id. If you have a /48,
+                                  valid values would be 2^16 or 0-65535.
                                   If you had a /56, it would be 2^8 or 0-255. A /60 is 0-15.
 ---------------------------------------------------------------------------------------------------------------
 Control release of IPv6 Addresses on exit
@@ -354,7 +354,7 @@ Control release of IPv6 Addresses on exit
         Routers Supported:      All
         Released:               Update-19
         Reboot Required:        Yes
-        Notes:                  Release addresses on exit.  Not releases addresses allows some ISPs to continue to assign the 
+        Notes:                  Release addresses on exit.  Not releases addresses allows some ISPs to continue to assign the
                                   same IPv6 addresses.
 ---------------------------------------------------------------------------------------------------------------
 Ability force a DHCPv6 request during IPv6 prefix delegation
@@ -366,7 +366,7 @@ Ability force a DHCPv6 request during IPv6 prefix delegation
         Routers Supported:      All
         Released:               Update-19
         Reboot Required:        Yes
-        Notes:                  Some ISPs will not send an IPv6 prefix without an address REQUEST.  
+        Notes:                  Some ISPs will not send an IPv6 prefix without an address REQUEST.
                                   Sky UK is known to require this option.
 ---------------------------------------------------------------------------------------------------------------
 Special IPv6 options
@@ -545,6 +545,23 @@ WSD Discovery enable
         Reboot Required:        No (must restart samba to activate changes)
         Notes:                  Allows Windows WSD to find samba shares on the router if Windows SMB1 is disabled.
 ---------------------------------------------------------------------------------------------------------------
+NextDNS support
+
+        Can be set in gui:      No
+        Enable via NVRAM:       nvram set nextdns_id=[your_id]
+                                nvram set nexdns_analytics=x
+                                nvram commit
+                                service restart_stubby
+                                  (where x = 0, disable analytics - default, x = 1, enable analytics)
+
+
+        Routers Supported:      All
+        Released:               Update-42E9
+        Reboot Required:        No (must restart stubby or select DoT servers to activate changes)
+        Notes:                  Allows sending of the NextDNS id and other info to NextDNS for personalization/analytics.
+                                  A NextDNS id must be provided in order to enable analytics.
+                                  If a provider other than NextDNS is selected/also selected/ analytics are automatically disabled.
+---------------------------------------------------------------------------------------------------------------
 
 
 Disabling the special options:
@@ -552,7 +569,7 @@ Disabling the special options:
 For options set with 'nvram set variable=1', setting 'nvram set variable=0' will disable
         (nvram commit and reboot if required)
 
-For options set with 'nvram set variable=some_string', setting the with no data 'nvram set variable=', 
+For options set with 'nvram set variable=some_string', setting the with no data 'nvram set variable=',
         will disable (nvram commit and reboot if required)
 
 Alternatively you can erase the variable with 'nvram unset variable' (nvram commit and reboot if required)

@@ -4,6 +4,25 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_42E9j9527  (5-April-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: jquery: update to 3.4.1
+* CHANGED: webui: remove use of manifest.appcache now deprecated
+* CHANGED: firewall: eliminate unnecessary ftp dnat rule when wan access not enabled
+* CHANGED: watchdog: add disable switch for httpd check; check uses httpd_check.htm
+* CHANGED: dropbear: (backport) strip version from ident
+* CHANGED: httpd: (backport) add recv & send timeouts
+* CHANGED: httpd: limit SSL certificate to 13 months if clock has been set
+- CHANGED: firewall: (backport) add support for TTL spoofing
+* CHANGED: make: clean up openssl/openssl11 install recipes
+* CHANGED: stubby: dnsmasq: add support for nextdns id's and analytics
+* CHANGED: stubby: dnsmasq: prevent setting nextdns analytics if other provider also selected
+* CHANGED: dnsfilter: update service providers
+* CHANGED: openssl11: update to 1.1.1f
+- FIXED: httpd: allow single quote in usb device name
+* FIXED: httpd: ensure all http requests are set in the tracking nvram var
+* FIXED: webui: fix misc problems flagged by browser console
+
+
 374.43_42E7j9527  (26-March-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: firewall: vsftpd: add nat rule for TLS/PASV when other FTP server defined
 * CHANGED: www: add descriptive text to help in setting ftp port
