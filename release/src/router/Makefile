@@ -1953,7 +1953,8 @@ util-linux-clean:
 	[ ! -f util-linux/Makefile ] || $(MAKE) -C util-linux distclean
 
 radvd/stamp-h1:
-	cd radvd && CFLAGS="-Os $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	cd radvd && autoreconf -fi && \
+	CFLAGS="-Os $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections $(EXTRALDFLAGS)" \
 	$(CONFIGURE) --prefix="" --disable-dependency-tracking \
 	DAEMON_CFLAGS="-I$(TOP)/libdaemon" \
@@ -1970,7 +1971,9 @@ radvd-clean:
 
 radvd-install: radvd
 	install -D radvd/radvd $(INSTALLDIR)/radvd/usr/sbin/radvd
+	install -D radvd/radvdump $(INSTALLDIR)/radvd/usr/sbin/radvdump
 	$(STRIP) $(INSTALLDIR)/radvd/usr/sbin/radvd
+	$(STRIP) $(INSTALLDIR)/radvd/usr/sbin/radvdump
 
 ndisc6/stamp-h1:
 ifeq ($(RTCONFIG_BCMARM),y)

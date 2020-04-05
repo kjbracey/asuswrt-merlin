@@ -1,9 +1,9 @@
 #
 #
 #   Authors:
-#    Lars Fenneberg		<lf@elemental.net>	 
+#    Lars Fenneberg		<lf@elemental.net>
 #
-#   This software is Copyright 1996,1997 by the above mentioned author(s), 
+#   This software is Copyright 1996,1997 by the above mentioned author(s),
 #   All Rights Reserved.
 #
 #   The license which is distributed with this software in the file COPYRIGHT
@@ -86,6 +86,7 @@ radvd_SOURCES = \
 	includes.h \
 	log.c \
 	log.h \
+	ifaddrs.c \
 	pathnames.h \
 	radvd.h \
 	recv.c \
@@ -262,6 +263,7 @@ check_all_SOURCES = \
 	test/check.c \
 	device-common.c \
 	interface.c \
+	ifaddrs.c \
 	log.c \
 	send.c \
 	timer.c \
