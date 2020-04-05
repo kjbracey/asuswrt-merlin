@@ -19,6 +19,10 @@
 #include "pathnames.h"
 #include "radvd.h"
 
+#ifndef ARPHRD_VOID  //added for older kernels
+#include "if_arp.h"
+#endif
+
 #ifndef IPV6_ADDR_LINKLOCAL
 #define IPV6_ADDR_LINKLOCAL 0x0020U
 #endif
