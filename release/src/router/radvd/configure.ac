@@ -12,12 +12,14 @@ dnl   may request it from <reubenhwk@gmail.com>.
 dnl
 dnl
 
-AC_INIT(radvd.c)
-
+dnl If adding rcX to version, be sure to separate with a '-' 
+AC_INIT(radvd, [2.18])
+AC_CONFIG_SRCDIR(radvd.c)
 AC_CANONICAL_SYSTEM
-VERSION=`cat ${srcdir}/VERSION | grep -v '^#' | tr -d '\012'`
-AM_INIT_AUTOMAKE(radvd,$VERSION,true)
+AM_INIT_AUTOMAKE
+
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
+
 
 AC_MSG_CHECKING([architecture])
 case "$target" in
@@ -40,12 +42,20 @@ case "$target" in
 		AC_MSG_ERROR(
 [currently only Linux and BSD 4.4 with NRLs IPv6 code are
 supported. If you have such a system and it is not guessed correctly 
-you must specifiy it with --target on the configure command line])
+you must specify it with --target on the configure command line])
         ;;
 esac
 
 dnl Determine CC and preset CFLAGS
-AC_PROG_CC
+AC_PROG_CC_C99
+AC_PROG_RANLIB
+
+AC_ARG_WITH([check], AS_HELP_STRING([--without-check], [Build without check unit testing framework]),[],[with_check=no])
+AS_IF([test "x$with_check" = "xyes"], [
+    AS_IF([test "x$arch" = "xlinux"], [
+        PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
+    ])
+])
 
 dnl Determine of netlink is available
 AC_MSG_CHECKING(netlink)
@@ -141,13 +151,12 @@ AC_CHECK_LIB(c, inet_ntop,,
 # prevent caching
 unset ac_cv_lib_inet6_inet_ntop
 
-PKG_CHECK_MODULES([DAEMON], libdaemon)
-
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS( \
 	getopt.h \
 	ifaddrs.h \
+	linux/if_arp.h \
 	machine/limits.h \
 	machine/param.h \
 	net/if_arp.h \
@@ -155,7 +164,6 @@ AC_CHECK_HEADERS( \
 	net/if_types.h \
 	sys/param.h \
 	sys/sockio.h \
-	sys/sysctl.h \
 	sys/time.h \
 	time.h \
 )
@@ -177,6 +185,8 @@ AC_MSG_RESULT(no))
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(getopt_long)
+AC_CHECK_FUNCS(ppoll)
+AC_CHECK_FUNCS(sysctl)
 
 CONDITIONAL_SOURCES="device-${arch}.${OBJEXT} ${CONDITIONAL_SOURCES}"
 if test x${arch} = xlinux ; then
@@ -191,13 +201,53 @@ AC_SUBST(PATH_RADVD_PID)
 AC_SUBST(PATH_RADVD_LOG)
 AC_SUBST(LOG_FACILITY)
 
+# Default value for sbindir
+prefix_temp=$prefix
+exec_prefix_temp=$exec_prefix
+
+test "${prefix}" = "NONE" && prefix="${ac_default_prefix}"
+test "${exec_prefix}" = "NONE" && exec_prefix='${prefix}'
+
+# Initial Value is $exec_prefix/sbin
+sbintemp="${sbindir}"
+
+# Expands to $prefix/sbin
+eval sbintemp=\"${sbintemp}\"
+# Expands to /usr/local/sbin or /usr/sbin if --prefix is passed
+eval sbintemp=\"${sbintemp}\"
+SBINDIR=${sbintemp}
+
+AC_SUBST(SBINDIR)
+
+PKG_PROG_PKG_CONFIG
+AC_ARG_WITH([systemdsystemunitdir],
+     [AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files])],,
+     [with_systemdsystemunitdir=auto])
+AS_IF([test "x$with_systemdsystemunitdir" = "xyes" -o "x$with_systemdsystemunitdir" = "xauto"], [
+     def_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)
+
+     AS_IF([test "x$def_systemdsystemunitdir" = "x"],
+   [AS_IF([test "x$with_systemdsystemunitdir" = "xyes"],
+    [AC_MSG_ERROR([systemd support requested but pkg-config unable to query systemd package])])
+    with_systemdsystemunitdir=no],
+   [with_systemdsystemunitdir="$def_systemdsystemunitdir"])])
+AS_IF([test "x$with_systemdsystemunitdir" != "xno"],
+      [AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])])
+AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$with_systemdsystemunitdir" != "xno"])
+
 AM_CONFIG_HEADER(config.h)
-AC_OUTPUT(Makefile redhat/radvd.spec)
+AC_OUTPUT(
+	Makefile \
+	radvd.service \
+	redhat/systemd/radvd.spec \
+	redhat/SysV/radvd.spec \
+)
 
 cat << EOF
 
 Your build configuration:
 
+	CPPFLAGS = $CPPFLAGS
 	CFLAGS = $CFLAGS
 	LDFLAGS = $LDFLAGS
 	Arch = ${arch}

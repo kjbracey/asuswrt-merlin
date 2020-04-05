@@ -32,6 +32,7 @@ The file contains one or more interface definitions of the form:
 	list of RDNSS definitions
 	list of DNSSL definitions
 	list of ABRO definitions
+	list of acceptable RA source addresses
 .B };
 .fi
 
@@ -92,7 +93,7 @@ DNSSL (DNS Search List) definitions are of the form:
 .B };
 .fi
 
-By default radvd will send route advertisements so that every node on the link can use them.
+By default radvd will send multicast route advertisements so that every node on the link can use them.
 The list of clients (IPv6 address) to advertise to, and accept route solicitations from can be configured.
 If done, radvd does not send send messages to the multicast addresses but
 to the configured unicast addresses only.  Solicitations from other addresses are refused.
@@ -102,7 +103,19 @@ configuration.  See examples section for a use case of this.
 The definitions are of the form:
 
 .nf
-.BR "clients " {
+.BR clients " " {
+        list of IPv6 addresses
+.B };
+.fi
+
+By default radvd will use the first link-local address for the interface as the
+source address for route advertisements. This can be overwritten by manually
+setting the list of acceptable source addresses. If done, radvd will use the
+first address from the interface that is present in the configured source
+addresses only. This functionality will NOT spoof the source address, but may be useful in combination with VRRP or other functionality that 
+
+.nf
+.BR AdvRASrcAddress " " {
         list of IPv6 addresses
 .B };
 .fi
@@ -110,12 +123,10 @@ The definitions are of the form:
 ABRO (Authoritative Border Router Option) definitions are of the form:
 
 .nf
-.BR "abro " prefix / "length " {
+.BR "abro " "IPv6-address " {
         list of abro specific options
 .B };
 .fi
-
-Prefix can be network prefix or the address of the interface.
 
 .SH INTERFACE SPECIFIC OPTIONS
 
@@ -160,6 +171,19 @@ soliciting node.  This option is necessary for non-broadcast,
 multiple-access links, such as ISATAP.
 
 Default: off
+
+.TP
+.BR AdvRASolicitedUnicast " " on | off
+
+Indicates that router solicitations will be responded to with unicast
+router advertisements, as recommended by RFC7772. Large networks with a
+high concentration of mobile devices might experience like battery
+depletion, when solicited Router Advertisement messages are multicast.
+
+This corresponds to the Cisco IOS option
+.B ipv6 nd ra solicited unicast
+
+Default: on
 
 .TP
 .BR "MaxRtrAdvInterval " seconds
@@ -733,13 +757,14 @@ RFC 6106, November 2010.
 .PP
 Z. Shelby, S. Chakrabarti, E. Nordmark and  C. Bormann " Neighbor Discovery Optimization for IPv6 over Low-Power 
 Wireless Personal Area Networks (6LoWPANs)", RFC 6775, November 2012.
+.PP
+Gont, F. "Security Implications of IPv6 Fragmentation with IPv6 Neighbor Discovery",
+RFC 6980, August 2013.
+.PP
+Yourtchenko, A. and Colitti, L. "Reducing Energy Consumption of Router Advertisements",
+RFC 7772, February 2016.
+
 .SH "SEE ALSO"
 
 .BR radvd (8),
 .BR radvdump (8)
-
-.SH BUGS
-radvd does not support splitting up RAs to multiple packets (RFC4861 6.2.3 last paragraph).
-In practise this limits advertising to ~45 prefixes on a link, but there is no reason to
-be able to so.
-

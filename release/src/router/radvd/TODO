@@ -10,19 +10,9 @@
 read list of interfaces with SIOCGIFCONF (AF_INET6 support in the kernel would
 be nice) or from /proc
 
-Quoting Peter Bieringer (peter@bieringer.de):
-> Das war's schon. Ach ja, wenn Du mal eine neue Version machst, kannst Du
-> noch einen Schalter einbauen, damit radvd trotz debug-level >0 auf Wunsch
-> als daemon in den Hintergrund starten kann?
-[ Peter wants that a debugging level greater than 0 doesn't stop radvd
-from forking.]
-
 support for few protocol constants defined in RFC 4861 Sec 10 is missing.
 
 consider whether UnicastOnly flag should be detected by radvdump.
-
-read the man pages one more time and make sure their are understandable
-and English is correct
 
 The following parts of RFC4861 are not implemented:
  - section 6.2.5: when AdvSendAdvertisements changes to FALSE, we don't send 
@@ -52,9 +42,6 @@ problem with this is that e.g. RHL73's glibc didn't support getifaddrs(),
 and before glibc 2.3.3 getifaddrs() didn't use netlink so it didn't work
 well with IPv6.  These old compat concerns are likely moot now..
 
-Consider whether radvd should work around missing/broken interfaces by
-default, especially if a previously working interface gets disabled.
-
 Implement Secure Neighbor Discovery (RFC 3971).
 
 Interface reconfiguration is only supported on Linux.  Consider whether to
@@ -64,13 +51,6 @@ The restrictions of the (privilege separation) master process could
 be restricted as currently it basically only needs to write to /proc,
 do some logging and nothing else.
 
-radvd does not support splitting up RAs to multiple packets (RFC4861 6.2.3
-last paragraph). In practise this limits advertising to ~45 prefixes on a 
-link, but there is no reason to be able to so.  In order to avoid
-fragmenting packets yet support receiving full-size frames, our hack is to
-have a bigger receive than send buffer. We could try using setsockopt
-IPV6_DONTFRAG, but at least Linux glibc doesn't appear to support it yet.
-
 Triggered by: https://bugzilla.redhat.com/show_bug.cgi?id=554125
 Known problems (probably can't do anything about these):
  - If interface MAC address changes, radvd will keep sending the old MAC
@@ -78,7 +58,20 @@ Known problems (probably can't do anything about these):
    Ethernet frames with the old MAC until interface is flapped.
    More: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=508466
 
-http://lists.litech.org/pipermail/radvd-devel-l/2009-August/000420.html
-localtime() used in vlog() is not reentrant, and is not safe in signal
-handling context.  There may be other such functions as well. It's not clear
-what could be done about that.
+AdvRASolicitedUnicast: Further improvement is possible.
+- If we get a RS and are about to send a multicast RA, then we can further save
+  battery on the client device by NOT sending a unicast response, and just
+  letting the client wait for the multicast response. This should be
+  implemented as a new time value, specifying the maximum amount of time
+  remaining to as a deciding factor between send-solicited-RA-now vs
+  wait-for-next-multicast.
+- The above can also form part of rate-limiting of unicast RA responses when
+  network topology has recently changed.
+
+The following parts of RFC7222 are not yet implemented:
+- Section 5.1.3: Networks that serve battery-powered devices SHOULD NOT send
+  multicast RAs too frequently (see Section 4) unless the information in the RA
+  packet has substantially changed.  If there is a desire to ensure that hosts
+  pick up configuration changes quickly, those networks MAY send frequent
+  Router Advertisements for a limited period of time (e.g., not more than one
+  minute) immediately after a configuration change.

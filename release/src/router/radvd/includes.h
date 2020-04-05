@@ -12,24 +12,23 @@
  *
  */
 
-#ifndef INCLUDES_H
-#define INCLUDES_H
+#pragma once
 
 #include "config.h"
 
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <time.h>
-#include <syslog.h>
-#include <unistd.h>
 #include <errno.h>
-#include <signal.h>
+#include <grp.h>
 #include <netdb.h>
 #include <pwd.h>
-#include <grp.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
+#include <time.h>
+#include <unistd.h>
 
 #include <sys/types.h>
 #ifdef HAVE_INTTYPES_H
@@ -63,17 +62,17 @@
 #include <sys/time.h>
 #include <sys/uio.h>
 
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #include <netinet/in.h>
 
-#include <netinet/ip6.h>
 #include <netinet/icmp6.h>
+#include <netinet/ip6.h>
 
 #include <arpa/inet.h>
 
-#ifdef HAVE_SYS_SYSCTL_H
+#ifdef HAVE_SYSCTL
 #include <sys/sysctl.h>
 #endif
 
@@ -82,12 +81,14 @@
 #ifdef HAVE_NET_IF_DL_H
 #include <net/if_dl.h>
 #endif
+
 #ifdef HAVE_NET_IF_TYPES_H
 #include <net/if_types.h>
 #endif
-#if defined(HAVE_NET_IF_ARP_H) && !defined(ARPHRD_ETHER)
+
+#if defined(HAVE_NET_IF_ARP_H) && !defined(ARPHRD_ETHER) && !defined(HAVE_LINUX_IF_ARP_H)
 #include <net/if_arp.h>
-#endif				/* defined(HAVE_NET_IF_ARP_H) && !defined(ARPHRD_ETHER) */
+#endif /* defined(HAVE_NET_IF_ARP_H) && !defined(ARPHRD_ETHER) */
 
 #ifdef HAVE_SYS_SOCKIO_H
 #include <sys/sockio.h>
@@ -101,30 +102,6 @@
 #include <ifaddrs.h>
 #endif
 
-/* Uclibc : include/netinet/icmpv6.h - Added by Bhadram*/
-#define ND_OPT_ARO	33
-#define ND_OPT_6CO	34
-#define ND_OPT_ABRO	35
-
-struct nd_opt_abro {
-	uint8_t nd_opt_abro_type;
-	uint8_t nd_opt_abro_len;
-	uint16_t nd_opt_abro_ver_low;
-	uint16_t nd_opt_abro_ver_high;
-	uint16_t nd_opt_abro_valid_lifetime;
-	struct in6_addr nd_opt_abro_6lbr_address;
-};
-
-struct nd_opt_6co {
-	uint8_t nd_opt_6co_type;
-	uint8_t nd_opt_6co_len;
-	uint8_t nd_opt_6co_context_len;
-	uint8_t nd_opt_6co_res:3;
-	uint8_t nd_opt_6co_c:1;
-	uint8_t nd_opt_6co_cid:4;
-	uint16_t nd_opt_6co_reserved;
-	uint16_t nd_opt_6co_valid_lifetime;
-	struct in6_addr nd_opt_6co_con_prefix;
-};				/*Added by Bhadram */
-
-#endif				/* INCLUDES_H */
+#ifdef HAVE_LINUX_IF_ARP_H
+#include <linux/if_arp.h>
+#endif

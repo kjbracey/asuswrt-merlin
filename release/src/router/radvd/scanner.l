@@ -13,7 +13,7 @@
  *
  */
 
-%option nounput noinput noyywrap
+%option nounput noinput noyywrap yylineno
 
 %{
 #include "config.h"
@@ -21,9 +21,8 @@
 #include "log.h"
 #include "gram.h"
 
-extern char *conf_file;
+int num_lines;
 
-int num_lines = 1;
 %}
 
 digit		[0-9]
@@ -36,7 +35,7 @@ addr2		{hexdigit}{1,4}(":"{hexdigit}{1,4})*"::"
 addr3		({hexdigit}{1,4}":"){7}{hexdigit}{1,4}
 addr		({addr1}|{addr2}|{addr3}|"::")
 whitespace	([ \t])+
-string		[a-zA-Z0-9`~!@#$%\^&*()_\-+=:\[\]<>,\.?\\]+
+string		[a-zA-Z0-9`~!@#$%\^&*()_\-+=:\[\]<>,\.?\\]+|L?\"(\\.|[^\\"])*\"
 %%
 
 #.*$			{/* ignore comments */}
@@ -51,6 +50,7 @@ DNSSL			{ return T_DNSSL; }
 clients			{ return T_CLIENTS; }
 lowpanco		{ return T_LOWPANCO; }
 abro			{ return T_ABRO; }
+AdvRASrcAddress	{ return T_RASRCADDRESS; }
 
 IgnoreIfMissing		{ return T_IgnoreIfMissing; }
 AdvSendAdvert		{ return T_AdvSendAdvert; }
@@ -59,6 +59,7 @@ MinRtrAdvInterval	{ return T_MinRtrAdvInterval; }
 AdvManagedFlag		{ return T_AdvManagedFlag; }
 AdvOtherConfigFlag	{ return T_AdvOtherConfigFlag; }
 AdvLinkMTU		{ return T_AdvLinkMTU; }
+AdvRAMTU		{ return T_AdvRAMTU; }
 AdvReachableTime	{ return T_AdvReachableTime; }
 AdvRetransTimer		{ return T_AdvRetransTimer; }
 AdvCurHopLimit		{ return T_AdvCurHopLimit; }
@@ -78,6 +79,7 @@ AdvHomeAgentFlag	{ return T_AdvHomeAgentFlag; }
 AdvIntervalOpt		{ return T_AdvIntervalOpt; }
 AdvHomeAgentInfo	{ return T_AdvHomeAgentInfo; }
 UnicastOnly		{ return T_UnicastOnly; }
+AdvRASolicitedUnicast	{ return T_AdvRASolicitedUnicast; }
 
 Base6Interface		{ return T_Base6Interface; }
 Base6to4Interface	{ return T_Base6to4Interface; }
@@ -115,8 +117,6 @@ Adv6LBRaddress		{ return T_Adv6LBRaddress; }
 {addr}		{
 			static struct in6_addr addr;
 			if (inet_pton(AF_INET6, yytext, &addr) < 1) {
-				flog(LOG_ERR, "invalid address in %s, line %d", conf_file,
-					num_lines);
 				return T_BAD_TOKEN;
 			}
 

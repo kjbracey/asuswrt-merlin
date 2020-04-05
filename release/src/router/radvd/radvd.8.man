@@ -23,6 +23,7 @@ radvd \- router advertisement daemon for IPv6
 .BI "[ \-p " pidfile " ]"
 .BI "[ \-m " logmethod " ]"
 .BI "[ \-l " logfile " ]"
+.BI "[ \-n " nodaemon " ]"
 .BI "[ \-f " facility " ]"
 .BI "[ \-t " chrootdir " ]"
 .BI "[ \-u " username " ]"
@@ -37,16 +38,7 @@ addresses and some other parameters. It also defines "Neighbor Discovery
 Optimization for IPv6 over Low-Power Wireless Personal Area Networks (6LoWPANs)" (RFC6775).
 They also can choose a default router based on these advertisements.
 
-Note that if debugging is not enabled,
-.B radvd
-will not start if IPv6 forwarding is disabled.  IPv6 forwarding can be
-controlled via sysctl(8),
-.B net.ipv6.conf.all.forwarding
-on Linux or
-.B net.inet6.ip6.forwarding
-on BSD.
-
-Similarly, the configuration file must not be writable by others, and if
+The configuration file must not be writable by others, and if
 non-root operation is requested, not even by self/own group.
 
 .SH OPTIONS
@@ -65,6 +57,9 @@ Displays a short usage description and then aborts.
 .TP
 .BR "\-c" , " \-\-configtest"
 Test configuration and do startup tests and then exit.
+.TP
+.BR "\-n" , " \-\-nodaemon"
+Prevent the daemonizing.
 .TP
 .BR "\-d " debuglevel, " \-\-debug " debuglevel
 With this option you turn on debugging information. The debugging level is
@@ -177,4 +172,5 @@ Jim Paris	<jim@jtan.com>		- Privilege separation support
 Reuben Hawkins  <reubenhwk@gmail.com>   - current maintainer
 Pierre Ossman   <pierre@ossman.eu>      - RFC6106 (DNSSL) support
 Varka Bhadram 	<varkabhadram@gmail.com> - 6LoWPAN-ND (RFC6775) support
+Robin H. Johnson	<robbat2@gentoo.org>	- RA splitting per RFC 6980 & RFC4861#6.2.3
 .fi
