@@ -4,6 +4,22 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_43D1j9527  (6-April-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: radvd: update to 2.18
+* CHANGED: radvd: add missing ifaddrs functions; add radvdump
+* CHANGED: make: radvd: disable fstack-protector for MIPS builds
+* CHANGED: radvd: supply missing defs for MIPS builds
+* CHANGED: radvd: (upstream) fix segfault because of accessing NULL pointer
+* CHANGED: radvd: (upstream) cleanups in send.c
+* CHANGED: radvd: (upstream) crash on SIGHUP when config file removed
+* CHANGED: radvd: (upstream) don't force -fstack-protector, the toolchain might lack support for it
+* CHANGED: radvd: (upstream) fix wrong assignment of struct msghdr
+* CHANGED: webui: (backport) include base64.js
+* FIXED: services: disable stubby and dnscrypt if not in router mode
+* FIXED: webui: do not allow invalid lan gateway during AP setup
+* FIXED: others: fix logging option for autov6
+
+
 374.43_42E9j9527  (5-April-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: jquery: update to 3.4.1
 * CHANGED: webui: remove use of manifest.appcache now deprecated
