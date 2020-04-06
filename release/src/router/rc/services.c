@@ -1132,6 +1132,11 @@ void start_dnscrypt(int force)
 	char *dnscrypt1_lanip;
 	char *dnscrypt2_lanip;
 
+	// Only allow in router mode
+	if (nvram_get_int("sw_mode") != SW_MODE_ROUTER) {
+		nvram_set_int("dnscrypt_proxy", 0);
+		return;
+	}
 	// Only start on first call or clock sync
 	ntp_sync = nvram_get_int("ntp_sync");
 	if (time_valid == ntp_sync)
@@ -1259,6 +1264,12 @@ void start_stubby(int force)
 	char *dotname, *ip4addr, *ip6addr, *tlsport, *authname, *tlsdigest, *tlspubkey, *dnssec, *nolog;
 	char buffer[256];
 	char *argv[6];
+
+	// Only allow in router mode
+	if (nvram_get_int("sw_mode") != SW_MODE_ROUTER) {
+		nvram_set_int("stubby_proxy", 0);
+		return;
+	}
 
 	// Only start on first call or clock sync
 	ntp_sync = nvram_get_int("ntp_sync");
