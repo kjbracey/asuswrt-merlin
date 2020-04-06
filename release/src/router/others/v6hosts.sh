@@ -1,17 +1,18 @@
 #!/bin/sh
 
 # Add EUI-64 addresses to dnsmasq hosts
-# Based on http://tomatousb.org/forum/t-306529/auto-creation-of-ipv6-hostnames 
+# Based on http://tomatousb.org/forum/t-306529/auto-creation-of-ipv6-hostnames
 
 scrname="v6hosts"
 debug=$(nvram get autov6_debug)
-if [ -n "$debug" ]; then
-    LOGA="/tmp/autov6.log"
-    LOGB="/tmp/autov6.dat"
-else
+if [ -z "$debug" -o "$debug" == "0" ]; then
     LOGA="/dev/null"
     LOGB="/dev/null"
+else
+	LOGA="/tmp/autov6.log"
+    LOGB="/tmp/autov6.dat"
 fi
+
 V6HOSTS="/etc/hosts.autov6"
 
 if [ "$1" != "add" -a "$1" != "old" ]; then
