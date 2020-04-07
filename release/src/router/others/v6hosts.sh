@@ -63,7 +63,8 @@ if [ $? == 0 ]; then
         fi
     fi
     # Do ping test
-    if ping -6 -q -c 1 -W 6 $v6addr; then
+    ping -6 -q -c 2 -W 5 $v6addr
+    if [ $? == 0 ]; then
         echo "$(date) known name, valid addr $HNAME" >> "$LOGA"
         #echo "found valid hosts entry $v6addr $HNAME" | logger -t "$scrname"
         exit 0
@@ -75,7 +76,8 @@ else
     sleep 2
 fi
 
-V6IFACE=$(ip -6 neigh show to fe80::/10 | grep "$2" | awk '{ print $1 }' | awk -F '::' '{ print $2 }')
+# extract first neighbor as global address (eiu64 or temp)
+V6IFACE=$(ip -6 neigh show to fe80::/10 | grep "$2" | awk 'FNR <= 1' | awk '{ print $1 }' | awk -F '::' '{ print $2 }')
 if [ "$V6IFACE" == "" ]; then
     echo "$(date) no neighbor $HNAME" >> "$LOGA"
     exit 0
@@ -100,13 +102,13 @@ else
     exit 1
 fi
 
-ping -6 -q -c 1 -W 6 $V6ADDR > /tmp/ping
+ping -6 -q -c 2 -W 5 $V6ADDR > /tmp/ping
 
 ip -6 neigh | grep -qi "$V6ADDR .* lladdr $2"
 if [ $? == 0 ]; then
     if [ $DEL_NEEDED -eq 1 ]; then
         # workaround lack of case insensitivity options
-	echo "$(date) removing hosts entry for $HNAME" >> "$LOGA"
+        echo "$(date) removing hosts entry $v6addr $HNAME" >> "$LOGA"
         sed -i "s/.*\b${HNAME}\b.*//I; /^$/ d" "$V6HOSTS"
     fi
     if [ $UPDATE_HOSTS -eq 1 ]; then
@@ -118,8 +120,8 @@ if [ $? == 0 ]; then
 			exit 0
 		else
 			echo "$V6ADDR $HNAME" >> "$V6HOSTS"
-			echo "$(date) updating hosts entry $V6ADDR $HNAME" >> "$LOGA"
-			echo "updating hosts entry $V6ADDR $HNAME" | logger -t "$scrname"
+			echo "$(date) `if [ $DEL_NEEDED -eq 1 ]; then echo 'updating'; else echo 'adding'; fi` hosts entry $V6ADDR $HNAME" >> "$LOGA"
+			echo "`if [ $DEL_NEEDED -eq 1 ]; then echo 'updating'; else echo 'adding'; fi` hosts entry $V6ADDR $HNAME" | logger -t "$scrname"
 			if [ ! -e /var/lock/autov6.lock ]; then
 				touch /var/lock/autov6.lock
 				/usr/sbin/updatehosts.sh 60 </dev/null &>/dev/null &

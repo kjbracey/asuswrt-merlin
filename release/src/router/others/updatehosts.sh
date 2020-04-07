@@ -6,7 +6,7 @@
 scrname="updatehosts"
 
 trap "" SIGHUP
-i=$1
+let i=timeout=$1
 oldpid=$(cat "/var/run/dnsmasq.pid")
 while [ $i -gt -1 ]; do
 	newpid=$(cat "/var/run/dnsmasq.pid")
@@ -14,6 +14,7 @@ while [ $i -gt -1 ]; do
 		i=$(($i-1))
 		sleep 1
 	else
+        sleep $(($timeout-$i))
 		rm -f /var/lock/autov6.lock
 		exit 0
 	fi
