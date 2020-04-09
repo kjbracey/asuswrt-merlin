@@ -10,14 +10,14 @@ body {
 	border:0px;
 	background:url(images/New_ui/middown_bg.png);
 	padding-bottom:24px;	/*for FAQ bottom searching bar */
-	
+
 	margin-top:-5px \0;	/* \0 for IE8-9 to move upper for covering the hidden form By Viz*/
 	padding-top:15px \0;	/* \0 for IE8-9 to move upper for covering the hidden form By Viz*/
 }
 
 .top-logo{
 	width:380px;
-/*	background:url(images/New_ui/top-asustitle.png) #c5d2d6 no-repeat;*/	
+/*	background:url(images/New_ui/top-asustitle.png) #c5d2d6 no-repeat;*/
 	vertical-align: top;
 }
 .top-logo a{
@@ -28,7 +28,7 @@ body {
 	font-family:Arial, Helvetica, sans-serif;
 	font-weight:bolder;
 	color:#FFFFFF;
-	letter-spacing:2px;	
+	letter-spacing:2px;
 	width:160px;
 	margin:5px 0px 0px 20px;
 	padding:34px 0px 0px 10px;
@@ -42,7 +42,7 @@ body {
 	height:54px;
 	background:url(images/New_ui/title_bg.png) 0 0 no-repeat;
 	margin:0px auto;
-}	
+}
 
 #banner3{
 	width:983px;
@@ -53,7 +53,7 @@ body {
 
 .menu {
 	font-weight:bold;
-	text-shadow: 1px 1px 0px black;	
+	text-shadow: 1px 1px 0px black;
 	width:189px;
 	height:52px;
 	font-family:Verdana;
@@ -161,7 +161,7 @@ body {
 .submenu a:link, .submenu a:visited {
 	color: #94ccf2;	display: block;
 	background: url(images/n-button-01.gif);
-	padding-left:35px;}	
+	padding-left:35px;}
 .submenu a:hover,.submenu a:active {
 	color: #ffffff;	background:url(images/n-button-01.gif) 0 -26px;}
 
@@ -238,7 +238,7 @@ body {
 
 .AiHintTitle{
 	font-family :Verdana;
-	font-size:11px; 
+	font-size:11px;
 	font-weight:bold;
 	color:#000;
 	text-align:center;
@@ -247,7 +247,7 @@ body {
 	height:23px;
 	line-height:23px;
 }
-	
+
 .sitemap{
 	font-size:11px;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
@@ -289,7 +289,7 @@ body {
 	border:0px;
 	float:right;
 	margin:0px 4px 0px 4px;
-	position:relative;	
+	position:relative;
 }
 .hint_body1 {
 	background-color:#FFFFFF;
@@ -336,7 +336,7 @@ body {
 }
 .hintstyle2:hover{
 	color: #0fd517;
-	font-weight:bold;	
+	font-weight:bold;
 	text-decoration:none;
 	cursor:help;
 	border-bottom:1px solid #0fd517;
@@ -347,7 +347,7 @@ body {
 .copyright {font-family :Verdana;font-size : 11px;text-align:right;color:#FFFFFF;padding-right:10px; margin:0 auto; width:983px;}
 
 .popup_bg{
-	position:absolute;	
+	position:absolute;
 	margin: auto;
 	top: 0;
 	left: 0;
@@ -362,7 +362,7 @@ body {
 	overflow:hidden;
 }
 .popup_bar_bg{
-	position:absolute;	
+	position:absolute;
 	margin: auto;
 	top: 0;
 	left: 0;
@@ -394,7 +394,7 @@ body {
 	background-color:#000000;
 	position:absolute;
 	/*left:35%;*/
-	top:0;Hot 
+	top:0;Hot
 	z-index:200;
 	_position:absolute;
 }
@@ -500,7 +500,7 @@ body {
 	border:0px;
 	font-size:10px;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
-	width:110px;		
+	width:110px;
 }
 .time{
 	border:0px solid #333;
@@ -558,13 +558,13 @@ body {
 
 
 /* ============ new ui =============*/
-.titlebtn {	
+.titlebtn {
       background: transparent url(images/New_ui/btn.png) no-repeat scroll right top;
       color: White;
       display: block;
       float: left;
       height: 34px;
-      padding-right: 10px;      
+      padding-right: 10px;
       margin-right: 10px;
       text-decoration: none;
 	  width:136px;
@@ -576,8 +576,8 @@ body {
       line-height: 24px;
 			font-weight: bold;
     }
-	
-	
+
+
 .titlebtn:hover {
       background-position: right -34px;
     }
@@ -599,7 +599,7 @@ body {
 	text-decoration:none;
 	width:147px;
 	height:33px;
-	line-height:33px;	
+	line-height:33px;
 }
 
 .titledropdownbtn:hover{
@@ -613,7 +613,7 @@ font-size:12px;
 }
 .titledown a:link{
 color:#FFFFFF;
-} 
+}
 .titledown:hover{
 color:#FFFFFF;
 }
@@ -628,7 +628,7 @@ font-size:12px;
 }
 
 /*Add by Viz*/
-.titledownbtntext{	
+.titledownbtntext{
 font:Arial, Helvetica, sans-serif;
 color:#FFFFFF;
 font-size:12px;
@@ -654,17 +654,17 @@ width:122px;
 }
 .cloud_main_radius{
 	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;	
+	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
 .cloud_main_radius_left{
 	-webkit-border-radius: 10px 0 0 10px;
-	-moz-border-radius: 10px 0 0 10px;	
+	-moz-border-radius: 10px 0 0 10px;
 	border-radius: 10px 0 0 10px;
 }
 .cloud_main_radius_right{
 	-webkit-border-radius: 0 10px 10px 0;
-	-moz-border-radius: 0 10px 10px 0;	
+	-moz-border-radius: 0 10px 10px 0;
 	border-radius: 0 10px 10px 0;
 }
 
@@ -700,13 +700,17 @@ width:122px;
   background: url(images/New_ui/icon_indexes.png);
   background-position: -0px -296px; width: 43px; height: 43px;
 }
+#index_img8{
+  background: url(images/New_ui/addons.png);
+  background-position: -0px -0px; width: 43px; height: 43px;
+}
 #menu_img1{
   background: url(images/New_ui/icon_menues.png);
   background-position: -0px 4px; width: 43px; height: 40px;
 }
 #menu_img2{
   background: url(images/New_ui/icon_menues.png);
-  background-position: -0px -36px; width: 43px; height: 40px;  
+  background-position: -0px -36px; width: 43px; height: 40px;
 }
 #menu_img3{
   background: url(images/New_ui/icon_menues.png);

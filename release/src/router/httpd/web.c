@@ -9660,6 +9660,7 @@ struct ej_handler ej_handlers[] = {
 	{ "get_resolver_array", ej_resolver_dump_array},
 	{ "get_stubby_array", ej_stubby_dump_array},
     { "get_custom_settings", ej_get_custom_settings},
+	{ "get_addons_array", ej_get_addons_array},
 
 	{ "iptraffic", ej_iptraffic},
 	{ "iptmon", ej_iptmon},

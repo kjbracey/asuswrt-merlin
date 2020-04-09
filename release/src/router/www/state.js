@@ -143,6 +143,7 @@ var yadns_support = isSupport("yadns");
 var dnsfilter_support = isSupport("dnsfilter");
 var manualstb_support = isSupport("manual_stb");
 var wps_multiband_support = isSupport("wps_multiband");
+var am_support = isSupport("am_addons");
 
 //MODELDEP : DSL-N55U、DSL-N55U-B、RT-N56U
 if(based_modelid == "DSL-N55U" || based_modelid == "DSL-N55U-B" || based_modelid == "RT-N56U")
@@ -240,6 +241,8 @@ var dsl_loss_sync = '<% nvram_get("dsltmp_syncloss"); %>';
 var nvram_used = '<% sysinfo("nvram.used"); %>';
 var nvram_total = '<% sysinfo("nvram.total"); %>';
 var firewall_enabled = '<% nvram_get("fw_enable_x"); %>';
+
+var addons_titles = <% get_addons_array(); %>
 
 var newDisk = function(){
 	this.usbPath = "";
@@ -511,6 +514,7 @@ tabtitle[9] = new Array("", "<#Network_Analysis#>", "Netstat", "<#NetworkTools_W
 tabtitle[10] = new Array("", "QoS", "QoS Statistics", "<#traffic_monitor#>", "Spectrum");
 tabtitle[11] = new Array("", "<#Parental_Control#>", "<#YandexDNS#>", "DNS Filtering");
 tabtitle[12] = new Array("", "Sysinfo", "Other Settings");
+tabtitle[13] = new Array("", "User1Tab", "User2Tab", "User3Tab", "User4Tab", "User5Tab", "User6Tab", "User7Tab", "User8Tab", "User9Tab", "User10Tab");
 
 var tablink = new Array();
 tablink[0] = new Array("", "Advanced_Wireless_Content.asp", "Advanced_WWPS_Content.asp", "Advanced_WMode_Content.asp", "Advanced_ACL_Content.asp", "Advanced_WSecurity_Content.asp", "Advanced_WAdvanced_Content.asp", "Advanced_Wireless_Survey.asp");
@@ -526,18 +530,20 @@ tablink[9] = new Array("", "Main_Analysis_Content.asp", "Main_Netstat_Content.as
 tablink[10] = new Array("", "QoS_EZQoS.asp", "QoS_Stats.asp", "Main_TrafficMonitor_realtime.asp", "Main_Spectrum_Content.asp", "Main_TrafficMonitor_last24.asp", "Main_TrafficMonitor_daily.asp", "Main_TrafficMonitor_monthly.asp", "Main_TrafficMonitor_devrealtime.asp", "Main_TrafficMonitor_devdaily.asp", "Main_TrafficMonitor_devmonthly.asp", "Advanced_QOSUserPrio_Content.asp", "Advanced_QOSUserRules_Content.asp", "Bandwidth_Limiter.asp");
 tablink[11] = new Array("", "ParentalControl.asp", "YandexDNS.asp", "DNSFilter.asp");
 tablink[12] = new Array("", "Tools_Sysinfo.asp", "Tools_OtherSettings.asp");
+tablink[13] = new Array("", "user1.asp", "user2.asp", "user3.asp", "user4.asp", "user5.asp", "user6.asp", "user7.asp", "user8.asp", "user9.asp", "user10asp");
 
 //Level 2 Menu
 menuL2_title = new Array("", "<#menu5_1#>", "<#menu5_2#>", "<#menu5_3#>", "<#menu5_4#>", "IPv6", "VPN", "<#menu5_5#>", "<#menu5_6#>", "<#System_Log#>", "<#Network_Tools#>");
 menuL2_link  = new Array("", tablink[0][1], tablink[1][1], tablink[2][1], tablink[3][1], tablink[4][1], tablink[5][1], tablink[6][1], tablink[7][1], tablink[8][1], tablink[9][1]);
 
 //Level 1 Menu
-menuL1_title = new Array("", "<#menu1#>", "<#Guest_Network#>", "<#Menu_TrafficManager#>", "<#Parental_Control#>", "<#Menu_usb_application#>", "AiCloud", "Tools", "<#menu5#>");
-menuL1_link = new Array("", "index.asp", "Guest_network.asp", "QoS_EZQoS.asp", "ParentalControl.asp", "APP_Installation.asp", "cloud_main.asp", tablink[12][1], "");
+menuL1_title = new Array("", "<#menu1#>", "<#Guest_Network#>", "<#Menu_TrafficManager#>", "<#Parental_Control#>", "<#Menu_usb_application#>", "AiCloud", "Tools", "Addons", "<#menu5#>");
+menuL1_link = new Array("", "index.asp", "Guest_network.asp", "QoS_EZQoS.asp", "ParentalControl.asp", "APP_Installation.asp", "cloud_main.asp", tablink[12][1], tablink[13][1], "");
 var calculate_height = menuL1_link.length+tablink.length-2;
 
 var traffic_L1_dx = 3;
 var tools_L1 = 7;
+var addons_L1 = 8;
 var traffic_L2_dx = 11;
 
 function remove_url(){
@@ -767,6 +773,30 @@ function remove_url(){
 	if(!SwitchCtrl_support){
 		remove_menu_item(1, "Advanced_SwitchCtrl_Content.asp");
 	}
+
+	if(!am_support){
+		menuL1_title[8]="";
+		menuL1_link[8]="";
+	}else{
+		var addon_installed = false;
+		for(var i = 1; i < tablink[13].length; i++){
+			if (addons_titles[i].length > 0) {
+				tabtitle[13][i] = addons_titles[i];
+				addon_installed = true;
+			}else{
+				tabtitle[13][i] = "";
+				tablink[13][i] = "";
+			}
+		}
+		if(!addon_installed){
+			menuL1_title[8] = "";
+			menuL1_link[8] = "";
+		}else{
+			if(addons_titles[1].length == 0)
+				remove_menu_item(13, "user1.asp");
+		}
+	}
+
 }
 
 function remove_menu_item(L2, remove_url){
@@ -819,7 +849,7 @@ function show_menu(){
 	}
 
 	// special case for Traffic Manager and Tools menu
-	if(L1 == traffic_L1_dx || L2 == traffic_L2_dx || L1 == tools_L1){
+	if(L1 == traffic_L1_dx || L2 == traffic_L2_dx || L1 == tools_L1 || L1 == addons_L1){
 		if(current_url.indexOf("QoS_EZQoS") == 0 ||
 			current_url.indexOf("Advanced_QOSUserRules_Content") == 0 ||
 			current_url.indexOf("Advanced_QOSUserPrio_Content") == 0 ||
@@ -858,6 +888,11 @@ function show_menu(){
 			L2 = 13;
 			L3 = 1;
 		}
+		else if(current_url.indexOf("user") == 0){
+			L1 = 8;
+			L2 = 14;
+			L3 = 1;
+		}
 
 		else{
 			L1 = traffic_L1_dx;
@@ -866,6 +901,10 @@ function show_menu(){
 		}
 	}
 	//end
+
+	// addons
+	if(current_url.indexOf("user") == 0)
+		L1 = 8;
 
 	// tools
 	if(current_url.indexOf("Tools_") == 0)
@@ -948,7 +987,7 @@ function show_menu(){
 			calculate_height--;
 			continue;
 		}
-		else if(L1 == i && (L2 <= 0 || L2 == traffic_L2_dx || L1 ==  7)){
+		else if(L1 == i && (L2 <= 0 || L2 == traffic_L2_dx || L1 ==  7 || L1 == 8)){
 		  //menu1_code += '<div class="m'+i+'_r" id="option'+i+'">'+'<table><tr><td><img border="0" width="50px" height="50px" src="images/New_ui/icon_index_'+i+'.png" style="margin-top:-3px;"/></td><td><div style="width:120px;">'+menuL1_title[i]+'</div></td></tr></table></div>\n';
 		  menu1_code += '<div class="m'+i+'_r" id="option'+i+'">'+'<table><tr><td><div id="index_img'+i+'"></div></td><td><div id="menu_string'+i+'" style="width:120px;">'+menuL1_title[i]+'</div></td></tr></table></div>\n';
 		}

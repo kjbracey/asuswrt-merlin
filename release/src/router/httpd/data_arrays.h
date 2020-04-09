@@ -20,6 +20,7 @@ extern int ej_resolver_dump_array(int eid, webs_t wp, int argc, char_t **argv);
 extern int ej_stubby_dump_array(int eid, webs_t wp, int argc, char_t **argv);
 extern int ej_get_custom_settings(int eid, webs_t wp, int argc, char **argv_);
 extern void write_custom_settings(char *jstring);
+extern int ej_get_addons_array(int eid, webs_t wp, int argc, char **argv_);
 int tcclass_dump(FILE *fp, webs_t wp);
 int resolver_dump(FILE *fp, webs_t wp);
 int stubby_dump(FILE *fp, webs_t wp);

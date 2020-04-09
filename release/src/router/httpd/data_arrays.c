@@ -403,3 +403,37 @@ void write_custom_settings(char *jstring) {
 
 	json_object_put(settings_obj);
 }
+
+int ej_get_addons_array(int eid, webs_t wp, int argc, char_t **argv) {
+	FILE *fp;
+	char sInputBuf[BUFFER_SIZE];
+	char filename[32];
+	int num = 10, i, len;
+	int ret = 0;
+
+	ret += websWrite(wp, "[[],"); //open array and write element 0 placeholder
+
+	// look for addon title files
+	for(i=1;i<=num;i++) {
+		sprintf(filename, "/tmp/var/wwwext/user%d.title", i);
+		if (f_exists(filename)) {
+			fp = fopen(filename, "r");
+			if (fp) {
+				// load line into static buffer
+				if (fgets(sInputBuf, BUFFER_SIZE-1, fp) != NULL) {
+					len = strlen(sInputBuf);
+					if (len && sInputBuf[len-1] == '\n') //remove trailing lf
+						sInputBuf[len-1] = '\0';
+					ret += websWrite(wp, "[\"%s\"]%s", sInputBuf, (i<num)? ", " : "");
+				} else
+					ret += websWrite(wp, "[]%s", (i<num)? ", " : "");
+			} else
+				ret += websWrite(wp, "[]%s", (i<num)? ", " : "");
+			fclose(fp);
+		} else
+			ret += websWrite(wp, "[]%s", (i<num)? ", " : "");
+	}
+	ret += websWrite(wp, "];\n");  //close array
+
+	return ret;
+}
