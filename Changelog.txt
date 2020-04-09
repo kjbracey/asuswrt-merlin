@@ -4,6 +4,11 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_43D3j9527  (9-April-2020) ARM SDK, MIPS,ARM KRACK
+* NEW: webui: support custom user addon gui integration
+* FIXED: others: fix v6hosts handling of multiple ip6 neighbors; improve logging
+
+
 374.43_43D1j9527  (6-April-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: radvd: update to 2.18
 * CHANGED: radvd: add missing ifaddrs functions; add radvdump
