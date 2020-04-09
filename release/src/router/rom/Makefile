@@ -99,7 +99,7 @@ endif
 
 ifeq ($(RTCONFIG_HTTPS),y)
 	sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < rom/etc/ssl/openssl.cnf > $(INSTALLDIR)/rom/etc/ssl/openssl.cnf
-	ln -s rom/ca-bundle.crt $(INSTALLDIR)/rom/etc/ssl/cert.pem
+	ln -s /rom/ca-bundle.crt $(INSTALLDIR)/rom/etc/ssl/cert.pem
 else
 	rm -f $(INSTALLDIR)/rom/etc/openssl.cnf
 endif
