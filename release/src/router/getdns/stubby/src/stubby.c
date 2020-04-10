@@ -128,8 +128,8 @@ main(int argc, char **argv)
 			break;
 		case 'F':
 			custom_log_fn = optarg;
-			if ((lfn = fopen(custom_log_fn, "w")) != NULL) {
-				dup2(fileno(lfn), STDOUT_FILENO);
+			if ((lfn = fopen(custom_log_fn, "a")) != NULL) {
+				//dup2(fileno(lfn), STDOUT_FILENO);
 				dup2(fileno(lfn), STDERR_FILENO);
 				fclose(lfn);
 			} else {
