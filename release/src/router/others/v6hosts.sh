@@ -34,10 +34,10 @@ elif [ -n "$4" ]; then
 elif [ -n "$DNSMASQ_SUPPLIED_HOSTNAME" ]; then
     HNAME="$DNSMASQ_SUPPLIED_HOSTNAME"
 else
-    echo "$(date) no name $2" >> "$LOGA"
+    echo "[$(date)] no name $2" >> "$LOGA"
     exit 0
 fi
-echo "$(date) $1 $2 '$4' '$DNSMASQ_SUPPLIED_HOSTNAME' '$DNSMASQ_OLD_HOSTNAME' ($HNAME)" >> "$LOGA"
+echo "[$(date)] $1 $2 '$4' '$DNSMASQ_SUPPLIED_HOSTNAME' '$DNSMASQ_OLD_HOSTNAME' ($HNAME)" >> "$LOGA"
 
 DEL_NEEDED=0
 WL_FLAGS=0
@@ -50,7 +50,7 @@ if [ $? == 0 ]; then
     if [ $? == 0 ]; then
         WL_FLAGS=$(wl sta_info $2 | grep flags | awk -F'[ :]' '{print $3}')
         if [[ $(($WL_FLAGS & 0x100)) -gt 0 ]]; then
-            echo "$(date) known name for 2.4GHz wireless client $HNAME in powersave mode" >> "$LOGA"
+            echo "[$(date)] known name for 2.4GHz wireless client $HNAME in powersave mode" >> "$LOGA"
             exit 0
         fi
     fi
@@ -58,18 +58,18 @@ if [ $? == 0 ]; then
     if [ $? == 0 ]; then
         WL_FLAGS=$(wl -i eth2 sta_info $2 | grep flags | awk -F'[ :]' '{print $3}')
         if [[ $(($WL_FLAGS & 0x100)) -gt 0 ]]; then
-            echo "$(date) known name for 5GHz wireless client $HNAME in powersave mode" >> "$LOGA"
+            echo "[$(date)] known name for 5GHz wireless client $HNAME in powersave mode" >> "$LOGA"
             exit 0
         fi
     fi
     # Do ping test
     ping -6 -q -c 2 -W 5 $v6addr
     if [ $? == 0 ]; then
-        echo "$(date) known name, valid addr $HNAME" >> "$LOGA"
+        echo "[$(date)] known name, valid addr $HNAME" >> "$LOGA"
         #echo "found valid hosts entry $v6addr $HNAME" | logger -t "$scrname"
         exit 0
     else
-        echo "$(date) known name, invalid addr error $HNAME" >> "$LOGA"
+        echo "[$(date)] known name, invalid addr error $HNAME" >> "$LOGA"
         DEL_NEEDED=1
     fi
 else
@@ -79,7 +79,7 @@ fi
 # extract first neighbor as global address (eiu64 or temp)
 V6IFACE=$(ip -6 neigh show to fe80::/10 | grep "$2" | awk 'FNR <= 1' | awk '{ print $1 }' | awk -F '::' '{ print $2 }')
 if [ "$V6IFACE" == "" ]; then
-    echo "$(date) no neighbor $HNAME" >> "$LOGA"
+    echo "[$(date)] no neighbor $HNAME" >> "$LOGA"
     exit 0
 fi
 V6IFLEN=$(echo $V6IFACE | awk -F ':' '{print NF}')
@@ -98,7 +98,7 @@ elif [[ $(($V6PFXLEN + $V6IFLEN)) -eq 8 ]]; then
     V6ADDR="${V6PFX}:${V6IFACE}";
     UPDATE_HOSTS=1;
 else
-    echo "$(date) wrong length error $V6PFX $V6IFACE  $HNAME" >> "$LOGA"
+    echo "[$(date)] wrong length error $V6PFX $V6IFACE  $HNAME" >> "$LOGA"
     exit 1
 fi
 
@@ -108,19 +108,19 @@ ip -6 neigh | grep -qi "$V6ADDR .* lladdr $2"
 if [ $? == 0 ]; then
     if [ $DEL_NEEDED -eq 1 ]; then
         # workaround lack of case insensitivity options
-        echo "$(date) removing hosts entry $v6addr $HNAME" >> "$LOGA"
+        echo "[$(date)] removing hosts entry $v6addr $HNAME" >> "$LOGA"
         sed -i "s/.*\b${HNAME}\b.*//I; /^$/ d" "$V6HOSTS"
     fi
     if [ $UPDATE_HOSTS -eq 1 ]; then
-        echo "$(date) $V6ADDR $HNAME" >> "$LOGB"
+        echo "[$(date)] $V6ADDR $HNAME" >> "$LOGB"
 		grep -qi  "${V6ADDR} ${HNAME}" "$V6HOSTS"
 		if [ $? == 0 ]; then
-			echo "$(date) skipping duplicate hosts update $V6ADDR $HNAME" >> "$LOGA"
+			echo "[$(date)] skipping duplicate hosts update $V6ADDR $HNAME" >> "$LOGA"
 			echo "skipping duplicate hosts entry $V6ADDR $HNAME" | logger -t "$scrname"
 			exit 0
 		else
 			echo "$V6ADDR $HNAME" >> "$V6HOSTS"
-			echo "$(date) `if [ $DEL_NEEDED -eq 1 ]; then echo 'updating'; else echo 'adding'; fi` hosts entry $V6ADDR $HNAME" >> "$LOGA"
+			echo "[$(date)] `if [ $DEL_NEEDED -eq 1 ]; then echo 'updating'; else echo 'adding'; fi` hosts entry $V6ADDR $HNAME" >> "$LOGA"
 			echo "`if [ $DEL_NEEDED -eq 1 ]; then echo 'updating'; else echo 'adding'; fi` hosts entry $V6ADDR $HNAME" | logger -t "$scrname"
 			if [ ! -e /var/lock/autov6.lock ]; then
 				touch /var/lock/autov6.lock
@@ -129,7 +129,7 @@ if [ $? == 0 ]; then
 		fi
     fi
 else
-    echo "$(date) no ping response from $V6ADDR $HNAME" >> "$LOGA"
+    echo "[$(date)] no ping response from $V6ADDR $HNAME" >> "$LOGA"
 fi
 
 exit
