@@ -58,7 +58,7 @@ getdns_return_t
 getdns_yaml2dict(const char *str, getdns_dict **dict)
 {
 	char *jsonstr;
-	
+
 	if (!str || !dict)
 		return GETDNS_RETURN_INVALID_PARAMETER;
 
@@ -69,7 +69,7 @@ getdns_yaml2dict(const char *str, getdns_dict **dict)
 		return res;
 	} else {
 		return GETDNS_RETURN_GENERIC_ERROR;
-	}       
+	}
 }
 #endif
 
@@ -248,7 +248,7 @@ static getdns_return_t parse_config(const char *config_str, int yaml_config)
 	if (yaml_config) {
 		r = getdns_yaml2dict(config_str, &config_dict);
 		if (r == GETDNS_RETURN_NOT_IMPLEMENTED) {
-			/* If this fails then YAML is really not supported. Check this at 
+			/* If this fails then YAML is really not supported. Check this at
 			   runtime because it could change under us..... */
 			r = getdns_yaml2dict(config_str, NULL);
 			if (r == GETDNS_RETURN_NOT_IMPLEMENTED) {
@@ -486,7 +486,7 @@ static void request_cb(
 	else if (rcode == GETDNS_RCODE_SERVFAIL)
 		servfail(msg, &response);
 
-	/* RRsigs when DO and (CD or not BOGUS) 
+	/* RRsigs when DO and (CD or not BOGUS)
 	 * Implemented in conversion to wireformat function by checking for DO
 	 * bit.  In recursing resolution mode we have to copy the do bit from
 	 * the request, because libunbound has it in the answer always.
@@ -512,7 +512,7 @@ static void request_cb(
 
 	else if (msg->rt == GETDNS_RESOLUTION_STUB)
 		; /* following checks are for RESOLUTION_RECURSING only */
-	
+
 	else if ((r = getdns_dict_get_int(
 	    response, "/replies_tree/0/header/ra", &n)))
 		SERVFAIL("Could not get RA bit from reply", r, msg, &response);
@@ -539,11 +539,11 @@ static void request_cb(
 			(void) snprintf(i_as_jptr, sizeof(i_as_jptr),
 			    "/replies_tree/0/additional/%d/rdata/options/%d",
 			    (int)(arcount - 1), i);
-		
+
 			if (getdns_dict_get_dict(response, i_as_jptr, &option)
 			||  getdns_dict_get_int(option, "option_code", &option_code))
 				continue;
-			
+
 			switch (option_code) {
 			case  8: /* CLIENT SUBNET */
 				if (getdns_context_get_edns_client_subnet_private
@@ -584,7 +584,7 @@ static void request_cb(
 	}
 	if (response)
 		getdns_dict_destroy(response);
-}	
+}
 
 static void incoming_request_handler(getdns_context *context,
     getdns_callback_type_t callback_type, getdns_dict *request,
@@ -738,7 +738,7 @@ static void stubby_log(void *userarg, uint64_t system,
 {
 	struct timeval tv;
 	struct tm tm;
-	char buf[10];
+	char buf[32];
 #if defined(STUBBY_ON_WINDOWS) || defined(GETDNS_ON_WINDOWS)
 	time_t tsec;
 
@@ -747,11 +747,11 @@ static void stubby_log(void *userarg, uint64_t system,
 	gmtime_s(&tm, (const time_t *) &tsec);
 #else
 	gettimeofday(&tv, NULL);
-	gmtime_r(&tv.tv_sec, &tm);
+	localtime_r(&tv.tv_sec, &tm);
 #endif
-	strftime(buf, 10, "%H:%M:%S", &tm);
+	strftime(buf, 32, "%c", &tm);
 	(void)userarg; (void)system; (void)level;
-	(void) fprintf(stderr, "[%s.%.6d] STUBBY: ", buf, (int)tv.tv_usec);
+	(void) fprintf(stderr, "[%s] STUBBY: ", buf);
 	(void) vfprintf(stderr, fmt, ap);
 }
 
@@ -776,7 +776,7 @@ main(int argc, char **argv)
 	int log_connections = 0;
 	getdns_return_t r;
 	int opt;
-	long log_level = 7; 
+	long log_level = 7;
 	char *ep;
 	getdns_dict *api_information = NULL;
 	getdns_list *api_info_keys = NULL;
@@ -814,7 +814,7 @@ main(int argc, char **argv)
 			log_connections = 1;
 			errno = 0;
 			log_level = strtol(optarg, &ep, 10);
-			if (log_level < 0 ||  log_level > 7 || *ep != '\0' || 
+			if (log_level < 0 ||  log_level > 7 || *ep != '\0' ||
 			    (errno == ERANGE &&
 			    (log_level == LONG_MAX || log_level == LONG_MIN)) ) {
 				fprintf(stderr, "Log level '%s' is invalid or out of range (0-7)\n", optarg);
@@ -927,7 +927,7 @@ main(int argc, char **argv)
 	}
 	if (print_api_info) {
 		char *api_information_str;
-	       
+
 		if (listen_dict && !getdns_dict_get_list(
 		    listen_dict, "listen_list", &listen_list)) {
 
@@ -1010,7 +1010,7 @@ main(int argc, char **argv)
 			       "DNSSEC Validation is %s\n", dnssec_validation==1 ? "ON":"OFF");
 		size_t transport_count = 0;
 		getdns_transport_list_t *transport_list;
-		getdns_context_get_dns_transport_list(context, 
+		getdns_context_get_dns_transport_list(context,
 		                                 &transport_count, &transport_list);
 		stubby_local_log(NULL,GETDNS_LOG_UPSTREAM_STATS, GETDNS_LOG_INFO,
 		                "Transport list is:\n");
@@ -1037,8 +1037,8 @@ main(int argc, char **argv)
 		getdns_tls_authentication_t auth;
 		getdns_context_get_tls_authentication(context, &auth);
 		stubby_local_log(NULL,GETDNS_LOG_UPSTREAM_STATS, GETDNS_LOG_INFO,
-		                "Privacy Usage Profile is %s\n", 
-		                 auth==GETDNS_AUTHENTICATION_REQUIRED ? 
+		                "Privacy Usage Profile is %s\n",
+		                 auth==GETDNS_AUTHENTICATION_REQUIRED ?
 		                "Strict (Authentication required)":"Opportunistic");
 		stubby_local_log(NULL,GETDNS_LOG_UPSTREAM_STATS, GETDNS_LOG_INFO,
 			            "(NOTE a Strict Profile only applies when TLS is the ONLY transport!!)\n");
