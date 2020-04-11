@@ -4,6 +4,19 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_43E5j9527  (12-April-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: other: v6hosts: clean up log formatting
+* CHANGED: stubby: change log format to date/localtime
+* CHANGED: stubby: update open logfile with append; don't redirect stdout
+* CHANGED: rc: stubby: delete existing logfile on start
+* CHANGED: radvd: use shared ifaddrs.c & system ifaddrs.h
+* CHANGED: webui: cleanup addons title array call/naming
+* CHANGED: webui: increase wait time for changing static routes
+* CHANGED: others: add optional line count parameter to check-log
+* FIXED: webui: fix typo in state.js user array
+* FIXED: make: fix etc/ssl link to ca-bundle location
+
+
 374.43_43D3j9527  (9-April-2020) ARM SDK, MIPS,ARM KRACK
 * NEW: webui: support custom user addon gui integration
 * FIXED: others: fix v6hosts handling of multiple ip6 neighbors; improve logging
