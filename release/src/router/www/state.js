@@ -242,7 +242,7 @@ var nvram_used = '<% sysinfo("nvram.used"); %>';
 var nvram_total = '<% sysinfo("nvram.total"); %>';
 var firewall_enabled = '<% nvram_get("fw_enable_x"); %>';
 
-var addons_titles = <% get_addons_array(); %>
+<% get_addons_array(); %>
 
 var newDisk = function(){
 	this.usbPath = "";
@@ -780,8 +780,8 @@ function remove_url(){
 	}else{
 		var addon_installed = false;
 		for(var i = 1; i < tablink[13].length; i++){
-			if (addons_titles[i].length > 0) {
-				tabtitle[13][i] = addons_titles[i];
+			if (addons_array[i].length > 0) {
+				tabtitle[13][i] = addons_array[i];
 				addon_installed = true;
 			}else{
 				tabtitle[13][i] = "";
@@ -792,7 +792,7 @@ function remove_url(){
 			menuL1_title[8] = "";
 			menuL1_link[8] = "";
 		}else{
-			if(addons_titles[1].length == 0)
+			if(addons_array[1].length == 0)
 				remove_menu_item(13, "user1.asp");
 		}
 	}

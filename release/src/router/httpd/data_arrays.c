@@ -411,7 +411,7 @@ int ej_get_addons_array(int eid, webs_t wp, int argc, char_t **argv) {
 	int num = 10, i, len;
 	int ret = 0;
 
-	ret += websWrite(wp, "[[],"); //open array and write element 0 placeholder
+	ret += websWrite(wp, "var addons_array = [[],"); //open array and write element 0 placeholder
 
 	// look for addon title files
 	for(i=1;i<=num;i++) {
