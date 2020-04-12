@@ -5,17 +5,26 @@ scr_name="$(basename $0)[$$]"
 # Shrink logfile to last 100 lines
 
 LOGFILE="$1"
+if [ "$2" == "" ]; then
+        LINES=100
+else
+        if [ $2 -lt 1 ]; then
+                LINES=1
+        else
+                LINES=$2
+        fi
+fi
 
 if [ -f "$LOGFILE" ]; then
-	lines=$(wc -l < $LOGFILE)
-	if [ $lines -gt 100 ]; then
-		echo "$(tail -n 100 $LOGFILE)" > $LOGFILE
-		logger -s -t $scr_name "log: $LOGFILE $lines total lines $((lines-100)) lines pruned"
-#	else
-#		logger -s -t $scr_name "log: $LOGFILE $lines total lines"
-	fi
+        lines=$(wc -l < $LOGFILE)
+        if [ $lines -gt $LINES ]; then
+                echo "$(tail -n $LINES $LOGFILE)" > $LOGFILE 2>&1
+                logger -s -t $scr_name "log: $LOGFILE $lines total lines $((lines-LINES)) lines pruned"
+#       else
+#               logger -s -t $scr_name "log: $LOGFILE $lines total lines"
+        fi
 else
-	logger -s -t $scr_name "log: $LOGFILE not found"
+        logger -s -t $scr_name "log: $LOGFILE not found"
 fi
 
 exit 0
