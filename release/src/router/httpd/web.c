@@ -6759,8 +6759,6 @@ struct mime_handler mime_handlers[] = {
 	{ "chart.min.js", "text/javascript", cache_object, NULL, do_file, NULL },
 	{ "httpd_check.htm", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
 	{ "get_webdavInfo.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
-	{ "manifest.appcache", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
-	{ "manifest.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
 	{ "wcdma_list.js", "text/javascript", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
 	{ "help_content.js", "text/javascript", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
 	{ "**.xml", "text/xml", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
@@ -6843,8 +6841,6 @@ struct except_mime_handler except_mime_handlers[] = {
 	{ "status.asp", MIME_EXCEPTION_NOAUTH_FIRST|MIME_EXCEPTION_NORESETTIME},
 	{ "automac.asp", MIME_EXCEPTION_NOAUTH_FIRST|MIME_EXCEPTION_NORESETTIME},
 	{ "result_of_detect_client.asp", MIME_EXCEPTION_NORESETTIME},
-	{ "manifest.appcache", MIME_EXCEPTION_NOAUTH_ALL},
-	{ "manifest.asp", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "detecWAN.asp", MIME_EXCEPTION_NORESETTIME},
 	{ "detecWAN2.asp", MIME_EXCEPTION_NORESETTIME},
 
@@ -6869,8 +6865,6 @@ struct except_mime_handler except_mime_handlers[] = {
 //	{ "jffsupload.cgi", MIME_EXCEPTION_NOAUTH_FIRST|MIME_EXCEPTION_NORESETTIME},
 //#endif
 #endif
-//	{ "manifest.appcache", MIME_EXCEPTION_NOAUTH_ALL},
-//	{ "manifest.asp", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "Nologin.asp", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "Logout.asp", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "alertImg.gif", MIME_EXCEPTION_NOAUTH_ALL},
