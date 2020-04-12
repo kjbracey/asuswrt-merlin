@@ -1288,6 +1288,11 @@ void start_stubby(int force)
 		if ((fp = fopen("/etc/stubby.yml", "w")) == NULL)
 			return;
 
+		// delete existing log file if it exists
+		sprintf(buffer, "%s", nvram_safe_get("stubby_logfile"));
+		if (f_exists(buffer))
+			unlink(buffer);
+
 		fprintf(fp, "tls_ca_file: \"/rom/ca-bundle.crt\"\n");
 		fprintf(fp, "resolution_type: GETDNS_RESOLUTION_STUB\n");
 		fprintf(fp, "dns_transport_list:\n");
