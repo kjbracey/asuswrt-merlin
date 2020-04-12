@@ -9,7 +9,7 @@
 <link rel="shortcut icon" href="images/favicon.png">
 <link rel="icon" href="images/favicon.png">
 <title><#Web_Title#> - <#menu5_2_3#></title>
-<link rel="stylesheet" type="text/css" href="index_style.css"> 
+<link rel="stylesheet" type="text/css" href="index_style.css">
 <link rel="stylesheet" type="text/css" href="form_style.css">
 <script language="JavaScript" type="text/javascript" src="/state.js"></script>
 <script language="JavaScript" type="text/javascript" src="/general.js"></script>
@@ -25,7 +25,7 @@
 	margin-left:2px;
 	*margin-left:-223px;
 	width:215px;
-	text-align:left;	
+	text-align:left;
 	height:auto;
 	overflow-y:auto;
 	z-index:200;
@@ -47,13 +47,13 @@
 	color:#FFF;
 	font-size:12px;
 	font-family:Arial, Helvetica, sans-serif;
-	text-decoration:none;	
+	text-decoration:none;
 }
 #ClientList_Block_PC div:hover, #ClientList_Block a:hover{
 	background-color:#3366FF;
 	color:#FFFFFF;
 	cursor:default;
-}	
+}
 </style>
 <script>
 wan_route_x = '<% nvram_get("wan_route_x"); %>';
@@ -76,15 +76,15 @@ function applyRule(){
 	var tmp_value = "";
 
 	for(i=0; i<rule_num; i++){
-		tmp_value += "<"		
-		for(j=0; j<item_num-1; j++){	
+		tmp_value += "<"
+		for(j=0; j<item_num-1; j++){
 			tmp_value += $('sr_rulelist_table').rows[i].cells[j].innerHTML;
-			if(j != item_num-2)	
+			if(j != item_num-2)
 				tmp_value += ">";
 		}
 	}
 	if(tmp_value == "<"+"<#IPConnection_VSList_Norule#>" || tmp_value == "<")
-		tmp_value = "";	
+		tmp_value = "";
 
 	document.form.sr_rulelist.value = tmp_value;
 
@@ -96,10 +96,10 @@ function done_validating(action){
 	refreshpage();
 }
 
-function GWStatic_validate_duplicate_noalert(o, v, l, off){	
+function GWStatic_validate_duplicate_noalert(o, v, l, off){
 	for (var i=0; i<o.length; i++)
 	{
-		if (entry_cmp(o[i][off], v, l)==0){ 
+		if (entry_cmp(o[i][off], v, l)==0){
 			return true;
 		}
 	}
@@ -122,7 +122,7 @@ function addRow(obj, head){
 		sr_rulelist_array += "&#60"
 	else
 		sr_rulelist_array += "&#62"
-			
+
 	sr_rulelist_array += obj.value;
 	obj.value = "";
 }
@@ -130,43 +130,43 @@ function addRow(obj, head){
 function addRow_Group(upper){
 	if('<% nvram_get("sr_enable_x"); %>' != "1")
 		document.form.sr_enable_x[0].checked = true;
-	
+
 	var rule_num = $('sr_rulelist_table').rows.length;
-	var item_num = $('sr_rulelist_table').rows[0].cells.length;		
+	var item_num = $('sr_rulelist_table').rows[0].cells.length;
 	if(rule_num >= upper){
 		alert("<#JS_itemlimit1#> " + upper + " <#JS_itemlimit2#>");
-		return false;	
-	}	
-		
+		return false;
+	}
+
 	if(document.form.sr_ipaddr_x_0.value==""){
 		alert("<#JS_fieldblank#>");
 		document.form.sr_ipaddr_x_0.focus();
-		document.form.sr_ipaddr_x_0.select();		
+		document.form.sr_ipaddr_x_0.select();
 		return false;
 	}else	if(document.form.sr_netmask_x_0.value==""){
 		alert("<#JS_fieldblank#>");
 		document.form.sr_netmask_x_0.focus();
-		document.form.sr_netmask_x_0.select();		
+		document.form.sr_netmask_x_0.select();
 		return false;
 	}else	if(document.form.sr_gateway_x_0.value==""){
 		alert("<#JS_fieldblank#>");
 		document.form.sr_gateway_x_0.focus();
-		document.form.sr_gateway_x_0.select();		
+		document.form.sr_gateway_x_0.select();
 		return false;
-	}else if(valid_IP_form(document.form.sr_ipaddr_x_0, 0) && valid_IP_form(document.form.sr_gateway_x_0, 0)){	
-		
+	}else if(valid_IP_form(document.form.sr_ipaddr_x_0, 0) && valid_IP_form(document.form.sr_gateway_x_0, 0)){
+
 		//2011.11 Viz add to valid netmask { start	// test if netmask is valid.
 		var default_netmask = "";
 		var wrong_netmask = 0;
 		var netmask_obj = document.form.sr_netmask_x_0;
 		var netmask_num = inet_network(netmask_obj.value);
-		
+
 		if(netmask_num==0){
 			var netmask_reverse_num = 0;		//Viz 2011.07 : Let netmask 0.0.0.0 pass
 		}else{
 		var netmask_reverse_num = ~netmask_num;
 		}
-		
+
 		if(netmask_num < 0) wrong_netmask = 1;
 
 		var test_num = netmask_reverse_num;
@@ -185,24 +185,24 @@ function addRow_Group(upper){
 			netmask_obj.select();
 			return false;
 		}
-		//2011.11 Viz add to valid netmask } end		
-		
+		//2011.11 Viz add to valid netmask } end
 
-//Viz check same rule  //match(ip+netmask) is not accepted 
+
+//Viz check same rule  //match(ip+netmask) is not accepted
 		if(item_num >=2){
 			for(i=0; i<rule_num; i++){
-					if(document.form.sr_ipaddr_x_0.value == $('sr_rulelist_table').rows[i].cells[0].innerHTML 
+					if(document.form.sr_ipaddr_x_0.value == $('sr_rulelist_table').rows[i].cells[0].innerHTML
 						&& document.form.sr_gateway_x_0.value == $('sr_rulelist_table').rows[i].cells[2].innerHTML){
 						alert("<#JS_duplicate#>");
 						document.form.sr_gateway_x_0.value="";
 						document.form.sr_ipaddr_x_0.focus();
 						document.form.sr_ipaddr_x_0.select();
 						return false;
-					}				
+					}
 			}
-		}		
-		
-		
+		}
+
+
 		addRow(document.form.sr_ipaddr_x_0 ,1);
 		addRow(document.form.sr_netmask_x_0, 0);
 		addRow(document.form.sr_gateway_x_0, 0);
@@ -212,36 +212,36 @@ function addRow_Group(upper){
 		showsr_rulelist();
 	}else{
 		return false;
-	}	
-}	
+	}
+}
 
-function edit_Row(r){ 	
+function edit_Row(r){
 	var i=r.parentNode.parentNode.rowIndex;
-  	
+
 	document.form.sr_ipaddr_x_0.value = $('sr_rulelist_table').rows[i].cells[0].innerHTML;
-	document.form.sr_netmask_x_0.value = $('sr_rulelist_table').rows[i].cells[1].innerHTML; 
-	document.form.sr_gateway_x_0.value = $('sr_rulelist_table').rows[i].cells[2].innerHTML; 
+	document.form.sr_netmask_x_0.value = $('sr_rulelist_table').rows[i].cells[1].innerHTML;
+	document.form.sr_gateway_x_0.value = $('sr_rulelist_table').rows[i].cells[2].innerHTML;
 	document.form.sr_matric_x_0.value = $('sr_rulelist_table').rows[i].cells[3].innerHTML;
 	document.form.sr_if_x_0.value = $('sr_rulelist_table').rows[i].cells[4].innerHTML;
-	
-  del_Row(r);	
+
+  del_Row(r);
 }
 
 function del_Row(r){
   var i=r.parentNode.parentNode.rowIndex;
   $('sr_rulelist_table').deleteRow(i);
-  
+
   var sr_rulelist_value = "";
 	for(k=0; k<$('sr_rulelist_table').rows.length; k++){
 		for(j=0; j<$('sr_rulelist_table').rows[k].cells.length-1; j++){
-			if(j == 0)	
+			if(j == 0)
 				sr_rulelist_value += "&#60";
 			else
 				sr_rulelist_value += "&#62";
-			sr_rulelist_value += $('sr_rulelist_table').rows[k].cells[j].innerHTML;		
+			sr_rulelist_value += $('sr_rulelist_table').rows[k].cells[j].innerHTML;
 		}
 	}
-	
+
 	sr_rulelist_array = sr_rulelist_value;
 	if(sr_rulelist_array == "")
 		showsr_rulelist();
@@ -276,24 +276,24 @@ function showsr_rulelist(){
 function showLANIPList(){
 	var code = "";
 	var show_name = "";
-	var client_list_array = '<% get_client_detail_info(); %>';	
-	var client_list_row = client_list_array.split('<');	
+	var client_list_array = '<% get_client_detail_info(); %>';
+	var client_list_row = client_list_array.split('<');
 
 	for(var i = 1; i < client_list_row.length; i++){
 		var client_list_col = client_list_row[i].split('>');
 		if(client_list_col[1] && client_list_col[1].length > 20)
 			show_name = client_list_col[1].substring(0, 16) + "..";
 		else
-			show_name = client_list_col[1];	
+			show_name = client_list_col[1];
 
 		//client_list_col[]  0:type 1:device 2:ip 3:mac 4: 5: 6:
 		code += '<a><div onmouseover="over_var=1;" onmouseout="over_var=0;" onclick="setClientIP(\''+client_list_col[2]+'\');"><strong>'+client_list_col[2]+'</strong> ';
-		
+
 		if(show_name && show_name.length > 0)
 				code += '( '+show_name+')';
 		code += ' </div></a>';
 		}
-	code +='<!--[if lte IE 6.5]><iframe class="hackiframe2"></iframe><![endif]-->';	
+	code +='<!--[if lte IE 6.5]><iframe class="hackiframe2"></iframe><![endif]-->';
 	$("ClientList_Block_PC").innerHTML = code;
 }
 
@@ -314,11 +314,11 @@ function hideClients_Block(){
 }
 
 function pullLANIPList(obj){
-	
-	if(isMenuopen == 0){		
+
+	if(isMenuopen == 0){
 		obj.src = "/images/arrow-top.gif"
-		$("ClientList_Block_PC").style.display = 'block';		
-		document.form.sr_ipaddr_x_0.focus();		
+		$("ClientList_Block_PC").style.display = 'block';
+		document.form.sr_ipaddr_x_0.focus();
 		isMenuopen = 1;
 	}
 	else
@@ -331,7 +331,7 @@ function Ctrl_LANIPList(obj){
 		$("pull_arrow").style.display ="";
 }
 
-//Viz add 2012.02 LAN client ip } end  
+//Viz add 2012.02 LAN client ip } end
 </script>
 </head>
 
@@ -346,7 +346,7 @@ function Ctrl_LANIPList(obj){
 <input type="hidden" name="next_page" value="">
 <input type="hidden" name="modified" value="0">
 <input type="hidden" name="action_mode" value="apply_new">
-<input type="hidden" name="action_wait" value="10">
+<input type="hidden" name="action_wait" value="60">
 <input type="hidden" name="action_script" value="restart_net">
 <input type="hidden" name="first_time" value="">
 <input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get("preferred_lang"); %>">
@@ -357,13 +357,13 @@ function Ctrl_LANIPList(obj){
 <table class="content" align="center" cellpadding="0" cellspacing="0">
   <tr>
 	<td width="17">&nbsp;</td>
-	
+
 	<!--=====Beginning of Main Menu=====-->
 	<td valign="top" width="202">
 	  <div id="mainMenu"></div>
 	  <div id="subMenu"></div>
 	</td>
-	
+
     <td valign="top">
 	<div id="tabMenu" class="submenuBlock"></div>
 <!--===================================Beginning of Main Content===========================================-->
@@ -378,13 +378,13 @@ function Ctrl_LANIPList(obj){
 		  <div class="formfonttitle"><#menu5_2#> - <#menu5_2_3#></div>
 		  <div style="margin-left:5px;margin-top:10px;margin-bottom:10px"><img src="/images/New_ui/export/line_export.png"></div>
       <div class="formfontdesc"><#RouterConfig_GWStaticEnable_sectiondesc#></div>
-		  
-			<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">				
+
+			<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 			  <thead>
 			  <tr>
 				<td colspan="2"><#t2BC#></td>
 			  </tr>
-			  </thead>		
+			  </thead>
 
 		  	<tr>
 	    		<th><#RouterConfig_GWStaticEnable_itemname#></th>
@@ -392,29 +392,29 @@ function Ctrl_LANIPList(obj){
 			  		<input type="radio" value="1" name="sr_enable_x" class="input" onclick="return change_common_radio(this, 'RouterConfig', 'sr_enable_x', '1')" <% nvram_match("sr_enable_x", "1", "checked"); %>><#checkbox_Yes#>
 			  		<input type="radio" value="0" name="sr_enable_x" class="input" onclick="return change_common_radio(this, 'RouterConfig', 'sr_enable_x', '0')" <% nvram_match("sr_enable_x", "0", "checked"); %>><#checkbox_No#>
 					</td>
-		  	</tr>				
-			</table>		
-							
+			</tr>
+			</table>
+
 			<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" class="FormTable_table">
 			<thead>
 			  	<tr>
 					<td colspan="6" id="GWStatic"><#RouterConfig_GWStatic_groupitemdesc#>&nbsp;(<#List_limit#>&nbsp;64)</td>
 			  	</tr>
-			</thead>			
+			</thead>
 				<tr>
 					<th><a href="javascript:void(0);" onClick="openHint(6,1);"><div class="table_text"><#RouterConfig_GWStaticIP_itemname#></div></a></th>
 					<th><a href="javascript:void(0);" onClick="openHint(6,2);"><div class="table_text"><#RouterConfig_GWStaticMask_itemname#></div></a></th>
 					<th><a href="javascript:void(0);" onClick="openHint(6,3);"><div class="table_text"><#RouterConfig_GWStaticGW_itemname#></div></a></th>
 					<th><a href="javascript:void(0);" onClick="openHint(6,4);"><div class="table_text"><#RouterConfig_GWStaticMT_itemname#></div></a></th>
 					<th><a href="javascript:void(0);" onClick="openHint(6,5);"><div class="table_text"><#wan_interface#></div></a></th>
-					<th><#list_add_delete#></th>					
+					<th><#list_add_delete#></th>
 			    </tr>
-			  
-			  <tr>
-			  	<!-- client info -->		
+
+				<tr>
+				<!-- client info -->
 					<td width="34%">
 						<input type="text" class="input_20_table" maxlength="15" name="sr_ipaddr_x_0" style="margin-left:-22px;width:215px;" onKeyPress="return is_ipaddr(this, event)" onClick="hideClients_Block();" onblur="if(!over_var){hideClients_Block();}">
-						<img id="pull_arrow" height="14px;" src="/images/arrow-down.gif" style="position:absolute;" onclick="pullLANIPList(this);" title="<#select_IP#>" onmouseover="over_var=1;" onmouseout="over_var=0;">						
+						<img id="pull_arrow" height="14px;" src="/images/arrow-down.gif" style="position:absolute;" onclick="pullLANIPList(this);" title="<#select_IP#>" onmouseover="over_var=1;" onmouseout="over_var=0;">
 						<div id="ClientList_Block_PC" class="ClientList_Block_PC"></div>
 					</td>
 					<td width="18%"><input type="text" maxlength="15" class="input_15_table" name="sr_netmask_x_0" onKeyPress="return is_ipaddr(this, event)" ></td>
@@ -427,34 +427,34 @@ function Ctrl_LANIPList(obj){
 							<option value="WAN">WAN</option>
 						</select>
 					</td>
-				
+
 					<td width="12%">
-						<div> 
+						<div>
 							<input type="button" class="add_btn" onClick="addRow_Group(64);" value="">
 						</div>
 					</td>
 			  </tr>
-			  </table>		
-			  
+			  </table>
+
 			  <div id="sr_rulelist_Block"></div>
-			  	
+
 				<div class="apply_gen">
 					<input name="button" type="button" class="button_gen" onclick="applyRule();" value="<#CTL_apply#>"/>
 				</div>
-			
+
 		  </td>
 		</tr>
 		</tbody>
-		
+
 		</table>
 	</td>
 </form>
 
   </tr>
-</table>				
-<!--===================================Ending of Main Content===========================================-->		
+</table>
+<!--===================================Ending of Main Content===========================================-->
 	</td>
-		
+
     <td width="10" align="center" valign="top">&nbsp;</td>
 	</tr>
 </table>
