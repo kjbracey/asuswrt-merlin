@@ -1159,6 +1159,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "misc_lpr_x", "0" },
 	{ "ttl_inc_enable", "0"},		// enable TTL increment
 	{ "ttl_spoof_enable", "0"},		// enable TTL spoofing
+	{ "ttl_spoof_value", "65"},		// default spoof TTL
 	{ "DSCP_fix_enable", "0" },
 	{ "ptcsrv_enable", "1" },		// ASUS protection server
 	{ "ntpdfilter_enable", "0" },	// redirect NTP requests

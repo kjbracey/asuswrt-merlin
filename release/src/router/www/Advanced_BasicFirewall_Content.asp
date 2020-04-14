@@ -217,6 +217,7 @@ function done_validating(action){
 				<td>
 								<input type="radio" value="1" name="ttl_spoof_enable" class="input" onClick="return change_common_radio(this, 'FirewallConfig', 'ttl_spoof_enable', '1')" <% nvram_match("ttl_spoof_enable", "1", "checked"); %>><#checkbox_Yes#>
 								<input type="radio" value="0" name="ttl_spoof_enable" class="input" onClick="return change_common_radio(this, 'FirewallConfig', 'ttl_spoof_enable', '0')" <% nvram_match("ttl_spoof_enable", "0", "checked"); %>><#checkbox_No#>
+								<label style="margin-left: 4em;">TTL:</label><input type="text" maxlength="3" class="input_3_table" name="ttl_spoof_value" onKeyPress="return is_number(this,event);" onblur="validate_number_range(this, 31, 253)" value="<% nvram_get("ttl_spoof_value"); %>" >
 				</td>
 		</tr>
 		<tr>

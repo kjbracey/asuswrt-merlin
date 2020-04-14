@@ -4540,8 +4540,9 @@ mangle_setting(char *wan_if, char *wan_ip, char *lan_if, char *lan_ip, char *log
 		char value[sizeof("255")];
 		int wan_ttl = 0;
 
-		if (f_read_string("/proc/sys/net/ipv4/ip_default_ttl", value, sizeof(value)) > 0)
-			wan_ttl = atoi(value);
+//		if (f_read_string("/proc/sys/net/ipv4/ip_default_ttl", value, sizeof(value)) > 0)
+//			wan_ttl = atoi(value);
+		wan_ttl = nvram_get_int("ttl_spoof_value");
 		snprintf(value, sizeof(value), "%d", wan_ttl);
 
 		if (wan_ttl > 1) {
@@ -4555,14 +4556,14 @@ mangle_setting(char *wan_if, char *wan_ip, char *lan_if, char *lan_ip, char *log
 		    "-j", "TTL", "--ttl-set", "255");
 #ifdef RTCONFIG_IPV6
 		if (ipv6_enabled() && *wan6face) {
-			int wan_hlim = ipv6_getconf(wan6face, "hop_limit") ? : ipv6_getconf("default", "hop_limit");
-			if (wan_hlim > 1) {
-				snprintf(value, sizeof(value), "%d", wan_hlim);
+//			int wan_hlim = ipv6_getconf(wan6face, "hop_limit") ? : ipv6_getconf("default", "hop_limit");
+//			if (wan_hlim > 1) {
+//				snprintf(value, sizeof(value), "%d", wan_hlim);
 				eval("ip6tables", "-t", "mangle", "-A", "FORWARD", "-o", wan6face,
 				     "-m", "hl", "--hl-gt", "30",
 				     "-m", "hl", "--hl-lt", "254",
 				     "-j", "HL", "--hl-set", value);
-			}
+//			}
 			eval("ip6tables", "-t", "mangle", "-A", "FORWARD", "-o", wan6face,
 			     "-m", "hl", "--hl-eq", "254",
 			     "-j", "HL", "--hl-set", "255");
@@ -4727,8 +4728,9 @@ mangle_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)
 		char value[sizeof("255")];
 		int wan_ttl = 0;
 
-		if (f_read_string("/proc/sys/net/ipv4/ip_default_ttl", value, sizeof(value)) > 0)
-			wan_ttl = atoi(value);
+//		if (f_read_string("/proc/sys/net/ipv4/ip_default_ttl", value, sizeof(value)) > 0)
+//			wan_ttl = atoi(value);
+		wan_ttl = nvram_get_int("ttl_spoof_value");
 		snprintf(value, sizeof(value), "%d", wan_ttl);
 
 		if (wan_ttl > 1) {
@@ -4742,14 +4744,14 @@ mangle_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)
 		    "-j", "TTL", "--ttl-set", "255");
 #ifdef RTCONFIG_IPV6
 		if (ipv6_enabled() && *wan6face) {
-			int wan_hlim = ipv6_getconf(wan6face, "hop_limit") ? : ipv6_getconf("default", "hop_limit");
-			if (wan_hlim > 1) {
-				snprintf(value, sizeof(value), "%d", wan_hlim);
+//			int wan_hlim = ipv6_getconf(wan6face, "hop_limit") ? : ipv6_getconf("default", "hop_limit");
+//			if (wan_hlim > 1) {
+//				snprintf(value, sizeof(value), "%d", wan_hlim);
 				eval("ip6tables", "-t", "mangle", "-A", "FORWARD", "-o", wan6face,
 				     "-m", "hl", "--hl-gt", "30",
 				     "-m", "hl", "--hl-lt", "254",
 				     "-j", "HL", "--hl-set", value);
-			}
+//			}
 			eval("ip6tables", "-t", "mangle", "-A", "FORWARD", "-o", wan6face,
 			     "-m", "hl", "--hl-eq", "254",
 			     "-j", "HL", "--hl-set", "255");

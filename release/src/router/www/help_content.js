@@ -170,7 +170,7 @@ helpcontent[8] = new Array("",
 						   "Automatically blocks repeated attempts from the same IP address to the Telnet/SSH ports.  If you are using a third-party router addon that provides similar protection, you may want to disable this option.",
 						   "Adjusts the number of buffers and thresholds used for managing TCP and UDP traffic.",
 						   "Redirects all NTP requests from the local LAN to the router SNTP server.",
-						   "Several ISPs restrict Internet sharing by checking TTL value, i.e allow Phones/Tablets only. Fix WAN outgoing packets with router's TTL, default is 64");
+						   "Several ISPs restrict Internet sharing by checking TTL value, i.e allow Phones/Tablets only. Fix WAN outgoing packets with the specified value, default is 65");
 helpcontent[9] = new Array("",
 						   "<#FirewallConfig_URLActiveDate_itemdesc#>",
 						   "<#FirewallConfig_URLActiveTime_itemdesc#>");
