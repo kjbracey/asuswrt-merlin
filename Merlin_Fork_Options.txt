@@ -549,7 +549,7 @@ NextDNS support
 
         Can be set in gui:      No
         Enable via NVRAM:       nvram set nextdns_id=[your_id]
-                                nvram set nexdns_analytics=x
+                                nvram set nextdns_analytics=x
                                 nvram commit
                                 service restart_stubby
                                   (where x = 0, disable analytics - default, x = 1, enable analytics)

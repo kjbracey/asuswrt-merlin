@@ -4,6 +4,15 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_43E6j9527  (15-April-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: dnsmasq: update to 2.81 final
+* CHANGED: others: limit check-log max lines to save to 200
+* CHANGED: firewall: allow setting ttl spoof value; default to 65
+* CHANGED: webui: unhide ddns password when selected
+* CHANGED: others: v6hosts: check all neighbors for valid link-local addresses
+* FIXED: webui: workaround onblur loop in chrome browser
+
+
 374.43_43E5j9527  (12-April-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: other: v6hosts: clean up log formatting
 * CHANGED: stubby: change log format to date/localtime
