@@ -10,6 +10,8 @@ if [ "$2" == "" ]; then
 else
         if [ $2 -lt 1 ]; then
                 LINES=1
+		elif [ $2 -gt 200 ]; then
+				LINES=200
         else
                 LINES=$2
         fi
