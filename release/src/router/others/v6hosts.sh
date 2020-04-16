@@ -76,60 +76,64 @@ else
     sleep 2
 fi
 
-# extract first neighbor as global address (eiu64 or temp)
-V6IFACE=$(ip -6 neigh show to fe80::/10 | grep "$2" | awk 'FNR <= 1' | awk '{ print $1 }' | awk -F '::' '{ print $2 }')
-if [ "$V6IFACE" == "" ]; then
+# check all link-local neighbors for valid addresses
+V6NEIGH=$(ip -6 neigh show to fe80::/10 | grep "$2" | awk '{ print $1 }' | awk -F '::' '{ print $2 }')
+if [ "$V6NEIGH" == "" ]; then
     echo "[$(date)] no neighbor $HNAME" >> "$LOGA"
     exit 0
 fi
-V6IFLEN=$(echo $V6IFACE | awk -F ':' '{print NF}')
 
-V6PFX=$(nvram get ipv6_prefix | awk -F ':' 'BEGIN {OFS=":"} { i=1; while ($i != "") {i++}; NF=i-1; print $0}')
-V6PFXLEN=$(echo $V6PFX | awk -F ':' '{print NF}')
+echo "$V6NEIGH" | while IFS= read -r V6IFACE ; do
 
-if [[ $(($V6PFXLEN + $V6IFLEN)) -eq 4 ]]; then
-    V6ADDR="::${V6IFACE}";
-    DEL_NEEDED=1;
-    UPDATE_HOSTS=0;
-elif [[ $(($V6PFXLEN + $V6IFLEN)) -lt 8 ]]; then
-    V6ADDR="${V6PFX}::${V6IFACE}";
-    UPDATE_HOSTS=1;
-elif [[ $(($V6PFXLEN + $V6IFLEN)) -eq 8 ]]; then
-    V6ADDR="${V6PFX}:${V6IFACE}";
-    UPDATE_HOSTS=1;
-else
-    echo "[$(date)] wrong length error $V6PFX $V6IFACE  $HNAME" >> "$LOGA"
-    exit 1
-fi
+	V6IFLEN=$(echo $V6IFACE | awk -F ':' '{print NF}')
+	V6PFX=$(nvram get ipv6_prefix | awk -F ':' 'BEGIN {OFS=":"} { i=1; while ($i != "") {i++}; NF=i-1; print $0}')
+	V6PFXLEN=$(echo $V6PFX | awk -F ':' '{print NF}')
 
-ping -6 -q -c 2 -W 5 $V6ADDR > /tmp/ping
+	if [[ $(($V6PFXLEN + $V6IFLEN)) -eq 4 ]]; then
+		V6ADDR="::${V6IFACE}";
+		DEL_NEEDED=1;
+		UPDATE_HOSTS=0;
+	elif [[ $(($V6PFXLEN + $V6IFLEN)) -lt 8 ]]; then
+		V6ADDR="${V6PFX}::${V6IFACE}";
+		UPDATE_HOSTS=1;
+	elif [[ $(($V6PFXLEN + $V6IFLEN)) -eq 8 ]]; then
+		V6ADDR="${V6PFX}:${V6IFACE}";
+		UPDATE_HOSTS=1;
+	else
+		echo "[$(date)] wrong length error $V6PFX $V6IFACE  $HNAME" >> "$LOGA"
+		exit 1
+	fi
 
-ip -6 neigh | grep -qi "$V6ADDR .* lladdr $2"
-if [ $? == 0 ]; then
-    if [ $DEL_NEEDED -eq 1 ]; then
-        # workaround lack of case insensitivity options
-        echo "[$(date)] removing hosts entry $v6addr $HNAME" >> "$LOGA"
-        sed -i "s/.*\b${HNAME}\b.*//I; /^$/ d" "$V6HOSTS"
-    fi
-    if [ $UPDATE_HOSTS -eq 1 ]; then
-        echo "[$(date)] $V6ADDR $HNAME" >> "$LOGB"
-		grep -qi  "${V6ADDR} ${HNAME}" "$V6HOSTS"
-		if [ $? == 0 ]; then
-			echo "[$(date)] skipping duplicate hosts update $V6ADDR $HNAME" >> "$LOGA"
-			echo "skipping duplicate hosts entry $V6ADDR $HNAME" | logger -t "$scrname"
-			exit 0
-		else
-			echo "$V6ADDR $HNAME" >> "$V6HOSTS"
-			echo "[$(date)] `if [ $DEL_NEEDED -eq 1 ]; then echo 'updating'; else echo 'adding'; fi` hosts entry $V6ADDR $HNAME" >> "$LOGA"
-			echo "`if [ $DEL_NEEDED -eq 1 ]; then echo 'updating'; else echo 'adding'; fi` hosts entry $V6ADDR $HNAME" | logger -t "$scrname"
-			if [ ! -e /var/lock/autov6.lock ]; then
-				touch /var/lock/autov6.lock
-				/usr/sbin/updatehosts.sh 60 </dev/null &>/dev/null &
+	ping -6 -q -c 2 -W 5 $V6ADDR > /tmp/ping
+
+	ip -6 neigh | grep -qi "$V6ADDR .* lladdr $2"
+	if [ $? == 0 ]; then
+		if [ $DEL_NEEDED -eq 1 ]; then
+			# workaround lack of case insensitivity options
+			echo "[$(date)] removing hosts entry $v6addr $HNAME" >> "$LOGA"
+			sed -i "s/.*\b${HNAME}\b.*//I; /^$/ d" "$V6HOSTS"
+		fi
+		if [ $UPDATE_HOSTS -eq 1 ]; then
+			echo "[$(date)] $V6ADDR $HNAME" >> "$LOGB"
+			grep -qi  "${V6ADDR} ${HNAME}" "$V6HOSTS"
+			if [ $? == 0 ]; then
+				echo "[$(date)] skipping duplicate hosts update $V6ADDR $HNAME" >> "$LOGA"
+				echo "skipping duplicate hosts entry $V6ADDR $HNAME" | logger -t "$scrname"
+				exit 0
+			else
+				echo "$V6ADDR $HNAME" >> "$V6HOSTS"
+				echo "[$(date)] `if [ $DEL_NEEDED -eq 1 ]; then echo 'updating'; else echo 'adding'; fi` hosts entry $V6ADDR $HNAME" >> "$LOGA"
+				echo "`if [ $DEL_NEEDED -eq 1 ]; then echo 'updating'; else echo 'adding'; fi` hosts entry $V6ADDR $HNAME" | logger -t "$scrname"
+				if [ ! -e /var/lock/autov6.lock ]; then
+					touch /var/lock/autov6.lock
+					/usr/sbin/updatehosts.sh 60 </dev/null &>/dev/null &
+				fi
 			fi
 		fi
-    fi
-else
-    echo "[$(date)] no ping response from $V6ADDR $HNAME" >> "$LOGA"
-fi
+	else
+		echo "[$(date)] no ping response from $V6ADDR $HNAME" >> "$LOGA"
+	fi
+
+done
 
 exit
