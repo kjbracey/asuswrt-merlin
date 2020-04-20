@@ -4,6 +4,14 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_43D7j9527  (20-April-2020) ARM SDK, MIPS,ARM KRACK
+* NEW: udhcpc: add continuous mode wan dhcp query (experimental)
+* CHANGED: services: webui: add enable/disable option for avahi mdns
+* CHANGED: webui: show mdns enabled with itunes server or timemachine
+* CHANGED: services: webui: add switch for enable/disable lpd server
+* CHANGED: stubby: update resolvers csv (20200417)
+
+
 374.43_43E6j9527  (15-April-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: dnsmasq: update to 2.81 final
 * CHANGED: others: limit check-log max lines to save to 200
