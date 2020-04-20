@@ -2,11 +2,11 @@
  * udhcpc scripts
  *
  * Copyright (C) 2009, Broadcom Corporation. All Rights Reserved.
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
@@ -65,7 +65,7 @@ expires(char *wan_ifname, unsigned int in)
 	return 0;
 }
 
-/* 
+/*
  * deconfig: This argument is used when udhcpc starts, and when a
  * leases is lost. The script should put the interface in an up, but
  * deconfigured state.
@@ -391,6 +391,15 @@ start_udhcpc(char *wan_ifname, int unit, pid_t *ppid)
 		/* set to 160 to accomodate new timings enforced by Charter cable */
 		dhcp_argv[index++] = "-A160";
 	}
+	if (nvram_get_int("dhcpc_mode") == 2)
+	{
+		/* 1 discover packet max (default 3 discover packets) */
+		dhcp_argv[index++] = "-t1";
+		/* 5 seconds between packets (default 3 seconds) */
+		dhcp_argv[index++] = "-T5";
+		/* Wait 0 seconds before trying again (default 20 seconds) */
+		dhcp_argv[index++] = "-A0";
+	}
 
 	if (ppid == NULL)
 		dhcp_argv[index++] = "-b";
@@ -549,7 +558,7 @@ expires_lan(char *lan_ifname, unsigned int in)
 	return 0;
 }
 
-/* 
+/*
  * deconfig: This argument is used when udhcpc starts, and when a
  * leases is lost. The script should put the interface in an up, but
  * deconfigured state.
@@ -699,11 +708,11 @@ static void update_nvram_prefix_lifetimes(char *p)
 		env_plft = env_vlft ? strdup(env_plft) : NULL;
 		// Check copies were created properly
 		if (env_plft) {
-			// Retrieve first token		
+			// Retrieve first token
 			cur_prefix = strtok_r(env_prefix, " ", &ptr_prefix);
 			cur_vlft = strtok_r(env_vlft, " ", &ptr_vlft);
 			cur_plft = strtok_r(env_plft, " ", &ptr_plft);
-			
+
 			while (cur_prefix) {
 				// Remove length part
 				cur_prefix = strtok_r(cur_prefix, "/", &ptr_no_length);
@@ -803,7 +812,7 @@ int dhcp6c_state_main(int argc, char **argv)
 		start_dhcp6s();
 */
 // (re)start radvd
-	if (((prefix_changed || lanaddr_changed) && strcmp("RELEASE", state) != 0) || 
+	if (((prefix_changed || lanaddr_changed) && strcmp("RELEASE", state) != 0) ||
 		(!pids("radvd") || !state || nvram_get_int("ipv6_radvd_dl_x")))
 		// Do not start radvd when dhcp6c released its address
 		// (i.e. when stop_dhcp6c is called)
