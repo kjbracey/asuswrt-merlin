@@ -15,10 +15,18 @@ name,ip4address,ip6address,tls_port,tls_name,tls_digest,tls_pubkey,dnssec,nologs
 "Cleanbrowsing-Family Secondary",185.228.168.169,2a0d:2a00:2::0,853,"family-filter-dns.cleanbrowsing.org",,,yes,yes,yes
 "Cleanbrowsing-Adult Primary",185.228.168.10,2a0d:2a00:1::1,853,"adult-filter-dns.cleanbrowsing.org",,,yes,yes,yes
 "Cleanbrowsing-Adult Secondary",185.228.168.11,2a0d:2a00:2::1,853,"adult-filter-dns.cleanbrowsing.org",,,yes,yes,yes
+"CIRA Private Primary",149.112.121.10,2620:10A:80BB::10,853,private.canadianshield.cira.ca,,,yes,yes,yes
+"CIRA Private Secondary",149.112.122.10,2620:10A:80BC::10,853,private.canadianshield.cira.ca,,,yes,yes,yes
+"CIRA Protected Primary",149.112.121.20,2620:10A:80BB::20,853,protected.canadianshield.cira.ca,,,yes,yes,yes
+"CIRA Protected Secondary",149.112.122.20,2620:10A:80BC::20,853,protected.canadianshield.cira.ca,,,yes,yes,yes
+"CIRA Family Primary",149.112.121.30,2620:10A:80BB::30,853,family.canadianshield.cira.ca,,,yes,yes,yes
+"CIRA Family Secondary",149.112.122.30,2620:10A:80BC::30,853,family.canadianshield.cira.ca,,,yes,yes,yes
 "Foundation for Applied Privacy",93.177.65.183,2a03:4000:38:53c::2,853,"dot1.applied-privacy.net",,,yes,yes,yes
 "Foundation for Applied Privacy",93.177.65.183,2a03:4000:38:53c::2,443,"dot1.applied-privacy.net",,,yes,yes,yes
 "Google Primary",8.8.8.8,2001:4860:4860::8888,853,"dns.google",,,yes,yes,yes
 "Google Secondary",8.8.4.4,2001:4860:4860::8844,853,"dns.google",,,yes,yes,yes
+"NextDNS Primary",45.90.28.0,2a07:a8c0::0,853,"dns1.nextdns.io",,,yes,yes,yes
+"NextDNS Secondary",45.90.30.0,2a07:a8c1::0,853,"dns2.nextdns.io",,,yes,yes,yes
 "dns.bitgeek.in server",139.59.51.46,,853,"dns.bitgeek.in","sha256",FndaG4ezEBQs4k0Ya3xt3z4BjFEyQHd7B75nRyP1nTs=,yes,yes,yes
 "dns.cmrg.net Primary",199.58.81.218,2001:470:1c:76d::53,853,"dns.cmrg.net","sha256",3IOHSS48KOc/zlkKGtI46a9TY9PPKDVGhE3W2ZS4JZo=,no,yes,yes
 "dns.cmrg.net Primary",199.58.81.218,2001:470:1c:76d::53,443,"dns.cmrg.net","sha256",3IOHSS48KOc/zlkKGtI46a9TY9PPKDVGhE3W2ZS4JZo=,yes,yes,yes
