@@ -4161,6 +4161,7 @@ int generate_itune_service_config()
 int start_mdns()
 {
 	int ret = 0;
+	int mdns_force = 0;
 
 	char afpd_service_config[80];
 	char adisk_service_config[80];
@@ -4177,6 +4178,7 @@ int start_mdns()
 
 	if (pids("afpd") && nvram_match("timemachine_enable", "1"))
 	{
+		mdns_force = 1;
 		if (!f_exists(afpd_service_config))
 			generate_afpd_service_config();
 		if (!f_exists(adisk_service_config))
@@ -4191,6 +4193,7 @@ int start_mdns()
 	}
 
 	if(nvram_match("daapd_enable", "1") && pids("mt-daapd")){
+		mdns_force = 1;
 		if (!f_exists(itune_service_config)){
 			generate_itune_service_config();
 		}
@@ -4200,12 +4203,14 @@ int start_mdns()
 		}
 	}
 
-	// Execute avahi_daemon daemon
-	//xstart("avahi-daemon");
-	char *avahi_daemon_argv[] = {"avahi-daemon", NULL};
-	pid_t pid;
+	if(nvram_get_int("mdns_enable") || (mdns_force == 1)){
+		// Execute avahi_daemon daemon
+		//xstart("avahi-daemon");
+		char *avahi_daemon_argv[] = {"avahi-daemon", NULL};
+		pid_t pid;
 
-	return _eval(avahi_daemon_argv, NULL, 0, &pid);
+		return _eval(avahi_daemon_argv, NULL, 0, &pid);
+	}
 }
 
 void stop_mdns()

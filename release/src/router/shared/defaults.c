@@ -587,6 +587,9 @@ struct nvram_tuple router_defaults[] = {
 	{ "lan_port", "80"},
 	{ "jumbo_frame_enable", "0"},
 
+	{ "mdns_enable", "1"},				/* multicast DNS (avahi) */
+	{ "mdns_enable_x", "0"},			/* mDNS force with iTunes, TimeMachine */
+
 	/* Guest TCP/IP parameters */
 
 	/* Guest H/W parameters */
