@@ -606,6 +606,7 @@ extern void stop_nas_services(int force);
 extern void start_webdav(void);
 #ifdef RTCONFIG_USB_PRINTER
 extern void start_usblpsrv(void);
+extern void stop_usblpsrv(void);
 #endif
 #ifdef RTCONFIG_SAMBASRV
 extern void create_custom_passwd(void);

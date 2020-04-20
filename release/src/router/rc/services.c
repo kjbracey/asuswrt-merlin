@@ -5657,6 +5657,11 @@ check_ddr_done:
 		if(action&RC_SERVICE_STOP) stop_u2ec();
 		if(action&RC_SERVICE_START) start_u2ec();
 	}
+	else if (strcmp(script, "usblpsrv") == 0)
+	{
+		if(action&RC_SERVICE_STOP) stop_usblpsrv();
+		if(action&RC_SERVICE_START) start_usblpsrv();
+	}
 #endif
 #ifdef RTCONFIG_MEDIA_SERVER
 	else if (strcmp(script, "media") == 0)

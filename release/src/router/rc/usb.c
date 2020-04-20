@@ -616,6 +616,16 @@ void start_usblpsrv(void)
 	start_u2ec();
 	start_lpd();
 }
+
+void stop_usblpsrv(void)
+{
+	nvram_set("u2ec_device", "");
+	nvram_set("u2ec_busyip", "");
+	nvram_set("MFP_busy", "0");
+
+	stop_u2ec();
+	stop_lpd();
+}
 #endif
 
 #define MOUNT_VAL_FAIL 	0

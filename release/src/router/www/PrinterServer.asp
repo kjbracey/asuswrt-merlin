@@ -11,21 +11,24 @@
 <link rel="stylesheet" type="text/css" href="index_style.css">
 <link rel="stylesheet" type="text/css" href="usp_style.css">
 <link rel="stylesheet" type="text/css" href="form_style.css">
-<style type="text/css"> 
+<style type="text/css">
 	div.wrapper { margin: 0 auto; width: 730px;}
 	td.sidenav { width:200px;}
 	body {font-family: Verdana, Tohoma, Arial, Helvetica, sans-serif;padding:0;margin:0;}
 	.wrapperDesc { margin: 0 auto; width: 570px;}
-</style> 
+</style>
 <script type="text/javascript" src="/state.js"></script>
 <script type="text/javascript" src="/popup.js"></script>
 <script type="text/javascript" src="/help.js"></script>
+<script type="text/javascript" src="/detect.js"></script>
+<script type="text/javascript" src="/jquery.js"></script>
+<script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 <style type="text/css">
 .printerServer_table{
 	width:740px;
-	padding:5px; 
-	padding-top:20px; 
-	margin-top:-16px; 
+	padding:5px;
+	padding-top:20px;
+	margin-top:-16px;
 	position:relative;
 	background-color:#4d595d;
 	align:left;
@@ -66,6 +69,7 @@
 }
 </style>
 <script>
+var $j = jQuery.noConflict();
 wan_route_x = '<% nvram_get("wan_route_x"); %>';
 wan_nat_x = '<% nvram_get("wan_nat_x"); %>';
 wan_proto = '<% nvram_get("wan_proto"); %>';
@@ -108,22 +112,23 @@ function showMethod(flag1, flag2){
 <input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get("preferred_lang"); %>">
 <input type="hidden" name="firmver" value="<% nvram_get("firmver"); %>">
 <input type="hidden" name="current_page" value="PrinterServer.asp">
-<input type="hidden" name="next_page" value="">
-<input type="hidden" name="action_mode" value="">
+<input type="hidden" name="next_page" value="PrinterServer.asp">
+<input type="hidden" name="modified" value="0">
+<input type="hidden" name="action_mode" value="apply">
 <input type="hidden" name="action_script" value="">
-<input type="hidden" name="action_wait" value="">
-</form>
+<input type="hidden" name="action_wait" value="5">
+<input type="hidden" name="usblpsrv_enable" value="<% nvram_get("usblpsrv_enable"); %>">
 
 <table class="content" align="center" cellspacing="0" style="margin:auto;">
   <tr>
 	<td width="17">&nbsp;</td>
-	
+
 	<!--=====Beginning of Main Menu=====-->
 	<td valign="top" width="202">
 	  <div id="mainMenu"></div>
 	  <div id="subMenu"></div>
 	</td>
-	
+
   <td valign="top">
 		<div id="tabMenu" class="submenuBlock"></div>
 		<br>
@@ -135,12 +140,12 @@ function showMethod(flag1, flag2){
   	<td class="formfonttitle"><#Network_Printer_Server#>
 			<img onclick="go_setting('/APP_Installation.asp')" align="right" style="cursor:pointer;margin-right:10px;margin-top:-10px" title="<#Menu_usb_application#>" src="/images/backprev.png" onMouseOver="this.src='/images/backprevclick.png'" onMouseOut="this.src='/images/backprev.png'">
 		</td>
-  </tr> 
+  </tr>
   <tr>
   	<td class="line_export"><img src="images/New_ui/export/line_export.png" /></td>
   </tr>
   <tr>
-   	<td><div class="formfontdesc"><#Network_Printer_desc#></div></td> 
+   	<td><div class="formfontdesc"><#Network_Printer_desc#></div></td>
   </tr>
   <tr>
    	<td>
@@ -149,7 +154,8 @@ function showMethod(flag1, flag2){
 				<div class="shadow-l">
 					<div class="shadow-r">
 						<table class="" cellspacing="0" cellpadding="0">
-							<tbody><tr valign="top">
+							<tbody>
+							<tr valign="top">
 								<td class="">
 									<div class="padding">
 										<div class="">
@@ -164,28 +170,68 @@ function showMethod(flag1, flag2){
 												<li style="margin-top:10px;">
 														<a id="faq3" href="" target="_blank" style="text-decoration:underline;font-size:14px;font-weight:bolder;color:#FFF"><#LPR_print_share#> FAQ (MAC)</a>&nbsp;&nbsp;
 												</li>
-											</ul>	
-										</div>	
+											</ul>
+										</div>
 									<span class="article_seperator">&nbsp;</span>
-								</div>
-							</td>
-						</tr>
-					</tbody></table>													
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
-		</div>
-
-		</td>
+	</td>
   </tr>
+  <tr>
+   	<td>
+   		<div>
+   		<table id="LPRServ" width="98%" border="1" align="center" cellpadding="4" cellspacing="1" bordercolor="#6b8fa3" class="FormTable">
+ 				<thead>
+					<tr><td colspan="2">USB LPR Server</td></tr>
+				</thead>
+   				<tr>
+        			<th>Enable LPR Server</th>
+        			<td>
+        				<div class="left" style="width:94px; position:relative; left:3%;" id="radio_usblpsrv_enable"></div>
+							<div class="clear"></div>
+							<script type="text/javascript">
+									$j('#radio_usblpsrv_enable').iphoneSwitch('<% nvram_get("usblpsrv_enable"); %>',
+										 function() {
+											document.form.usblpsrv_enable.value = 1;
+											document.form.action_script.value = "restart_usblpsrv";
+											parent.showLoading();
+											document.form.submit();
+											return true;
+										 },
+										 function() {
+											document.form.usblpsrv_enable.value = 0;
+											document.form.action_script.value = "stop_usblpsrv";
+											parent.showLoading();
+											document.form.submit();
+											return true;
+										 },
+										 {
+											switch_on_container_path: '/switcherplugin/iphone_switch_container_off.png'
+										 }
+									);
+							</script>
+        			</td>
+				</tr>
+		</table>
+		</div>
+  	</td>
+  </tr>
+
   </table>
 
 <!--=====End of Main Content=====-->
-		</td>
-
-		<td width="20" align="center" valign="top"></td>
-	</tr>
+  </td>
+  <td width="10" align="center" valign="top">&nbsp;</td>
+</tr>
 </table>
+</form>
 
 <div id="footer"></div>
 </body>

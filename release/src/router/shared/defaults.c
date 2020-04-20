@@ -1399,6 +1399,10 @@ struct nvram_tuple router_defaults[] = {
 	{ "daapd_friendly_name",""},
 #endif
 
+#ifdef RTCONFIG_USB_PRINTER
+	{ "usblpsrv_enable", "1" },
+#endif
+
 #ifdef DM
 	{ "apps_dl", "1"},
 	{ "apps_dl_share", "0"},

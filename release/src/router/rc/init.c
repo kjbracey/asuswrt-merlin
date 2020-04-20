@@ -4426,7 +4426,8 @@ dbg("boot/continue fail= %d/%d\n", nvram_get_int("Ate_boot_fail"),nvram_get_int(
 			nvram_set_int("wlready", 1);
 			lanaccess_wl();
 #ifdef RTCONFIG_USB_PRINTER
-			start_usblpsrv();
+			if(nvram_get_int("usblpsrv_enable"))
+				start_usblpsrv();
 #endif
 
 #ifdef REMOVE
