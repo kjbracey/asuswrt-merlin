@@ -11,63 +11,13 @@
 <link rel="stylesheet" type="text/css" href="index_style.css">
 <link rel="stylesheet" type="text/css" href="usp_style.css">
 <link rel="stylesheet" type="text/css" href="form_style.css">
-<style type="text/css">
-	div.wrapper { margin: 0 auto; width: 730px;}
-	td.sidenav { width:200px;}
-	body {font-family: Verdana, Tohoma, Arial, Helvetica, sans-serif;padding:0;margin:0;}
-	.wrapperDesc { margin: 0 auto; width: 570px;}
-</style>
+
 <script type="text/javascript" src="/state.js"></script>
 <script type="text/javascript" src="/popup.js"></script>
 <script type="text/javascript" src="/help.js"></script>
 <script type="text/javascript" src="/detect.js"></script>
 <script type="text/javascript" src="/jquery.js"></script>
 <script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
-<style type="text/css">
-.printerServer_table{
-	width:740px;
-	padding:5px;
-	padding-top:20px;
-	margin-top:-16px;
-	position:relative;
-	background-color:#4d595d;
-	align:left;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
-	height: 760px;
-}
-.line_export{
-	height:20px;
-	width:736px;
-}
-.desctitle{
-	font-size: 14px;
-	font-weight: bolder;
-	margin-left: 20px;
-	margin-top: 15px;
-}
-.desc{
-	margin-left: 20px;
-	margin-top: 10px;
-}
-.descimage{
-	margin-left: 20px;
-	margin-top: 5px;
-}
-.statusBar{
-	margin:auto;
-}
-.MethodDesc{
-	font-style: italic;
-	color: #999;
-}
-.imdShade{
-	-moz-box-shadow: 15px 15px 10px #333;
-	-webkit-box-shadow: 15px 15px 10px #333;
-	box-shadow: 15px 15px 10px #333;
-}
-</style>
 <script>
 var $j = jQuery.noConflict();
 wan_route_x = '<% nvram_get("wan_route_x"); %>';
@@ -119,7 +69,7 @@ function showMethod(flag1, flag2){
 <input type="hidden" name="action_wait" value="5">
 <input type="hidden" name="usblpsrv_enable" value="<% nvram_get("usblpsrv_enable"); %>">
 
-<table class="content" align="center" cellspacing="0" style="margin:auto;">
+<table class="content" align="center" cellpadding="0" cellspacing="0">
   <tr>
 	<td width="17">&nbsp;</td>
 
@@ -129,111 +79,94 @@ function showMethod(flag1, flag2){
 	  <div id="subMenu"></div>
 	</td>
 
-  <td valign="top">
+	<td valign="top">
 		<div id="tabMenu" class="submenuBlock"></div>
-		<br>
-
 <!--=====Beginning of Main Content=====-->
-<div class="printerServer_table" id="printerServer_table">
-<table>
-  <tr>
-  	<td class="formfonttitle"><#Network_Printer_Server#>
-			<img onclick="go_setting('/APP_Installation.asp')" align="right" style="cursor:pointer;margin-right:10px;margin-top:-10px" title="<#Menu_usb_application#>" src="/images/backprev.png" onMouseOver="this.src='/images/backprevclick.png'" onMouseOut="this.src='/images/backprev.png'">
-		</td>
-  </tr>
-  <tr>
-  	<td class="line_export"><img src="images/New_ui/export/line_export.png" /></td>
-  </tr>
-  <tr>
-   	<td><div class="formfontdesc"><#Network_Printer_desc#></div></td>
-  </tr>
-  <tr>
-   	<td>
-		<div id="mainbody">
-			<div class="wrapper">
-				<div class="shadow-l">
-					<div class="shadow-r">
-						<table class="" cellspacing="0" cellpadding="0">
-							<tbody>
-							<tr valign="top">
-								<td class="">
-									<div class="padding">
-										<div class="">
-											<ul class="">
-												<li>
-														<a id="faq1" href="" target="_blank" style="text-decoration:underline;font-size:14px;font-weight:bolder;color:#FFF"><#asus_ez_print_share#> FAQ</a>&nbsp;&nbsp;
-														<a href="http://dlcdnet.asus.com/pub/ASUS/LiveUpdate/Release/Wireless/Printer.zip" style="text-decoration:underline;font-size:14px;font-weight:bolder;color:#FC0"">Download Now!</a>
-												</li>
-												<li style="margin-top:10px;">
-														<a id="faq2" href="" target="_blank" style="text-decoration:underline;font-size:14px;font-weight:bolder;color:#FFF"><#LPR_print_share#> FAQ (Windows)</a>&nbsp;&nbsp;
-												</li>
-												<li style="margin-top:10px;">
-														<a id="faq3" href="" target="_blank" style="text-decoration:underline;font-size:14px;font-weight:bolder;color:#FFF"><#LPR_print_share#> FAQ (MAC)</a>&nbsp;&nbsp;
-												</li>
-											</ul>
-										</div>
-									<span class="article_seperator">&nbsp;</span>
-									</div>
-								</td>
-							</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-	</td>
-  </tr>
-  <tr>
-   	<td>
-   		<div>
-   		<table id="LPRServ" width="98%" border="1" align="center" cellpadding="4" cellspacing="1" bordercolor="#6b8fa3" class="FormTable">
- 				<thead>
-					<tr><td colspan="2">USB LPR Server</td></tr>
-				</thead>
-   				<tr>
-        			<th>Enable LPR Server</th>
-        			<td>
-        				<div class="left" style="width:94px; position:relative; left:3%;" id="radio_usblpsrv_enable"></div>
-							<div class="clear"></div>
-							<script type="text/javascript">
-									$j('#radio_usblpsrv_enable').iphoneSwitch('<% nvram_get("usblpsrv_enable"); %>',
-										 function() {
-											document.form.usblpsrv_enable.value = 1;
-											document.form.action_script.value = "restart_usblpsrv";
-											parent.showLoading();
-											document.form.submit();
-											return true;
-										 },
-										 function() {
-											document.form.usblpsrv_enable.value = 0;
-											document.form.action_script.value = "stop_usblpsrv";
-											parent.showLoading();
-											document.form.submit();
-											return true;
-										 },
-										 {
-											switch_on_container_path: '/switcherplugin/iphone_switch_container_off.png'
-										 }
-									);
-							</script>
-        			</td>
-				</tr>
-		</table>
-		</div>
-  	</td>
-  </tr>
+		<table width="98%" border="0" align="left" cellpadding="0" cellspacing="0">
+	        <tr>
+                <td align="left" valign="top" >
 
-  </table>
+					<table width="760px" border="0" cellpadding="5" cellspacing="0" class="FormTitle" id="FormTitle">
+						<tr>
+							<td bgcolor="#4D595D" valign="top"  >
+								<div>&nbsp;</div>
+								<div style="width:730px">
+									<table width="730px">
+										<tr>
+											<td align="left">
+												<span class="formfonttitle"><#Network_Printer_Server#></span>
+											</td>
+											<td align="right">
+												<img onclick="go_setting('/APP_Installation.asp')" align="right" style="cursor:pointer;position:absolute;margin-left:-20px;margin-top:-30px;" title="Back to USB Extension" src="/images/backprev.png" onMouseOver="this.src='/images/backprevclick.png'" onMouseOut="this.src='/images/backprev.png'">
+											</td>
+										</tr>
+									</table>
+								</div>
+								<div style="margin:5px;"><img src="/images/New_ui/export/line_export.png"></div>
+								<div class="formfontdesc"><#Network_Printer_desc#></div>
+								<div class="">
+									<ul class="">
+										<li>
+											<a id="faq1" href="" target="_blank" style="text-decoration:underline;font-size:14px;font-weight:bolder;color:#FFF"><#asus_ez_print_share#> FAQ</a>&nbsp;&nbsp;
+											<a href="http://dlcdnet.asus.com/pub/ASUS/LiveUpdate/Release/Wireless/Printer.zip" style="text-decoration:underline;font-size:14px;font-weight:bolder;color:#FC0"">Download Now!</a>
+										</li>
+										<li style="margin-top:10px;">
+											<a id="faq2" href="" target="_blank" style="text-decoration:underline;font-size:14px;font-weight:bolder;color:#FFF"><#LPR_print_share#> FAQ (Windows)</a>&nbsp;&nbsp;
+										</li>
+										<li style="margin-top:10px;">
+											<a id="faq3" href="" target="_blank" style="text-decoration:underline;font-size:14px;font-weight:bolder;color:#FFF"><#LPR_print_share#> FAQ (MAC)</a>&nbsp;&nbsp;
+										</li>
+									</ul>
+								</div>
+								<div>
+									<table id="LPRServ" width="98%" border="1" align="center" cellpadding="4" cellspacing="1" bordercolor="#6b8fa3" class="FormTable">
+									<!-- <thead>
+										<tr><td colspan="2">USB LPR Server</td></tr>
+									</thead> -->
+										<tr>
+										<th>Enable USB LPR Server</th>
+										<td>
+											<div class="left" style="width:94px; position:relative; left:3%;" id="radio_usblpsrv_enable"></div>
+												<div class="clear"></div>
+												<script type="text/javascript">
+												$j('#radio_usblpsrv_enable').iphoneSwitch('<% nvram_get("usblpsrv_enable"); %>',
+													 function() {
+														document.form.usblpsrv_enable.value = 1;
+														document.form.action_script.value = "restart_usblpsrv";
+														parent.showLoading();
+														document.form.submit();
+														return true;
+													 },
+													 function() {
+														document.form.usblpsrv_enable.value = 0;
+														document.form.action_script.value = "stop_usblpsrv";
+														parent.showLoading();
+														document.form.submit();
+														return true;
+													 },
+													 {
+														switch_on_container_path: '/switcherplugin/iphone_switch_container_off.png'
+													 }
+												);
+												</script>
+										</td>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
 
 <!--=====End of Main Content=====-->
-  </td>
-  <td width="10" align="center" valign="top">&nbsp;</td>
-</tr>
+	</td>
+	  <td width="10" align="center" valign="top">&nbsp;</td>
+  </tr>
 </table>
 </form>
 
 <div id="footer"></div>
 </body>
 </html>
-
