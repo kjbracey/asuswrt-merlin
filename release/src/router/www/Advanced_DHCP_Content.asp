@@ -93,6 +93,7 @@ var dhcp_dns1_curr = '<% nvram_get("dhcp_dns1_x"); %>';
 var dhcp_dns2_curr = '<% nvram_get("dhcp_dns2_x"); %>';
 var dhcp_wins_curr = '<% nvram_get("dhcp_wins_x"); %>';
 var mdns_enable_curr = '<% nvram_get("mdns_enable"); %>';
+var mdns_force = '<% nvram_get("mdns_enable_x"); %>';
 
 function initial(){
 	show_menu();
@@ -107,6 +108,14 @@ function initial(){
 								$('router_in_pool').style.display="";
   				}
 			}
+	}
+
+	if(mdns_force == "1"){
+		document.getElementById("mdns_select").style.display = "none";
+		document.getElementById("mdns_force").style.display = "";
+	}else{
+		document.getElementById("mdns_select").style.display = "";
+		document.getElementById("mdns_force").style.display = "none";
 	}
 
 	// aswild 2015.11
@@ -708,13 +717,13 @@ function check_vpn(){		//true: (DHCP ip pool & static ip ) conflict with VPN cli
 				  <div id="yadns_hint" style="display:none;"></div>
 				</td>
 			  </tr>
-                          <tr>
-                                <th>Advertise router's IP in addition to<br>user-specified DNS</th>
-                                <td>
-                                  <input type="radio" value="1" name="dhcpd_dns_router" class="content_input_fd" onClick="return change_common_radio(this, 'LANHostConfig', 'dhcpd_dns_router', '1')" <% nvram_match("dhcpd_dns_router", "1", "checked"); %>><#checkbox_Yes#>
-                                  <input type="radio" value="0" name="dhcpd_dns_router" class="content_input_fd" onClick="return change_common_radio(this, 'LANHostConfig', 'dhcpd_dns_router', '0')" <% nvram_match("dhcpd_dns_router", "0", "checked"); %>><#checkbox_No#>
-                                </td>
-                          </tr>
+			  <tr>
+				  <th>Advertise router's IP in addition to<br>user-specified DNS</th>
+					  <td>
+						  <input type="radio" value="1" name="dhcpd_dns_router" class="content_input_fd" onClick="return change_common_radio(this, 'LANHostConfig', 'dhcpd_dns_router', '1')" <% nvram_match("dhcpd_dns_router", "1", "checked"); %>><#checkbox_Yes#>
+						  <input type="radio" value="0" name="dhcpd_dns_router" class="content_input_fd" onClick="return change_common_radio(this, 'LANHostConfig', 'dhcpd_dns_router', '0')" <% nvram_match("dhcpd_dns_router", "0", "checked"); %>><#checkbox_No#>
+					  </td>
+			  </tr>
 
 			  <tr>
 				<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(5,8);"><#LANHostConfig_x_WINSServer_itemname#></a></th>
@@ -725,9 +734,12 @@ function check_vpn(){		//true: (DHCP ip pool & static ip ) conflict with VPN cli
 
 			  <tr>
 				<th>Enable multicast DNS (Avahi mDNS)</a></th>
-				<td colspan="2" id="mdns_select" style="text-align:left;">
+				<td colspan="2" id="mdns_select">
 					<input type="radio" value="1" name="mdns_enable" class="content_input_fd" onclick="return change_common_radio(this, 'LANHostConfig', 'mdns_enable', '1')" <% nvram_match("mdns_enable", "1", "checked"); %> /><#checkbox_Yes#>
 					<input type="radio" value="0" name="mdns_enable" class="content_input_fd" onclick="return change_common_radio(this, 'LANHostConfig', 'mdns_enable', '0')" <% nvram_match("mdns_enable", "0", "checked"); %> /><#checkbox_No#>
+				</td>
+				<td colspan="2" id="mdns_force">
+				<span>Enabled by iTunes server and/or TimeMachine</span>
 				</td>
 			  </tr>
 			</table>

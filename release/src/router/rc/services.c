@@ -4203,6 +4203,8 @@ int start_mdns()
 		}
 	}
 
+	nvram_set_int("mdns_enable_x", mdns_force);
+
 	if(nvram_get_int("mdns_enable") || (mdns_force == 1)){
 		// Execute avahi_daemon daemon
 		//xstart("avahi-daemon");
