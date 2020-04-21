@@ -701,6 +701,7 @@ again:
 	}
 
 	struct ifaddrs *ifaddrs;
+	struct in6_addr in6addr;
 	fd_set fds;
 	int svn, rv = 0, nfds = -1;
 	struct endpoint *ep, *badep = NULL;
@@ -749,6 +750,13 @@ again:
 					struct stat st;
 					snprintf(path, sizeof(path), "/sys/class/net/%s/brport", ifa->ifa_name);
 					if (stat(path, &st) == 0)
+						continue;
+				}
+
+				// Only process ipv6 linklocal
+				if (ifa->ifa_addr->sa_family == AF_INET6) {
+					memcpy(&in6addr, &((struct sockaddr_in6 *)ifa->ifa_addr)->sin6_addr, sizeof(in6addr));
+					if (!IN6_IS_ADDR_LINKLOCAL(&in6addr) && !IN6_IS_ADDR_MC_LINKLOCAL(&in6addr))
 						continue;
 				}
 
