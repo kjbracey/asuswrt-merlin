@@ -91,9 +91,9 @@ void crypto_print_openssl_errors(const unsigned int flags);
  *
  * This is just a convenience wrapper for often occurring situations.
  *
-+ * @param flags         Flags to indicate error type and priority.
-+ * @param format        Format string to print.
-+ * @param format args   (optional) arguments for the format string.
+ * @param flags         Flags to indicate error type and priority.
+ * @param format        Format string to print.
+ * @param format args   (optional) arguments for the format string.
  */
 #define crypto_msg(flags, ...) \
     do { \
