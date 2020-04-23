@@ -1504,6 +1504,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "modem_ttlsid", ""},
 	{ "modem_mode", "0"}, // 0: auto, 2: 2G only, 3: 3G only, 4: 4G only, 43: 4G/3G.
 	{ "modem_running", "0"},
+	{ "modem_android", "0"}, //tethered android phone
 #ifdef RTCONFIG_USB_MODEM_PIN
 	{ "modem_pincode_opt", "1"},
 #endif
