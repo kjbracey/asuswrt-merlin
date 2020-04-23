@@ -4,6 +4,16 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_43E8j9527  (24-April-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: openvpn: update to 2.4.9
+* CHANGED: openssl11: update to 1.1.1g
+* CHANGED: others: update amtm to 3.1.6
+* CHANGED: webui: update chart.min.js to 2.9.3
+* CHANGED: nano: update to 4.9.2
+* FIXED: wsdd2: only bind ipv6 based on linklocal address
+* FIXED: curl: (upstream) smtp: set auth correctly
+
+
 374.43_43D7j9527  (20-April-2020) ARM SDK, MIPS,ARM KRACK
 * NEW: udhcpc: add continuous mode wan dhcp query (experimental)
 * CHANGED: services: webui: add enable/disable option for avahi mdns
