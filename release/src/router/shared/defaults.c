@@ -1492,6 +1492,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "record_lanaddr", ""},
 	{ "telnetd_enable", "0"},
 
+	{ "modem_unit", "0"},	//modem wan connection
 	{ "Dev3G", "AUTO"},
 	{ "modem_enable", "1"}, // 0: disabled, 1: WCDMA, 2: CDMA2000, 3: TD-SCDMA, 4: WiMAX.
 	{ "modem_pincode", ""},

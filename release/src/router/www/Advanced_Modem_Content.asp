@@ -170,12 +170,14 @@ function initial(){
 	$j('#usb_modem_switch').iphoneSwitch(usb_modem_enable,
 		function() {
 			if(dualWAN_support){
-				if(wans_dualwan_array[0] != "usb" && wans_dualwan_array[1] == "none"){ //usb not primary, dualwan not active
+				if(document.form.modem_unit.value == "0"){
 					document.form.wans_dualwan.value = "usb" + " none"; //set usb as primary
 					document.form.web_redirect.value = "0"; //turn off redirect on error
 				}
-				else //true dual wan setup
-					document.form.web_redirect.value = "3"; //turn on redirect on LAN or WAN down
+				else{
+					document.form.wans_dualwan.value = wans_dualwan_array[0] + " usb"; //set usb as secondary, dualwan active
+//					document.form.web_redirect.value = "3"; //turn on redirect on LAN or WAN down
+				}
 			}
 			if(document.form.modem_enable.value == "0")
 				document.form.modem_enable.value = "1";
@@ -326,6 +328,7 @@ function switch_modem_mode(mode){
 	show_modem_list(mode);
 
 	if(mode == "1"){ // WCDMA
+		inputCtrl(document.form.modem_unit, 1);
 		inputCtrl(document.form.Dev3G, 1);
 		inputCtrl(document.form.modem_country, 1);
 		inputCtrl(document.form.modem_isp, 1);
@@ -340,6 +343,7 @@ function switch_modem_mode(mode){
 		//document.getElementById("hsdpa_hint").style.display = "";
 	}
 	else if(mode == "2"){ // CDMA2000
+		inputCtrl(document.form.modem_unit, 1);
 		inputCtrl(document.form.Dev3G, 1);
 		inputCtrl(document.form.modem_country, 1);
 		inputCtrl(document.form.modem_isp, 1);
@@ -354,6 +358,7 @@ function switch_modem_mode(mode){
 		//document.getElementById("hsdpa_hint").style.display = "";
 	}
 	else if(mode == "3"){ // TD-SCDMA
+		inputCtrl(document.form.modem_unit, 1);
 		inputCtrl(document.form.Dev3G, 1);
 		inputCtrl(document.form.modem_country, 1);
 		inputCtrl(document.form.modem_isp, 1);
@@ -368,6 +373,7 @@ function switch_modem_mode(mode){
 		//document.getElementById("hsdpa_hint").style.display = "";
 	}
 	else if(mode == "4"){	// WiMAX
+		inputCtrl(document.form.modem_unit, 1);
 		inputCtrl(document.form.Dev3G, 1);
 		inputCtrl(document.form.modem_country, 1);
 		inputCtrl(document.form.modem_isp, 1);
@@ -382,6 +388,7 @@ function switch_modem_mode(mode){
 		//document.getElementById("hsdpa_hint").style.display = "";
 	}
 	else{	// Disable (mode == 0)
+		inputCtrl(document.form.modem_unit, 0);
 		inputCtrl(document.form.Dev3G, 0);
 		inputCtrl(document.form.modem_enable_option, 0);
 		inputCtrl(document.form.modem_country, 0);
@@ -544,6 +551,9 @@ function applyRule(){
 	if(wans_dualwan_array.indexOf("usb") == 0 && document.form.wan0_enable.value == "0")
 		document.form.wan0_enable.value = "1";
 
+	if(wans_dualwan_array.indexOf("none") == 1 && document.form.wan1_enable.value == "1")
+		document.form.wan1_enable.value = "0";
+
 	if(wans_dualwan_array.indexOf("usb") == 1 && document.form.wan1_enable.value == "0")
 		document.form.wan1_enable.value = "1";
 
@@ -655,6 +665,7 @@ function hide_usb_settings(_flag){
 	inputCtrl(document.form.modem_authmode, 0);
 	inputCtrl(document.form.modem_ttlsid, 0);
 	inputCtrl(document.form.Dev3G, 0);
+	inputCtrl(document.form.modem_unit, (typeof(_flag) != 'undefined' && _flag) ? 1 : 0);
 	inputCtrl(document.form.modem_mtu, (typeof(_flag) != 'undefined' && _flag) ? 1 : 0);
 	document.getElementById("modem_enable_div_tr").style.display = "none";
 	document.getElementById("modem_apn_div_tr").style.display = "none";
@@ -691,6 +702,7 @@ function change_apn_mode(){
 		inputCtrl(document.form.modem_dialnum, 0);
 		inputCtrl(document.form.modem_user, 0);
 		inputCtrl(document.form.modem_pass, 0);
+		inputCtrl(document.form.modem_unit, 1);
 		document.getElementById("modem_enable_div_tr").style.display = "";
 		document.getElementById("modem_apn_div_tr").style.display = "";
 		document.getElementById("modem_dialnum_div_tr").style.display = "";
@@ -725,6 +737,7 @@ function change_apn_mode(){
 		inputCtrl(document.form.modem_dialnum, 1);
 		inputCtrl(document.form.modem_user, 1);
 		inputCtrl(document.form.modem_pass, 1);
+		inputCtrl(document.form.modem_unit, 1);
 		document.getElementById("modem_enable_div_tr").style.display = "none";
 		document.getElementById("modem_apn_div_tr").style.display = "none";
 		document.getElementById("modem_dialnum_div_tr").style.display = "none";
@@ -809,7 +822,7 @@ function change_apn_mode(){
 					</table>
 				</div>
 				<div style="margin:5px;" class="splitLine"></div>
-			<div class="formfontdesc"><#HSDPAConfig_hsdpa_enable_hint1#><br>For Dual WAN, first set the Primary and Secondary WAN.&nbsp;&nbsp;Otherwise the USB device will become the primary WAN.</div>
+			<div class="formfontdesc"><#HSDPAConfig_hsdpa_enable_hint1#></div>
 					<table  width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="WANscap">
 						<thead>
 							<tr>
@@ -836,6 +849,16 @@ function change_apn_mode(){
 						<td>
 							<div class="left" style="width:94px; float:left; cursor:pointer;" id="usb_modem_switch"></div>
 							<div class="clear" style="height:32px; width:74px; position: relative; overflow: hidden"></div>
+						</td>
+					</tr>
+
+					<tr>
+						<th width="40%">USB WAN Connection</th>
+						<td>
+							<select name="modem_unit" id="modem_unit" class="input_option">
+								<option value="0" <% nvram_match("modem_unit", "0","selected"); %>>Primary WAN&nbsp;&nbsp;&nbsp;(SingleWAN)</option>
+								<option value="1" <% nvram_match("modem_unit", "1","selected"); %>>Secondary WAN&nbsp;(DualWAN)</option>
+							</select>
 						</td>
 					</tr>
 
