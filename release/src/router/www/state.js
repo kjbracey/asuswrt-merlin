@@ -392,6 +392,16 @@ function change_wl_unit_status(_unit){
 	document.titleForm.submit();
 }
 
+//for dualwan
+var wans_dualwan_orig = '<% nvram_get("wans_dualwan"); %>';
+var wans_dualwan_array = new Array();
+wans_dualwan_array = wans_dualwan_orig.split(" ");
+var usb_index = wans_dualwan_array.getIndexByValue("usb");
+var active_wan_unit = '<% get_wan_unit(); %>';
+var wan0_enable = '<% nvram_get("wan0_enable"); %>';
+var wan1_enable = '<% nvram_get("wan1_enable"); %>';
+var dualwan_enabled = (dualWAN_support && wans_dualwan_orig.search("none") == -1) ? 1 : 0;
+
 var banner_code, menu_code="", menu1_code="", menu2_code="", tab_code="", footer_code;
 function show_banner(L3){// L3 = The third Level of Menu
 	var banner_code = "";
