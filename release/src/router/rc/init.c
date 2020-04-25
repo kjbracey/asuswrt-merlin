@@ -3351,6 +3351,10 @@ int init_nvram(void)
 	// addon web page support
 	add_rc_support("am_addons");
 
+	// clear modem enable if usb wan not used
+	if(strstr(nvram_safe_get("wans_dualwan"), "usb") == NULL)
+		nvram_set_int("modem_enable", 0);
+
 // End special fork processing
 
 #if defined(CONFIG_BCMWL5) && !defined(RTCONFIG_DUALWAN)
