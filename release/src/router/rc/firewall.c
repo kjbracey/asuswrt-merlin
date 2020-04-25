@@ -1375,13 +1375,9 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 	unlink(NAT_RULES);
 	symlink(name, NAT_RULES);
 
-	wan_unit = wan_ifunit(wan_if);
-	_dprintf("wanport_status(%d) %d\n", wan_unit, wanport_status(wan_unit));
-	if (wan_unit || get_wanports_status(wan_unit)) {
-		/* force nat update */
-		nvram_set_int("nat_state", NAT_STATE_UPDATE);
-		start_nat_rules();
-	}
+	/* force nat update */
+	nvram_set_int("nat_state", NAT_STATE_UPDATE);
+	start_nat_rules();
 }
 
 #ifdef RTCONFIG_DUALWAN // RTCONFIG_DUALWAN
@@ -1721,8 +1717,8 @@ void redirect_setting(void)
 		lan_netmask_t = nvram_safe_get("lan_netmask");
 	}
 
-	if ((redirect_fp = fopen("/tmp/redirect_rules", "w+")) == NULL) {
-		fprintf(stderr, "*** Can't make the file of the redirect rules! ***\n");
+	if ((redirect_fp = fopen("/tmp/redirect_rules", "w")) == NULL) {
+		fclose(redirect_fp);
 		return;
 	}
 
