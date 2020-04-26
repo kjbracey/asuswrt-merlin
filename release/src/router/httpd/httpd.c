@@ -124,6 +124,7 @@ static FILE *conn_fp;
 static char auth_userid[AUTH_MAX];
 static char auth_passwd[AUTH_MAX];
 static char auth_realm[AUTH_MAX];
+static int httpd_debug;	// use Global for HTTPD debugging
 char host_name[64];
 char referer_host[64];
 char user_agent[1024];
@@ -451,6 +452,28 @@ referer_check(char* referer, int fromapp_flag)
 	return REFERERFAIL;
 }
 
+static void
+set_referer_host(void)
+{
+	const int d_len = strlen(DUT_DOMAIN_NAME);
+	int port = 0;
+	int referer_includes_port = 0;
+
+	memset(referer_host, 0, sizeof(referer_host));
+	if (*(host_name + d_len) == ':' && (port = atoi(host_name + d_len + 1)) > 0 && port < 65536){
+		referer_includes_port = 1;
+	}
+	if (((strlen(host_name) == d_len) || (*(host_name + d_len) == ':' && atoi(host_name + d_len + 1) > 0))
+	   && strncmp(DUT_DOMAIN_NAME, host_name, d_len)==0){
+		if(referer_includes_port)
+			snprintf(referer_host,sizeof(referer_host),"%s:%d",nvram_safe_get("lan_ipaddr"), port);
+		else
+			snprintf(referer_host,sizeof(referer_host),"%s",nvram_safe_get("lan_ipaddr"));
+	}
+	else
+		snprintf(referer_host,sizeof(host_name),"%s",host_name);
+}
+
 static int
 auth_check( char* dirname, char* authorization ,char* url)
 {
@@ -491,7 +514,7 @@ auth_check( char* dirname, char* authorization ,char* url)
 		}
 	}
 	if ( login_ip == 0 && (logout_auth_req >= 0 || login_auth_req == 1) ) {
-		if (nvram_get_int("debug_httpd") & 2) {
+		if (httpd_debug & 2) {
 			if (logout_auth_req >= 0)
 				_dprintf("httpd logout auth forced for %u, array location %i\n", login_ip_tmp, logout_auth_req);
 			if (login_auth_req == 1)
@@ -863,27 +886,6 @@ void do_file(char *path, FILE *stream)
 
 #endif
 
-void set_referer_host(void)
-{
-	const int d_len = strlen(DUT_DOMAIN_NAME);
-	int port = 0;
-	int referer_includes_port = 0;
-
-	memset(referer_host, 0, sizeof(referer_host));
-	if (*(host_name + d_len) == ':' && (port = atoi(host_name + d_len + 1)) > 0 && port < 65536){
-		referer_includes_port = 1;
-	}
-	if (((strlen(host_name) == d_len) || (*(host_name + d_len) == ':' && atoi(host_name + d_len + 1) > 0))
-	   && strncmp(DUT_DOMAIN_NAME, host_name, d_len)==0){
-		if(referer_includes_port)
-			snprintf(referer_host,sizeof(referer_host),"%s:%d",nvram_safe_get("lan_ipaddr"), port);
-		else
-			snprintf(referer_host,sizeof(referer_host),"%s",nvram_safe_get("lan_ipaddr"));
-	}
-	else
-		snprintf(referer_host,sizeof(host_name),"%s",host_name);
-}
-
 int is_firsttime(void);
 
 time_t detect_timestamp, detect_timestamp_old, signal_timestamp;
@@ -1012,7 +1014,7 @@ handle_request(void)
 			cp += strspn( cp, " \t" );
 			useragent = cp;
 			cur = cp + strlen(cp) + 1;
-			//if (nvram_get_int("debug_httpd") & 1)
+			//if (httpd_debug & 1)
 			//	_dprintf("httpd user-agent = %s\n", useragent);
 		}
 		else if ( strncasecmp( cur, "Referer:", 8 ) == 0 )
@@ -1021,7 +1023,7 @@ handle_request(void)
 			cp += strspn( cp, " \t" );
 			referer = cp;
 			cur = cp + strlen(cp) + 1;
-			if (nvram_get_int("debug_httpd") & 1)
+			if (httpd_debug & 1)
 				_dprintf("httpd referer = %s\n", referer);
 		}
 		else if ( strncasecmp( cur, "Host:", 5 ) == 0 )
@@ -1030,7 +1032,7 @@ handle_request(void)
 			cp += strspn( cp, " \t" );
 			sethost(cp);
 			cur = cp + strlen(cp) + 1;
-			if (nvram_get_int("debug_httpd") & 1)
+			if (httpd_debug & 1)
 				_dprintf("httpd host = %s\n", host_name);
 		}
 		else if (strncasecmp( cur, "Content-Length:", 15 ) == 0) {
@@ -1086,7 +1088,7 @@ handle_request(void)
 	}
 // 2007.11 James. }
 
-	if (nvram_get_int("debug_httpd") & 1)
+	if (httpd_debug & 1)
 		_dprintf("httpd url: %s file: %s\n", url, file);
 
 	if(strncmp(url, APPLYAPPSTR, strlen(APPLYAPPSTR))==0)  fromapp=1;
@@ -1095,7 +1097,7 @@ handle_request(void)
 		strlcpy(url, url+strlen(GETAPPSTR), sizeof(url));
 		file += strlen(GETAPPSTR);
 	}
-	if (nvram_get_int("debug_httpd") & 1)
+	if (httpd_debug & 1)
 		_dprintf("fromapp(url): %i\n", fromapp);
 
 	memset(user_agent, 0, sizeof(user_agent));
@@ -1105,7 +1107,7 @@ handle_request(void)
 		strcpy(user_agent, "");
 
 	fromapp = check_user_agent(useragent);
-	if (nvram_get_int("debug_httpd") & 1)
+	if (httpd_debug & 1)
 		_dprintf("fromapp(check_user_agent): %i\n", fromapp);
 
 	http_login_timeout(login_ip_tmp);
@@ -1174,7 +1176,7 @@ handle_request(void)
 				else {
 					if(do_referer&CHECK_REFERER){
 						referer_result = referer_check(referer, fromapp);
-						if (nvram_get_int("debug_httpd") & 1)
+						if (httpd_debug & 1)
 							_dprintf("referer_result(check): %i, referer: %s fromapp: %i\n", referer_result, referer, fromapp);
 						if(referer_result != 0){
 							if(strcasecmp(method, "post") == 0 && handler->input)   //response post request
@@ -1188,7 +1190,7 @@ handle_request(void)
 					handler->auth(auth_userid, auth_passwd, auth_realm);
 					if (!auth_check(auth_realm, authorization, url))
 					{
-						if (nvram_get_int("debug_httpd") & 1)
+						if (httpd_debug & 1)
 							_dprintf("referer_result(auth): realm: %s url: %s\n", auth_realm, url);
 						if(strcasecmp(method, "post") == 0 && handler->input)   //response post request
 								while (cl--) (void)fgetc(conn_fp);
@@ -1210,7 +1212,7 @@ handle_request(void)
 			}else{
 				if(fromapp == 0 && (do_referer&CHECK_REFERER)){
 					referer_result = check_noauth_referrer(referer, fromapp);
-					if (nvram_get_int("debug_httpd") & 1)
+					if (httpd_debug & 1)
 						_dprintf("referer_result(noauth): %i, referer: %s fromapp: %i\n", referer_result, referer, fromapp);
 					if(referer_result != 0){
 						if(strcasecmp(method, "post") == 0 && handler->input)   //response post request
@@ -1367,7 +1369,7 @@ void http_login(unsigned int ip, char *url) {
 	nvram_set("login_timestamp", login_timestampstr);
 
 	if(ip != login_ip || http_port != login_port) {
-		if (nvram_get_int("debug_httpd") & 2)
+		if (httpd_debug & 2)
 			_dprintf("httpd_login(%u:%i)\n", ip, http_port);
 
 		login_ip = ip;
@@ -1477,12 +1479,12 @@ void http_logout(unsigned int ip)
 	int i;
 
 	if (ip == login_ip && (http_port != 0 || login_port == 0)) {
-		if (nvram_get_int("debug_httpd") & 2)
+		if (httpd_debug & 2)
 			_dprintf("httpd_logout(%u:%i)\n", ip, http_port);
 		for (i=0; i<ARRAY_SIZE(logout_hst); i++) {
 			if (logout_hst[i] == 0) {
 				logout_hst[i] = ip; // save ip needing re-authorization
-				if (nvram_get_int("debug_httpd") & 2)
+				if (httpd_debug & 2)
 					_dprintf("httpd re-auth set for %u, array location %i\n", ip, i);
 				break;
 			}
@@ -1952,6 +1954,7 @@ extern char *wl_ether_etoa(const struct ether_addr *n);
 
 int do_ssl = 0; 	// use Global for HTTPS upgrade judgment in web.c
 int ssl_stream_fd; 	// use Global for HTTPS stream fd in web.c
+
 int main(int argc, char **argv)
 {
 	usockaddr usa;
@@ -1961,7 +1964,8 @@ int main(int argc, char **argv)
 	fd_set active_rfds;
 	conn_list_t pool;
 	int c;
-	//int do_ssl = 0;
+
+	httpd_debug = nvram_get_int("httpd_debug"); // debugging
 
 	do_ssl = 0; // default
 	http_port = nvram_get_int("http_lanport");
