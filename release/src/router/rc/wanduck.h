@@ -154,6 +154,7 @@ typedef struct REQCLIENT{
 // var
 char router_name[PATHLEN];
 int sw_mode, isFirstUse;
+int	wanduck_debug;
 #ifdef RTCONFIG_DUALWAN
 char dualwan_mode[8];
 char dualwan_wans[16];

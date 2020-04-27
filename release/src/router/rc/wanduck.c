@@ -33,7 +33,8 @@ int LanWanLedCtrl(void);
 #endif
 
 static void safe_leave(int signo){
-	csprintf("\n## wanduck.safeexit ##\n");
+	if(wanduck_debug & 1)
+		_dprintf("\n## wanduck.safeexit ##\n");
 	signal(SIGTERM, SIG_IGN);
 	signal(SIGUSR1, SIG_IGN);
 	signal(SIGINT, SIG_IGN);
@@ -45,7 +46,8 @@ static void safe_leave(int signo){
 	int i, ret;
 	for(i = 0; i < maxfd; ++i){
 		ret = close(i);
-		csprintf("## close %d: result=%d.\n", i, ret);
+		if(wanduck_debug & 1)
+			_dprintf("## close %d: result=%d.\n", i, ret);
 	}
 
 #ifndef RTCONFIG_BCMARM
@@ -65,7 +67,8 @@ static void safe_leave(int signo){
 		char *fn = NAT_RULES, ln[PATH_MAX];
 		struct stat s;
 
-		csprintf("\n# Disable direct rule(exit wanduck)\n");
+		if(wanduck_debug & 1)
+			_dprintf("\n# Disable direct rule(exit wanduck)\n");
 
 		rule_setup = 0;
 		conn_changed_state[current_wan_unit] = CONNED; // for cleaning the redirect rules.
@@ -97,7 +100,8 @@ static void safe_leave(int signo){
 			sprintf(buf, "nat_state=%d", NAT_STATE_NORMAL);
 			eval("nvram", "set", buf);
 
-			_dprintf("%s: apply the nat_rules(%s): %s!\n", __FUNCTION__, fn, buf);
+			if(wanduck_debug & 1)
+				_dprintf("%s: apply the nat_rules(%s): %s!\n", __FUNCTION__, fn, buf);
 			logmessage("wanduck exit", "apply the nat_rules(%s)!", fn);
 
 			setup_ct_timeout(TRUE);
@@ -109,7 +113,8 @@ static void safe_leave(int signo){
 			sprintf(buf, "nat_state=%d", NAT_STATE_INITIALIZING);
 			eval("nvram", "set", buf);
 
-			_dprintf("%s: initial the nat_rules: %s!\n", __FUNCTION__, buf);
+			if(wanduck_debug & 1)
+				_dprintf("%s: initial the nat_rules: %s!\n", __FUNCTION__, buf);
 			logmessage("wanduck exit", "initial the nat_rules!");
 		}
 #endif
@@ -117,12 +122,14 @@ static void safe_leave(int signo){
 
 	remove(WANDUCK_PID_FILE);
 
-	csprintf("\n# return(exit wanduck)\n");
+	if(wanduck_debug & 1)
+		_dprintf("\n# return(exit wanduck)\n");
 	exit(0);
 }
 
 void get_related_nvram(){
 	sw_mode = nvram_get_int("sw_mode");
+	wanduck_debug = nvram_get_int("wanduck_debug");
 
 	if(nvram_match("x_Setting", "1"))
 		isFirstUse = 0;
@@ -174,15 +181,15 @@ void get_related_nvram(){
 	max_wait_time = scan_interval*max_disconn_count;
 
 #ifdef RTCONFIG_DUALWAN
-	if(nvram_match("wanduck_debug", "1") && wans_dualwan == 1){
-		csprintf("# wanduck: Got dualwan information:\n", current_lan_unit);
-		csprintf("# wanduck:       wans_dualwan=%d.\n", wans_dualwan);
-		csprintf("# wanduck:      wandog_enable=%d.\n", wandog_enable);
-		csprintf("# wanduck:      wandog_target=%s.\n", wandog_target);
-		csprintf("# wanduck:  max_disconn_count=%d.\n", max_disconn_count);
-		csprintf("# wanduck:       wandog_delay=%d.\n", wandog_delay);
-		csprintf("# wanduck:      scan_interval=%d.\n", scan_interval);
-		csprintf("# wanduck:      max_wait_time=%d.\n", max_wait_time);
+	if((wanduck_debug & 2) && wans_dualwan == 1){
+		_dprintf("# wanduck: Got dualwan information:\n", current_lan_unit);
+		_dprintf("# wanduck:       wans_dualwan=%d.\n", wans_dualwan);
+		_dprintf("# wanduck:      wandog_enable=%d.\n", wandog_enable);
+		_dprintf("# wanduck:      wandog_target=%s.\n", wandog_target);
+		_dprintf("# wanduck:  max_disconn_count=%d.\n", max_disconn_count);
+		_dprintf("# wanduck:       wandog_delay=%d.\n", wandog_delay);
+		_dprintf("# wanduck:      scan_interval=%d.\n", scan_interval);
+		_dprintf("# wanduck:      max_wait_time=%d.\n", max_wait_time);
 	}
 #endif
 
@@ -227,23 +234,24 @@ void get_lan_nvram(){
 	}
 #endif
 
-	csprintf("# wanduck: Got LAN(%d) information:\n", current_lan_unit);
-	if(nvram_match("wanduck_debug", "1")){
+	if(wanduck_debug & 1)
+		_dprintf("# wanduck: Got LAN(%d) information:\n", current_lan_unit);
+	if(wanduck_debug & 2){
 #ifdef RTCONFIG_WIRELESSREPEATER
 		if(sw_mode == SW_MODE_REPEATER){
-			csprintf("# wanduck:   ipaddr=%s.\n", current_lan_ipaddr);
-			csprintf("# wanduck:wlc_state=%d.\n", wlc_state);
+			_dprintf("# wanduck:   ipaddr=%s.\n", current_lan_ipaddr);
+			_dprintf("# wanduck:wlc_state=%d.\n", wlc_state);
 		}
 		else
 #endif
 		{
-			csprintf("# wanduck:   ifname=%s.\n", current_lan_ifname);
-			csprintf("# wanduck:    proto=%s.\n", current_lan_proto);
-			csprintf("# wanduck:   ipaddr=%s.\n", current_lan_ipaddr);
-			csprintf("# wanduck:  netmask=%s.\n", current_lan_netmask);
-			csprintf("# wanduck:  gateway=%s.\n", current_lan_gateway);
-			csprintf("# wanduck:      dns=%s.\n", current_lan_dns);
-			csprintf("# wanduck:   subnet=%s.\n", current_lan_subnet);
+			_dprintf("# wanduck:   ifname=%s.\n", current_lan_ifname);
+			_dprintf("# wanduck:    proto=%s.\n", current_lan_proto);
+			_dprintf("# wanduck:   ipaddr=%s.\n", current_lan_ipaddr);
+			_dprintf("# wanduck:  netmask=%s.\n", current_lan_netmask);
+			_dprintf("# wanduck:  gateway=%s.\n", current_lan_gateway);
+			_dprintf("# wanduck:      dns=%s.\n", current_lan_dns);
+			_dprintf("# wanduck:   subnet=%s.\n", current_lan_subnet);
 		}
 	}
 }
@@ -312,9 +320,11 @@ static void wan_led_control(int sig) {
 	if ((unit = get_usbif_dualwan_unit()) >= 0)
 		link_wan[unit] = is_usb_modem_ready();
 	else
-		csprintf("# wanduck: nvram changed: Don't enable the USB line!\n");
+		if(wanduck_debug & 1)
+			_dprintf("# wanduck: nvram changed: Don't enable the USB line!\n");
 
-	csprintf("# wanduck: nvram changed: x_Setting=%d, link_modem=%d.\n", !isFirstUse, link_wan[unit]);
+	if(wanduck_debug & 1)
+		_dprintf("# wanduck: nvram changed: x_Setting=%d, link_modem=%d.\n", !isFirstUse, link_wan[unit]);
 #endif
 #if defined(RTAC68U) ||  defined(RTAC87U) || defined(DSL_AC68U)
 	if(nvram_match("AllLED", "1")
@@ -349,14 +359,16 @@ int get_packets_of_net_dev(const char *net_dev, unsigned long *rx_packets, unsig
 	int i, got_packets = 0;
 
 	if((fp = fopen(PROC_NET_DEV, "r")) == NULL){
-		csprintf("get_packets_of_net_dev: Can't open the file: %s.\n", PROC_NET_DEV);
+		if(wanduck_debug & 1)
+			_dprintf("get_packets_of_net_dev: Can't open the file: %s.\n", PROC_NET_DEV);
 		return got_packets;
 	}
 
 	// headers.
 	for(i = 0; i < 2; ++i){
 		if(fgets(buf, sizeof(buf), fp) == NULL){
-			csprintf("get_packets_of_net_dev: Can't read out the headers of %s.\n", PROC_NET_DEV);
+			if(wanduck_debug & 1)
+				_dprintf("get_packets_of_net_dev: Can't read out the headers of %s.\n", PROC_NET_DEV);
 			fclose(fp);
 			return got_packets;
 		}
@@ -377,7 +389,8 @@ int get_packets_of_net_dev(const char *net_dev, unsigned long *rx_packets, unsig
 
 		// <rx bytes, packets, errors, dropped, fifo errors, frame errors, compressed, multicast><tx ...>
 		if(sscanf(ptr+1, "%*u%lu%*u%*u%*u%*u%*u%*u%*u%lu", rx_packets, tx_packets) != 2){
-			csprintf("get_packets_of_net_dev: Can't read the packet's number in %s.\n", PROC_NET_DEV);
+			if(wanduck_debug & 1)
+				_dprintf("get_packets_of_net_dev: Can't read the packet's number in %s.\n", PROC_NET_DEV);
 			fclose(fp);
 			return got_packets;
 		}
@@ -425,7 +438,8 @@ int do_ping_detect(int wan_unit){
 
 	/* Check for valid domain to avoid shell escaping */
 	if (!is_valid_domainname(wandog_target)) {
-		csprintf("wanduck: %s %s...invalid target\n", __FUNCTION__, wandog_target);
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: %s %s...invalid target\n", __FUNCTION__, wandog_target);
 		return -1;
 	}
 
@@ -441,7 +455,8 @@ int do_ping_detect(int wan_unit){
 	system(cmd);
 
 	if(check_if_file_exist(PING_RESULT_FILE)){
-		csprintf("wanduck: %s %s from WAN(%d) %s...ok\n", __FUNCTION__, wandog_target, wan_unit, wan_iface);
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: %s %s from WAN(%d) %s...ok\n", __FUNCTION__, wandog_target, wan_unit, wan_iface);
 		unlink(PING_RESULT_FILE);
 		last_status = 1;
 		return 1;
@@ -449,7 +464,8 @@ int do_ping_detect(int wan_unit){
 #else
 	return 1;
 #endif
-	csprintf("wanduck: %s %s from WAN(%d) %s...failed\n", __FUNCTION__, wandog_target, wan_unit, wan_iface);
+	if(wanduck_debug & 1)
+		_dprintf("wanduck: %s %s from WAN(%d) %s...failed\n", __FUNCTION__, wandog_target, wan_unit, wan_iface);
 	if (last_status == 1) {
 		last_status = 0;
 		return 1;
@@ -464,11 +480,13 @@ int do_dns_detect(){
 
 	foreach(word, test_url, next){
 		if(gethostbyname(word) != NULL){
-			_dprintf("wanduck: %s checking %s...success.\n", __FUNCTION__, word);
+			if(wanduck_debug & 1)
+				_dprintf("wanduck: %s checking %s...success.\n", __FUNCTION__, word);
 			nvram_set_int("link_internet", 1);
 			return 1;
 		}
-		_dprintf("wanduck: %s checking %s...failed.\n", __FUNCTION__, word);
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: %s checking %s...failed.\n", __FUNCTION__, word);
 	}
 
 	return 0;
@@ -505,19 +523,22 @@ int do_tcp_dns_detect(int wan_unit){
 	remove(DETECT_FILE);
 
 	if(organize_tcpcheck_cmd(wan_dns, cmd, PATH_MAX) == NULL){
-		csprintf("wanduck: No tcpcheck cmd.\n");
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: No tcpcheck cmd.\n");
 		return 0;
 	}
 	system(cmd);
 
 	if((fp = fopen(DETECT_FILE, "r")) == NULL){
-		csprintf("wanduck: No file: %s.\n", DETECT_FILE);
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: No file: %s.\n", DETECT_FILE);
 		return 0;
 	}
 
 	while(fgets(line, sizeof(line), fp) != NULL){
 		if(strstr(line, "alive")){
-			csprintf("wanduck: %s WAN(%d) %s", __FUNCTION__, wan_unit, line);
+			if(wanduck_debug & 1)
+				_dprintf("wanduck: %s WAN(%d) %s", __FUNCTION__, wan_unit, line);
 			fclose(fp);
 			return 1;
 		}
@@ -541,13 +562,16 @@ int detect_internet(int wan_unit){
 	strcpy(wan_ifname, get_wan_ifname(wan_unit));
 
 #ifdef RTCONFIG_DUALWAN
-	if(wan_unit != current_wan_unit && wans_dualwan == 1)
-		csprintf("wanduck: %s current WAN unit WAN(%d), checking WAN(%d)\n", __FUNCTION__, current_wan_unit, wan_unit);
+	if(wan_unit != current_wan_unit && wans_dualwan == 1){
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: %s current WAN unit WAN(%d), checking WAN(%d)\n", __FUNCTION__, current_wan_unit, wan_unit);
+	}
 	else
 #endif
-		csprintf("wanduck: %s checking WAN(%d)\n", __FUNCTION__, wan_unit);
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: %s checking WAN(%d)\n", __FUNCTION__, wan_unit);
 
-	if(nvram_match("wanduck_debug", "2")) {
+	if(wanduck_debug & 2) {
 		do_dns_detect();
 		do_tcp_dns_detect(wan_unit);
 		do_ping_detect(wan_unit);
@@ -563,18 +587,21 @@ int detect_internet(int wan_unit){
 #ifndef NO_DETECT_INTERNET
 	else if(!get_packets_of_net_dev(wan_ifname, &rx_packets, &tx_packets) || rx_packets <= RX_THRESHOLD) {
 		link_internet = DISCONN;
-		csprintf("wanduck: disconnect by packet transfer check.\n");
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: disconnect by packet transfer check.\n");
 	}
 	else if(!isFirstUse && (!do_dns_detect() && !do_tcp_dns_detect(wan_unit) && !do_ping_detect(wan_unit))) {
 		link_internet = DISCONN;
-		csprintf("wanduck: disconnect by dns/ping check.\n");
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: disconnect by dns/ping check.\n");
 	}
 #endif
 #ifdef RTCONFIG_DUALWAN
 	else if((!strcmp(dualwan_mode, "fo") || !strcmp(dualwan_mode, "fb")) && ((wans_dualwan == 1 && wandog_enable == 1) || nvram_match("ping_debug", "1"))
 			&& !isFirstUse && !do_ping_detect(wan_unit)) {
 		link_internet = DISCONN;
-		csprintf("wanduck: %sWAN(%d) disconnect by wandog.\n", (wans_dualwan == 1 ? "dualwan " : ""), wan_unit);
+		if(wanduck_debug & 1)
+			_dprintf("wanduck: %sWAN(%d) disconnect by wandog.\n", (wans_dualwan == 1 ? "dualwan " : ""), wan_unit);
 	}
 #endif
 	else
@@ -594,7 +621,8 @@ int detect_internet(int wan_unit){
 		record_wan_state_nvram(wan_unit, -1, -1, WAN_AUXSTATE_NONE);
 	}
 
-	csprintf("wanduck: link_internet=%d.\n", link_internet);
+	if(wanduck_debug & 1)
+		_dprintf("wanduck: link_internet=%d.\n", link_internet);
 	return link_internet;
 }
 
@@ -1010,13 +1038,15 @@ void handle_wan_line(int wan_unit, int action){
 
 #if defined(RTCONFIG_APP_PREINSTALLED) || defined(RTCONFIG_APP_NETINSTALLED)
 		if(check_if_dir_exist("/opt/lib/ipkg")){
-			_dprintf("wanduck: update the APP's lists...\n");
+			if(wanduck_debug & 1)
+				_dprintf("wanduck: update the APP's lists...\n");
 			notify_rc("start_apps_update");
 		}
 #endif
 	}
 	else{ // conn_changed_state[wan_unit] == PHY_RECONN
-		csprintf("\n# wanduck(%d): Try to restart_wan_if.\n", action);
+		if(wanduck_debug & 1)
+			_dprintf("\n# wanduck(%d): Try to restart_wan_if.\n", action);
 		memset(cmd, 0, 32);
 		sprintf(cmd, "restart_wan_if %d", wan_unit);
 		notify_rc_and_wait(cmd);
@@ -1032,12 +1062,14 @@ void close_socket(int sockfd, char type){
 
 int build_socket(char *http_port, char *dns_port, int *hd, int *dd){
 	if((*hd = passivesock(http_port, IPPROTO_TCP, 10)) < 0){
-		csprintf("Fail to socket for httpd port: %s.\n", http_port);
+		if(wanduck_debug & 1)
+			_dprintf("Fail to socket for httpd port: %s.\n", http_port);
 		return -1;
 	}
 
 	if((*dd = passivesock(dns_port, IPPROTO_UDP, 10)) < 0){
-		csprintf("Fail to socket for DNS port: %s.\n", dns_port);
+		if(wanduck_debug & 1)
+			_dprintf("Fail to socket for DNS port: %s.\n", dns_port);
 		return -1;
 	}
 
@@ -1296,7 +1328,7 @@ void run_dns_serv(int sockfd){
 	int n;
 	char line[MAXLINE];
 	struct sockaddr_in cliaddr;
-	int clilen = sizeof(cliaddr);
+	unsigned int clilen = sizeof(cliaddr);
 
 	memset(line, 0, MAXLINE);
 	memset(&cliaddr, 0, clilen);
@@ -1519,7 +1551,8 @@ int switch_wan_line(const int wan_unit){
 	}
 #endif
 
-	csprintf("%s: wan(%d) Starting...\n", __FUNCTION__, wan_unit);
+	if(wanduck_debug & 1)
+		_dprintf("%s: wan(%d) Starting...\n", __FUNCTION__, wan_unit);
 	// Set the modem to be running.
 	set_wan_primary_ifunit(wan_unit);
 
@@ -1531,7 +1564,8 @@ int switch_wan_line(const int wan_unit){
 			sleep(1);
 
 		if(lock == -1){
-			csprintf("(%d): No pppd conf file and turn off the state of USB Modem.\n", wan_unit);
+			if(wanduck_debug & 1)
+				_dprintf("(%d): No pppd conf file and turn off the state of USB Modem.\n", wan_unit);
 			set_wan_primary_ifunit(0);
 			return 0;
 		}
@@ -1575,13 +1609,14 @@ TRACE_PT("%s.\n", cmd);
 	}
 #endif
 
-	csprintf("%s: wan(%d) End.\n", __FUNCTION__, wan_unit);
+	if(wanduck_debug & 1)
+		_dprintf("%s: wan(%d) End.\n", __FUNCTION__, wan_unit);
 	return 1;
 }
 
 int wanduck_main(int argc, char *argv[]){
 	char *http_servport, *dns_servport;
-	int clilen;
+	unsigned int clilen;
 	struct sockaddr_in cliaddr;
 	struct timeval  tval;
 	int nready, maxi, sockfd;
@@ -1628,7 +1663,8 @@ int wanduck_main(int argc, char *argv[]){
 	}
 
 	if(build_socket(http_servport, dns_servport, &http_sock, &dns_sock) < 0){
-		csprintf("\n*** Fail to build socket! ***\n");
+		if(wanduck_debug & 1)
+			_dprintf("\n*** Fail to build socket! ***\n");
 		exit(0);
 	}
 
@@ -1722,7 +1758,8 @@ int wanduck_main(int argc, char *argv[]){
 			&& (!strcmp(dualwan_mode, "fo") || !strcmp(dualwan_mode, "fb"))
 			){
 		if(wandog_delay > 0){
-			csprintf("wanduck: delay %d seconds...\n", wandog_delay);
+			if(wanduck_debug & 1)
+				_dprintf("wanduck: delay %d seconds...\n", wandog_delay);
 			sleep(wandog_delay);
 			delay_detect = 0;
 		}
@@ -1789,11 +1826,13 @@ int wanduck_main(int argc, char *argv[]){
 	 * handle_wan_line() must not be run at the first detect.
 	 */
 	if(cross_state == DISCONN){
-		csprintf("\n# Enable direct rule\n");
+		if(wanduck_debug & 1)
+			_dprintf("\n# Enable direct rule\n");
 		rule_setup = 1;
 	}
 	else if(cross_state == CONNED && isFirstUse){
-		csprintf("\n#CONNED : Enable direct rule\n");
+		if(wanduck_debug & 1)
+			_dprintf("\n#CONNED : Enable direct rule\n");
 		rule_setup = 1;
 	}
 
@@ -1868,7 +1907,8 @@ int wanduck_main(int argc, char *argv[]){
 					}
 					else if(conn_state[wan_unit] == CONNED){
 						if(rule_setup == 1 && !isFirstUse){
-							csprintf("\n# DualWAN: Disable direct rule(D2C)\n");
+							if(wanduck_debug & 1)
+								_dprintf("\n# DualWAN: Disable direct rule(D2C)\n");
 							rule_setup = 0;
 						}
 
@@ -1902,13 +1942,15 @@ int wanduck_main(int argc, char *argv[]){
 					else
 						set_disconn_count(wan_unit, get_disconn_count(wan_unit)+1);
 
-					csprintf("%s: wan(%d) disconn count = %d/%d ...\n", __FUNCTION__, wan_unit, get_disconn_count(wan_unit), max_disconn_count);
+					if(wanduck_debug & 1)
+						_dprintf("%s: wan(%d) disconn count = %d/%d ...\n", __FUNCTION__, wan_unit, get_disconn_count(wan_unit), max_disconn_count);
 				}
 			}
 		}
 		else if(sw_mode == SW_MODE_ROUTER && !strcmp(dualwan_mode, "fo")){
 			if(delay_detect == 1 && wandog_delay > 0){
-				csprintf("wanduck: delay %d seconds...\n", wandog_delay);
+				if(wanduck_debug & 1)
+					_dprintf("wanduck: delay %d seconds...\n", wandog_delay);
 				sleep(wandog_delay);
 				delay_detect = 0;
 			}
@@ -1942,7 +1984,8 @@ int wanduck_main(int argc, char *argv[]){
 
 				// When the current line is re-plugged and the other line has plugged, the count has to be reset.
 				if(link_wan[other_wan_unit]){
-					csprintf("# wanduck: set S_COUNT: PHY_RECONN.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_COUNT: PHY_RECONN.\n");
 					set_disconn_count(current_wan_unit, S_COUNT);
 				}
 			}
@@ -1974,7 +2017,8 @@ int wanduck_main(int argc, char *argv[]){
 				conn_state_old[current_wan_unit] = conn_state[current_wan_unit];
 
 				if(disconn_case[current_wan_unit] == CASE_THESAMESUBNET){
-					csprintf("# wanduck: set S_IDLE: CASE_THESAMESUBNET.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_IDLE: CASE_THESAMESUBNET.\n");
 					set_disconn_count(current_wan_unit, S_IDLE);
 				}
 #ifdef RTCONFIG_USB_MODEM
@@ -1991,10 +2035,12 @@ int wanduck_main(int argc, char *argv[]){
 			if(get_disconn_count(current_wan_unit) != S_IDLE){
 				if(get_disconn_count(current_wan_unit) < max_disconn_count){
 					set_disconn_count(current_wan_unit, get_disconn_count(current_wan_unit)+1);
-					csprintf("# wanduck: wait time for switching: %d/%d.\n", get_disconn_count(current_wan_unit)*scan_interval, max_wait_time);
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: wait time for switching: %d/%d.\n", get_disconn_count(current_wan_unit)*scan_interval, max_wait_time);
 				}
 				else{
-					csprintf("# wanduck: set S_COUNT: changed_count[] >= max_disconn_count.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_COUNT: changed_count[] >= max_disconn_count.\n");
 					set_disconn_count(current_wan_unit, S_COUNT);
 				}
 			}
@@ -2003,7 +2049,8 @@ int wanduck_main(int argc, char *argv[]){
 		}
 		else if(sw_mode == SW_MODE_ROUTER && !strcmp(dualwan_mode, "fb")){
 			if(delay_detect == 1 && wandog_delay > 0){
-				csprintf("wanduck: delay %d seconds...\n", wandog_delay);
+				if(wanduck_debug & 1)
+					_dprintf("wanduck: delay %d seconds...\n", wandog_delay);
 				sleep(wandog_delay);
 				delay_detect = 0;
 			}
@@ -2033,7 +2080,8 @@ int wanduck_main(int argc, char *argv[]){
 				if(other_wan_unit == WAN_FB_UNIT && conn_state[other_wan_unit] == CONNED){
 					current_state[other_wan_unit] = nvram_get_int(nvram_state[other_wan_unit]);
 					conn_state[other_wan_unit] = if_wan_connected(other_wan_unit, current_state[other_wan_unit]);
-					csprintf("wanduck: detect the fail-back line(%d): %d.\n", other_wan_unit+1, conn_state[other_wan_unit]);
+					if(wanduck_debug & 1)
+						_dprintf("wanduck: detect the fail-back line(%d): %d.\n", other_wan_unit+1, conn_state[other_wan_unit]);
 				}
 			}
 
@@ -2044,7 +2092,8 @@ int wanduck_main(int argc, char *argv[]){
 
 				// When the current line is re-plugged and the other line has plugged, the count has to be reset.
 				if(link_wan[other_wan_unit]){
-					csprintf("# wanduck: set S_COUNT: PHY_RECONN.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_COUNT: PHY_RECONN.\n");
 					set_disconn_count(current_wan_unit, S_COUNT);
 				}
 			}
@@ -2077,7 +2126,8 @@ int wanduck_main(int argc, char *argv[]){
 				conn_state_old[current_wan_unit] = conn_state[current_wan_unit];
 
 				if(disconn_case[current_wan_unit] == CASE_THESAMESUBNET){
-					csprintf("# wanduck: set S_IDLE: CASE_THESAMESUBNET.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_IDLE: CASE_THESAMESUBNET.\n");
 					set_disconn_count(current_wan_unit, S_IDLE);
 				}
 #ifdef RTCONFIG_USB_MODEM
@@ -2105,10 +2155,12 @@ int wanduck_main(int argc, char *argv[]){
 			if(get_disconn_count(current_wan_unit) != S_IDLE){
 				if(get_disconn_count(current_wan_unit) < max_disconn_count){
 					set_disconn_count(current_wan_unit, get_disconn_count(current_wan_unit)+1);
-					csprintf("# wanduck: wait time for switching: %d/%d.\n", get_disconn_count(current_wan_unit)*scan_interval, max_wait_time);
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: wait time for switching: %d/%d.\n", get_disconn_count(current_wan_unit)*scan_interval, max_wait_time);
 				}
 				else{
-					csprintf("# wanduck: set S_COUNT: changed_count[] >= max_disconn_count.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_COUNT: changed_count[] >= max_disconn_count.\n");
 					set_disconn_count(current_wan_unit, S_COUNT);
 				}
 			}
@@ -2116,10 +2168,12 @@ int wanduck_main(int argc, char *argv[]){
 			if(get_disconn_count(other_wan_unit) != S_IDLE){
 				if(get_disconn_count(other_wan_unit) < max_fb_count){
 					set_disconn_count(other_wan_unit, get_disconn_count(other_wan_unit)+1);
-					csprintf("# wanduck: wait time for returning: %d/%d.\n", get_disconn_count(other_wan_unit)*scan_interval, max_fb_wait_time);
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: wait time for returning: %d/%d.\n", get_disconn_count(other_wan_unit)*scan_interval, max_fb_wait_time);
 				}
 				else{
-					csprintf("# wanduck: set S_COUNT: changed_count[] >= max_fb_count.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_COUNT: changed_count[] >= max_fb_count.\n");
 					set_disconn_count(other_wan_unit, S_COUNT);
 				}
 			}
@@ -2162,7 +2216,8 @@ int wanduck_main(int argc, char *argv[]){
 
 				// When the current line is re-plugged and the other line has plugged, the count has to be reset.
 				if(link_wan[other_wan_unit]){
-					csprintf("# wanduck: set S_COUNT: PHY_RECONN.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_COUNT: PHY_RECONN.\n");
 					set_disconn_count(current_wan_unit, S_COUNT);
 				}
 			}
@@ -2186,7 +2241,8 @@ int wanduck_main(int argc, char *argv[]){
 
 #ifdef RTCONFIG_DSL /* Paul add 2013/7/29, for Non-DualWAN 3G/4G WAN -> DSL WAN, auto Fail-Back feature */
 			if (nvram_match("dsltmp_adslsyncsts","up") && current_wan_unit == WAN_UNIT_SECOND){
-				csprintf("\n# wanduck: adslsync up.\n");
+				if(wanduck_debug & 1)
+					_dprintf("\n# wanduck: adslsync up.\n");
 				set_disconn_count(current_wan_unit, S_IDLE);
 				link_wan[current_wan_unit] = DISCONN;
 				conn_state[current_wan_unit] = DISCONN;
@@ -2208,7 +2264,8 @@ int wanduck_main(int argc, char *argv[]){
 				conn_state_old[current_wan_unit] = conn_state[current_wan_unit];
 
 				if(disconn_case[current_wan_unit] == CASE_THESAMESUBNET){
-					csprintf("# wanduck: set S_IDLE: CASE_THESAMESUBNET.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_IDLE: CASE_THESAMESUBNET.\n");
 					set_disconn_count(current_wan_unit, S_IDLE);
 				}
 #ifdef RTCONFIG_USB_MODEM
@@ -2223,10 +2280,12 @@ int wanduck_main(int argc, char *argv[]){
 			if(get_disconn_count(current_wan_unit) != S_IDLE){
 				if(get_disconn_count(current_wan_unit) < max_disconn_count){
 					set_disconn_count(current_wan_unit, get_disconn_count(current_wan_unit)+1);
-					csprintf("# wanduck: wait time for switching: %d/%d.\n", get_disconn_count(current_wan_unit)*scan_interval, max_wait_time);
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: wait time for switching: %d/%d.\n", get_disconn_count(current_wan_unit)*scan_interval, max_wait_time);
 				}
 				else{
-					csprintf("# wanduck: set S_COUNT: changed_count[] >= max_disconn_count.\n");
+					if(wanduck_debug & 1)
+						_dprintf("# wanduck: set S_COUNT: changed_count[] >= max_disconn_count.\n");
 					set_disconn_count(current_wan_unit, S_COUNT);
 				}
 			}
@@ -2265,12 +2324,17 @@ int wanduck_main(int argc, char *argv[]){
 				; // do nothing.
 			else if(conn_changed_state[current_wan_unit] == DISCONN || conn_changed_state[current_wan_unit] == C2D || isFirstUse){
 				//if(rule_setup == 0){
-					if(conn_changed_state[current_wan_unit] == DISCONN)
-						csprintf("\n# mode(%d): Enable direct rule(DISCONN)\n", sw_mode);
-					else if(conn_changed_state[current_wan_unit] == C2D)
-						csprintf("\n# mode(%d): Enable direct rule(C2D)\n", sw_mode);
+					if(conn_changed_state[current_wan_unit] == DISCONN){
+						if(wanduck_debug & 1)
+							_dprintf("\n# mode(%d): Enable direct rule(DISCONN)\n", sw_mode);
+					}
+					else if(conn_changed_state[current_wan_unit] == C2D){
+						if(wanduck_debug & 1)
+							_dprintf("\n# mode(%d): Enable direct rule(C2D)\n", sw_mode);
+					}
 					else
-						csprintf("\n# mode(%d): Enable direct rule(isFirstUse)\n", sw_mode);
+						if(wanduck_debug & 1)
+							_dprintf("\n# mode(%d): Enable direct rule(isFirstUse)\n", sw_mode);
 					rule_setup = 1;
 
 					eval("ebtables", "-t", "broute", "-F");
@@ -2286,7 +2350,8 @@ int wanduck_main(int argc, char *argv[]){
 			else{
 				//if(rule_setup == 1 && !isFirstUse){
 				if(!isFirstUse){
-					csprintf("\n# mode(%d): Disable direct rule(CONNED)\n", sw_mode);
+					if(wanduck_debug & 1)
+						_dprintf("\n# mode(%d): Disable direct rule(CONNED)\n", sw_mode);
 					rule_setup = 0;
 
 					eval("ebtables", "-t", "broute", "-F");
@@ -2332,10 +2397,12 @@ int wanduck_main(int argc, char *argv[]){
 							}
 						}
 					}
-					csprintf("\n# Enable direct rule(C2D)\n");
+					if(wanduck_debug & 1)
+						_dprintf("\n# Enable direct rule(C2D)\n");
 				}
 				else
-					csprintf("\n# Enable direct rule(isFirstUse)\n");
+					if(wanduck_debug & 1)
+						_dprintf("\n# Enable direct rule(isFirstUse)\n");
 				rule_setup = 1;
 
 				handle_wan_line(current_wan_unit, rule_setup);
@@ -2348,13 +2415,15 @@ int wanduck_main(int argc, char *argv[]){
 #ifdef RTCONFIG_USB_MODEM
 					// the current line is USB and be plugged off.
 					if (!link_wan[current_wan_unit] && dualwan_unit__usbif(current_wan_unit)) {
-						csprintf("\n# wanduck(C2D): Modem was plugged off and try to Switch the other line.\n");
+						if(wanduck_debug & 1)
+							_dprintf("\n# wanduck(C2D): Modem was plugged off and try to Switch the other line.\n");
 						switch_wan_line(other_wan_unit);
 
 #ifdef RTCONFIG_DSL /* Paul add 2013/7/29, for Non-DualWAN 3G/4G WAN -> DSL WAN, auto Fail-Back feature */
 #ifndef RTCONFIG_DUALWAN
 						if (nvram_match("dsltmp_adslsyncsts","up") && usb_switched_back_dsl == 1){
-							csprintf("\n# wanduck: usb_switched_back_dsl: 1.\n");
+							if(wanduck_debug & 1)
+								_dprintf("\n# wanduck: usb_switched_back_dsl: 1.\n");
 							link_wan[WAN_UNIT_SECOND] = CONNED;
 							max_disconn_count = max_wait_time/scan_interval;
 							usb_switched_back_dsl = 0;
@@ -2367,7 +2436,8 @@ int wanduck_main(int argc, char *argv[]){
 					// C2D: Try to prepare the backup line.
 					if(link_wan[other_wan_unit] == 1){
 						if(get_wan_state(other_wan_unit) != WAN_STATE_CONNECTED){
-							csprintf("\n# wanduck(C2D): Try to prepare the backup line.\n");
+							if(wanduck_debug & 1)
+								_dprintf("\n# wanduck(C2D): Try to prepare the backup line.\n");
 							memset(cmd, 0, 32);
 							sprintf(cmd, "restart_wan_if %d", other_wan_unit);
 							notify_rc_and_wait(cmd);
@@ -2392,7 +2462,8 @@ int wanduck_main(int argc, char *argv[]){
 						enable_wan_led();
 					}
 				}
-				csprintf("\n# Disable direct rule(D2C)\n");
+				if(wanduck_debug & 1)
+					_dprintf("\n# Disable direct rule(D2C)\n");
 				rule_setup = 0;
 				handle_wan_line(current_wan_unit, rule_setup);
 			}
@@ -2408,10 +2479,13 @@ int wanduck_main(int argc, char *argv[]){
 #endif
 					)
 			{
-				if(current_wan_unit)
-					csprintf("# Switching the connect to the first WAN line...\n");
+				if(current_wan_unit){
+					if(wanduck_debug & 1)
+						_dprintf("# Switching the connect to the first WAN line...\n");
+				}
 				else
-					csprintf("# Switching the connect to the second WAN line...\n");
+					if(wanduck_debug & 1)
+						_dprintf("# Switching the connect to the second WAN line...\n");
 				set_disconn_count(other_wan_unit, S_IDLE);
 				switch_wan_line(other_wan_unit);
 			}
@@ -2425,7 +2499,8 @@ int wanduck_main(int argc, char *argv[]){
 		if(!strcmp(dualwan_mode, "fb") && other_wan_unit == WAN_FB_UNIT && conn_state[other_wan_unit] == CONNED
 				&& get_disconn_count(other_wan_unit) >= max_fb_count
 				){
-			csprintf("# wanduck: returning the connect to the %d WAN line...\n", other_wan_unit);
+			if(wanduck_debug & 1)
+				_dprintf("# wanduck: returning the connect to the %d WAN line...\n", other_wan_unit);
 			set_disconn_count(other_wan_unit, S_IDLE);
 			switch_wan_line(other_wan_unit);
 		}
@@ -2487,7 +2562,8 @@ WANDUCK_SELECT:
 			}
 
 			if(fd_i == MAX_USER){
-				csprintf("# wanduck servs full\n");
+				if(wanduck_debug & 1)
+					_dprintf("# wanduck servs full\n");
 				close(cur_sockfd);
 				continue;
 			}
@@ -2525,6 +2601,7 @@ WANDUCK_SELECT:
 		}
 	}
 
-	csprintf("# wanduck exit error\n");
+	if(wanduck_debug & 1)
+		_dprintf("# wanduck exit error\n");
 	exit(1);
 }
