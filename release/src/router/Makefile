@@ -234,14 +234,13 @@ obj-$(RTCONFIG_USB_MODEM) += sdparm-1.02
 obj-$(RTCONFIG_USB_MODEM) += comgt-0.32
 obj-$(RTCONFIG_USB_MODEM) += uqmi
 
-ifneq ($(or $(findstring linux-2.6.36.x,$(LINUXDIR)),$(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
-#obj-$(RTCONFIG_USB_MODEM) += usbmodeswitch-1.2.3
-obj-$(RTCONFIG_USB_MODEM) += usb-modeswitch-2.1.1
+ifeq ($(or $(findstring linux-2.6.36.x,$(LINUXDIR)),$(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
+obj-$(RTCONFIG_USB_MODEM) += usb-modeswitch
 else
 ifeq ($(RTCONFIG_BCMWL6),y)
-obj-$(RTCONFIG_USB_MODEM) += usb-modeswitch-2.2.3
+obj-$(RTCONFIG_USB_MODEM) += usb-modeswitch
 else
-obj-$(RTCONFIG_USB_MODEM) += usbmodeswitch
+obj-$(RTCONFIG_USB_MODEM) += usb-modeswitch-1.2.3
 endif
 endif
 
@@ -1752,31 +1751,11 @@ libupnp-1.3.1/Makefile: libupnp-1.3.1/Makefile.in
 	  $(CONFIGURE) --prefix=/usr --disable-dependency-tracking \
 	 )
 
-libusb10/stamp-h1:
-	cd libusb10 && CFLAGS="-Os -Wall $(EXTRACFLAGS)" LIBS="-lpthread" \
-	$(CONFIGURE) --prefix=/usr ac_cv_lib_rt_clock_gettime=no
-	-@$(MAKE) -C libusb10 clean
-	touch $@
-
-libusb10: libusb10/stamp-h1
-	$(MAKE) -C $@
-
-libusb10-install: libusb10
-	install -D libusb10/libusb/.libs/libusb-1.0.so.0.0.0 $(INSTALLDIR)/libusb10/usr/lib/libusb-1.0.so.0
-	$(STRIP) $(INSTALLDIR)/libusb10/usr/lib/*.so.*
-	cd $(INSTALLDIR)/libusb10/usr/lib && \
-		ln -sf libusb-1.0.so.0 libusb-1.0.so.0.0.0 && \
-		ln -sf libusb-1.0.so.0 libusb-1.0.so
-
-libusb10-clean:
-	-@$(MAKE) -C libusb10 clean
-	@rm -f libusb10/stamp-h1
-
 libusb/stamp-h1:
-	cd libusb && CFLAGS="-Wall -Os $(EXTRACFLAGS)" \
+	cd libusb && CFLAGS="-Wall -Os $(EXTRACFLAGS)" LIBS="-lpthread -ldl -lc $(EXTRALDFLAGS)" \
 	$(CONFIGURE) --prefix=/usr \
 		LIBUSB_1_0_CFLAGS="-I$(TOP)/libusb10/libusb" \
-		LIBUSB_1_0_LIBS="-L$(TOP)/libusb10/libusb/.libs -lusb-1.0 -lpthread \
+		LIBUSB_1_0_LIBS="-L$(TOP)/libusb10/libusb/.libs -lusb-1.0 \
 		-Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share"
 	-@$(MAKE) -C libusb clean
 	touch $@
@@ -1795,57 +1774,50 @@ libusb-clean:
 	-@$(MAKE) -C libusb clean
 	@rm -f libusb/stamp-h1
 
-#usbmodeswitch: libusb10
-#	$(MAKE) -C $@ CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) -DLIBUSB10 \
-#	    -Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share -lpthread \
-#	    -I$(TOP)/libusb10/libusb -L$(TOP)/libusb10/libusb/.libs -lusb-1.0"
+usb-modeswitch-1.2.3: libusb
+	$(MAKE) -C $@ CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) -I$(TOP)/libusb/libusb" LIBS="\
+		-Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share -lpthread -ldl \
+		-L$(TOP)/libusb/libusb/.libs -lusb -L$(TOP)/libusb10/libusb/.libs -lusb-1.0"
 
-usbmodeswitch: libusb-0.1.12
-	$(MAKE) -C $@ CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) \
-		-Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share -lpthread \
-		-I$(TOP)/libusb-0.1.12 -L$(TOP)/libusb-0.1.12/.libs -lusb"
-
-usbmodeswitch-install: usbmodeswitch usbmodeswitch-install
-	install -D usbmodeswitch/usb_modeswitch $(INSTALLDIR)/usbmodeswitch/usr/sbin/usb_modeswitch
-	$(STRIP) -s $(INSTALLDIR)/usbmodeswitch/usr/sbin/usb_modeswitch
+usb-modeswitch-1.2.3-install: usb-modeswitch-1.2.3
+	install -D usb-modeswitch-1.2.3/usb_modeswitch $(INSTALLDIR)/usb-modeswitch-1.2.3/usr/sbin/usb_modeswitch
+	$(STRIP) -s $(INSTALLDIR)/usb-modeswitch-1.2.3/usr/sbin/usb_modeswitch
 	@mkdir -p $(TARGETDIR)/rom/etc
-	@sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < $(TOP)/usbmodeswitch/usb_modeswitch.conf > $(TARGETDIR)/rom/etc/usb_modeswitch.conf
+	@sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < $(TOP)/usb-modeswitch-1.2.3/usb_modeswitch.conf > $(TARGETDIR)/rom/etc/usb_modeswitch.conf
 
-usbmodeswitch-1.2.3: libusb-0.1.12
-	$(MAKE) -C $@ CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) \
-		-Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share -lpthread \
-		-I$(TOP)/libusb-0.1.12 -L$(TOP)/libusb-0.1.12/.libs -lusb"
+libusb10/stamp-h1:
+	cd libusb10 && CFLAGS="-Os -Wall $(EXTRACFLAGS)" LIBS="-lpthread -ldl -lc $(EXTRALDFLAGS)" \
+	$(CONFIGURE) --enable-shared --prefix=/usr ac_cv_lib_rt_clock_gettime=no
+	-@$(MAKE) -C libusb10 clean
+	touch $@
 
-usbmodeswitch-1.2.3-install: usbmodeswitch-1.2.3
-	install -D usbmodeswitch-1.2.3/usb_modeswitch $(INSTALLDIR)/usbmodeswitch-1.2.3/usr/sbin/usb_modeswitch
-	$(STRIP) -s $(INSTALLDIR)/usbmodeswitch-1.2.3/usr/sbin/usb_modeswitch
-	@mkdir -p $(TARGETDIR)/rom/etc
-	@sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < $(TOP)/usbmodeswitch-1.2.3/usb_modeswitch.conf > $(TARGETDIR)/rom/etc/usb_modeswitch.conf
+libusb10: libusb10/stamp-h1
+	$(MAKE) -C $@
 
-usb-modeswitch-2.1.1: libusb10
-	$(MAKE) -C $@ CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) \
-		-Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share -lpthread \
-		-I$(TOP)/libusb10/libusb -L$(TOP)/libusb10/libusb/.libs -lusb-1.0"
+libusb10-install: libusb10
+	install -D libusb10/libusb/.libs/libusb-1.0.so.0.0.0 $(INSTALLDIR)/libusb10/usr/lib/libusb-1.0.so.0
+	$(STRIP) $(INSTALLDIR)/libusb10/usr/lib/*.so.*
+	cd $(INSTALLDIR)/libusb10/usr/lib && \
+		ln -sf libusb-1.0.so.0 libusb-1.0.so.0.0.0 && \
+		ln -sf libusb-1.0.so.0 libusb-1.0.so
 
-usb-modeswitch-2.1.1-install: usb-modeswitch-2.1.1
-	install -D usb-modeswitch-2.1.1/usb_modeswitch $(INSTALLDIR)/usb-modeswitch-2.1.1/usr/sbin/usb_modeswitch
-	$(STRIP) -s $(INSTALLDIR)/usb-modeswitch-2.1.1/usr/sbin/usb_modeswitch
-	@mkdir -p $(TARGETDIR)/rom/etc
-	@sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < $(TOP)/usb-modeswitch-2.1.1/usb_modeswitch.conf > $(TARGETDIR)/rom/etc/usb_modeswitch.conf
+libusb10-clean:
+	-@$(MAKE) -C libusb10 clean
+	@rm -f libusb10/stamp-h1
 
-usb-modeswitch-2.2.3: libusb10
+usb-modeswitch: libusb10
 	$(MAKE) -C $@ CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) \
 		-Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share -lpthread -ldl \
 		-I$(TOP)/libusb10/libusb -L$(TOP)/libusb10/libusb/.libs -lusb-1.0"
 
-usb-modeswitch-2.2.3-install: usb-modeswitch-2.2.3
-	install -D usb-modeswitch-2.2.3/usb_modeswitch $(INSTALLDIR)/usb-modeswitch-2.2.3/usr/sbin/usb_modeswitch
-	$(STRIP) -s $(INSTALLDIR)/usb-modeswitch-2.2.3/usr/sbin/usb_modeswitch
+usb-modeswitch-install: usb-modeswitch
+	install -D usb-modeswitch/usb_modeswitch $(INSTALLDIR)/usb-modeswitch/usr/sbin/usb_modeswitch
+	$(STRIP) -s $(INSTALLDIR)/usb-modeswitch/usr/sbin/usb_modeswitch
 	@mkdir -p $(TARGETDIR)/rom/etc
-	@sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < $(TOP)/usb-modeswitch-2.2.3/usb_modeswitch.conf > $(TARGETDIR)/rom/etc/usb_modeswitch.conf
+	@sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < $(TOP)/usb-modeswitch/usb_modeswitch.conf > $(TARGETDIR)/rom/etc/usb_modeswitch.conf
 
 libusb-0.1.12/stamp-h1:
-	cd libusb-0.1.12 && CFLAGS="-Os -Wall $(EXTRACFLAGS)" LIBS="-lpthread" \
+	cd libusb-0.1.12 && CFLAGS="-Os -Wall $(EXTRACFLAGS)" LIBS="-lpthread -ldl" \
 	$(CONFIGURE) --prefix=/usr --disable-build-docs --disable-dependency-tracking
 	-@$(MAKE) -C libusb-0.1.12 clean
 	touch $@
