@@ -4013,6 +4013,8 @@ int generate_mdns_config()
 	/* Set [server] configuration */
 	fprintf(fp, "[Server]\n");
 	fprintf(fp, "host-name=%s-%c%c%c%c\n", get_productid(),et0macaddr[12],et0macaddr[13],et0macaddr[15],et0macaddr[16]);
+	fprintf(fp, "aliases=%s\n",get_productid());
+	fprintf(fp, "aliases_llmnr=%s\n",get_productid());
 	fprintf(fp, "use-ipv4=yes\n");
 	fprintf(fp, "use-ipv6=no\n");
 	fprintf(fp, "allow-interfaces=\n"); //workaround for avahi bug
@@ -4025,6 +4027,11 @@ int generate_mdns_config()
 	fprintf(fp, "\n");
 	fprintf(fp, "ratelimit-interval-usec=1000000\n");
 	fprintf(fp, "ratelimit-burst=1000\n");
+
+	/* Set [publish] configuration */
+	fprintf(fp, "\n[publish]\n");
+	fprintf(fp, "publish-a-on-ipv6=no\n");
+	fprintf(fp, "publish-aaaa-on-ipv4=no\n");
 
 	/* Set [wide-area] configuration */
 	fprintf(fp, "\n[wide-area]\n");
@@ -4166,7 +4173,9 @@ int start_mdns()
 	char afpd_service_config[80];
 	char adisk_service_config[80];
 	char itune_service_config[80];
-	char buf[50];
+	char *avahi_daemon_argv[] = {"avahi-daemon", "-D", NULL};
+	pid_t pid;
+
 	sprintf(afpd_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_AFPD_SERVICE_FN);
 	sprintf(adisk_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_ADISK_SERVICE_FN);
 	sprintf(itune_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_ITUNE_SERVICE_FN);
@@ -4208,9 +4217,6 @@ int start_mdns()
 	if(nvram_get_int("mdns_enable") || (mdns_force == 1)){
 		// Execute avahi_daemon daemon
 		//xstart("avahi-daemon");
-		char *avahi_daemon_argv[] = {"avahi-daemon", NULL};
-		pid_t pid;
-
 		return _eval(avahi_daemon_argv, NULL, 0, &pid);
 	}
 }
@@ -4227,6 +4233,9 @@ void restart_mdns()
 	char itune_service_config[80];
 	sprintf(afpd_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_AFPD_SERVICE_FN);
 	sprintf(itune_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_ITUNE_SERVICE_FN);
+
+	if (g_reboot)
+		return;
 
 	if (nvram_match("timemachine_enable", "1") == f_exists(afpd_service_config)){
 		if(nvram_match("daapd_enable", "1") == f_exists(itune_service_config)){
@@ -6268,7 +6277,10 @@ check_ddr_done:
 #if defined(RTCONFIG_MDNS)
 	else if (strcmp(script, "mdns") == 0)
 	{
-		if(action&RC_SERVICE_STOP) stop_mdns();
+		if(action&RC_SERVICE_STOP){
+			stop_mdns();
+			sleep(2);
+		}
 		if(action&RC_SERVICE_START) start_mdns();
 	}
 #endif

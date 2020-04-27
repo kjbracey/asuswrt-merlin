@@ -363,7 +363,7 @@ obj-$(RTCONFIG_TIMEMACHINE) += db-4.8.30
 obj-$(RTCONFIG_TIMEMACHINE) += netatalk-3.0.5
 ifeq ($(or $(RTCONFIG_TIMEMACHINE),$(RTCONFIG_MDNS)),y)
 obj-y += libdaemon
-obj-y += avahi-0.6.32
+obj-y += avahi
 obj-y += expat-2.2.0
 else
 obj-$(RTCONFIG_MEDIA_SERVER) += mDNSResponder
@@ -1866,12 +1866,13 @@ libusb-0.1.12-clean:
 	@rm -f libusb-0.1.12/stamp-h1
 
 libdaemon/stamp-h1:
-	cd libdaemon && $(CONFIGURE) ac_cv_func_setpgrp_void=yes \
-	--disable-dependency-tracking
+	cd libdaemon && autoreconf -i -f && $(CONFIGURE) --prefix=/usr \
+	--disable-dependency-tracking \
+	ac_cv_func_setpgrp_void=yes
 	touch $@
 
 libdaemon: libdaemon/stamp-h1
-	$(MAKE) -C $@
+	$(MAKE) -C $@ && $(MAKE) $@-stage
 
 libdaemon-install: libdaemon
 	install -D libdaemon/libdaemon/.libs/libdaemon.so.0.5.0 $(INSTALLDIR)/libdaemon/usr/lib/libdaemon.so.0.5.0
@@ -3394,12 +3395,13 @@ netatalk-3.0.5-clean:
 #expat-2.2.0
 expat-2.2.0/stamp-h1:
 	cd $(TOP)/expat-2.2.0 && \
-	$(CONFIGURE) --build=i686-linux --prefix=$(INSTALLDIR)/expat-2.2.0/usr
+	$(CONFIGURE) --prefix=/usr
 	touch $@
 
 expat-2.2.0: expat-2.2.0/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C expat-2.2.0 $(PARALLEL_BUILD)
+	@$(MAKE) -C expat-2.2.0 $(PARALLEL_BUILD) && $(MAKE) $@-stage
+	sed 's|/usr/lib|$(STAGEDIR)/usr/lib|g' -i $(STAGEDIR)/usr/lib/libexpat.la
 
 expat-2.2.0-install: expat-2.2.0
 	install -D expat-2.2.0/.libs/libexpat.so.1.6.2 $(INSTALLDIR)/expat-2.2.0/usr/lib/libexpat.so.1.6.2
@@ -3409,6 +3411,47 @@ expat-2.2.0-install: expat-2.2.0
 expat-2.2.0-clean:
 	-@$(MAKE) -C expat-2.2.0 clean
 	@rm -f expat-2.2.0/stamp-h1
+
+avahi: expat-2.2.0 libdaemon avahi/Makefile
+	@$(SEP)
+	@$(MAKE) -j 8 -C $@
+
+avahi/Makefile: avahi/configure
+	cd avahi && $(CONFIGURE) \
+		LDFLAGS="$(LDFLAGS) -L$(STAGEDIR)/usr/lib -ldl -lpthread $(EXTRA_LDFLAGS)" \
+		CFLAGS="-Os $(CFLAGS) -I$(STAGEDIR)/usr/include" \
+		--prefix=/usr --sysconfdir=/tmp localstatedir=/var --with-distro=none \
+		--disable-nls --disable-glib --disable-gobject \
+		--enable-introspection=no \
+		--disable-qt3 --disable-qt4 --disable-gtk --disable-gtk3 \
+		--disable-dbus \
+		--disable-gdbm \
+		--disable-python --disable-pygtk --disable-python-dbus \
+		--disable-mono --disable-monodoc \
+		--disable-autoipd \
+		--disable-doxygen-doc --disable-manpages --disable-xmltoman \
+		--with-xml=expat \
+		--with-avahi-user="nobody" --with-avahi-group="nobody" \
+		--disable-dependency-tracking \
+		--disable-stack-protector \
+		avahi_runtime_dir=/var/run \
+		servicedir=/tmp/avahi/services \
+		LIBDAEMON_LIBS="-L$(STAGEDIR)/usr/lib -ldaemon" \
+		LIBDAEMON_CFLAGS="-I$(STAGEDIR)/usr/include"
+
+avahi-install: avahi
+	install -D avahi/avahi-daemon/.libs/avahi-daemon $(INSTALLDIR)/avahi/usr/sbin/avahi-daemon
+	install -D avahi/avahi-common/.libs/libavahi-common.so.3.5.3 $(INSTALLDIR)/avahi/usr/lib/libavahi-common.so.3.5.3
+	install -D avahi/avahi-core/.libs/libavahi-core.so.7.0.2 $(INSTALLDIR)/avahi/usr/lib/libavahi-core.so.7.0.2
+	$(STRIP) $(INSTALLDIR)/avahi/usr/sbin/avahi-daemon
+	$(STRIP) $(INSTALLDIR)/avahi/usr/lib/libavahi-common.so.3.5.3
+	$(STRIP) $(INSTALLDIR)/avahi/usr/lib/libavahi-core.so.7.0.2
+	cd $(INSTALLDIR)/avahi/usr/lib && ln -sf libavahi-common.so.3.5.3 libavahi-common.so.3
+	cd $(INSTALLDIR)/avahi/usr/lib && ln -sf libavahi-core.so.7.0.2 libavahi-core.so.7
+
+avahi-clean:
+	[ ! -f avahi/Makefile ] || $(MAKE) -C avahi distclean
+	@rm -f avahi/Makefile
 
 #avahi-0.6.32
 avahi-0.6.32/stamp-h1: shared nvram$(BCMEX) expat-2.2.0 libdaemon
