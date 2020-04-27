@@ -4,6 +4,14 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_43E9j9527  (28-April-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: rc: avahi: update to 0.7
+* CHANGED: firewall: always load nat rules for primary wan
+* CHANGED: webui: don't attempt restart when disabling mdns
+* CHANGED: rc: avahi: wait for daemon stop; gen configs only if active
+* FIXED: firewall: openvpn: fix duplicate openvpn rules on wan/openvpn restart
+
+
 374.43_43E8j9527  (24-April-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: openvpn: update to 2.4.9
 * CHANGED: openssl11: update to 1.1.1g
