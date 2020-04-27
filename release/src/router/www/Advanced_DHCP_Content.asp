@@ -331,8 +331,12 @@ function applyRule(){
 			document.form.action_wait.value = 5;
 		}
 
-		if (document.form.mdns_enable.value != mdns_enable_curr)
-			document.form.action_script.value += ";restart_mdns";
+		if (document.form.mdns_enable.value != mdns_enable_curr) {
+			if (document.form.mdns_enable.value == "1")
+				document.form.action_script.value += ";restart_mdns";
+			else
+				document.form.action_script.value += ";stop_mdns";
+		}
 
 		showLoading();
 		document.form.submit();
