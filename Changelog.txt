@@ -4,6 +4,16 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_44D1j9527  (28-April-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: wanduck: add nvram enable for wanduck debug
+* CHANGED: httpd: optimize debug; standardize debug variable name
+* CHANGED: init: disable usb modem at start if not in use
+* CHANGED: webui: add single/dual wan select for usb modem
+* CHANGED: webui: update modem page for android tethering/services
+* CHANGED: usbmodeswitch: update to 2.4.0 (v2)
+* CHANGED: usb: update usb_device support (384.16)
+
+
 374.43_43E9j9527  (28-April-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: rc: avahi: update to 0.7
 * CHANGED: firewall: always load nat rules for primary wan
