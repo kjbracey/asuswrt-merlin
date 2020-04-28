@@ -4176,10 +4176,17 @@ int start_mdns()
 	char *avahi_daemon_argv[] = {"avahi-daemon", "-D", NULL};
 	pid_t pid;
 
+	if ((pids("afpd") && nvram_match("timemachine_enable", "1")) ||
+		(nvram_match("daapd_enable", "1") && pids("mt-daapd")))
+			mdns_force = 1;
+
+	nvram_set_int("mdns_enable_x", mdns_force);
+	if(!nvram_get_int("mdns_enable") && (mdns_force == 0))
+		return 0;
+
 	sprintf(afpd_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_AFPD_SERVICE_FN);
 	sprintf(adisk_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_ADISK_SERVICE_FN);
 	sprintf(itune_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_ITUNE_SERVICE_FN);
-
 	mkdir_if_none(AVAHI_CONFIG_PATH);
 	mkdir_if_none(AVAHI_SERVICES_PATH);
 
@@ -4187,7 +4194,6 @@ int start_mdns()
 
 	if (pids("afpd") && nvram_match("timemachine_enable", "1"))
 	{
-		mdns_force = 1;
 		if (!f_exists(afpd_service_config))
 			generate_afpd_service_config();
 		if (!f_exists(adisk_service_config))
@@ -4202,7 +4208,6 @@ int start_mdns()
 	}
 
 	if(nvram_match("daapd_enable", "1") && pids("mt-daapd")){
-		mdns_force = 1;
 		if (!f_exists(itune_service_config)){
 			generate_itune_service_config();
 		}
@@ -4212,19 +4217,18 @@ int start_mdns()
 		}
 	}
 
-	nvram_set_int("mdns_enable_x", mdns_force);
+	// Execute avahi_daemon daemon
+	//xstart("avahi-daemon");
+	return _eval(avahi_daemon_argv, NULL, 0, &pid);
 
-	if(nvram_get_int("mdns_enable") || (mdns_force == 1)){
-		// Execute avahi_daemon daemon
-		//xstart("avahi-daemon");
-		return _eval(avahi_daemon_argv, NULL, 0, &pid);
-	}
 }
 
 void stop_mdns()
 {
 	if (pids("avahi-daemon"))
-		killall("avahi-daemon", SIGTERM);
+		killall_tk("avahi-daemon");
+
+	logmessage("mdns", "avahi-daemon is stopped");
 }
 
 void restart_mdns()
@@ -6277,10 +6281,7 @@ check_ddr_done:
 #if defined(RTCONFIG_MDNS)
 	else if (strcmp(script, "mdns") == 0)
 	{
-		if(action&RC_SERVICE_STOP){
-			stop_mdns();
-			sleep(2);
-		}
+		if(action&RC_SERVICE_STOP) stop_mdns();
 		if(action&RC_SERVICE_START) start_mdns();
 	}
 #endif
