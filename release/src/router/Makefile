@@ -503,6 +503,7 @@ endef
 
 obj-y += openssl-1.1 # include for all builds
 obj-y += haveged
+obj-y += udp-broadcast-relay-redux
 ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
 obj-y += libnfnetlink
 obj-y += libmnl
@@ -3514,6 +3515,16 @@ sd-idle: sd-idle/sd-idle-2.6
 sd-idle-install: sd-idle-2.6
 	install -D sd-idle/sd-idle-2.6 $(INSTALLDIR)/sd-idle/usr/sbin/sd-idle-2.6
 	$(STRIP) -s $(INSTALLDIR)/sd-idle/usr/sbin/sd-idle-2.6
+
+udp-broadcast-relay-redux: udp-broadcast-relay-redux/main
+	cd udp-broadcast-relay-redux && \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	$(CC) main.c -o udp-broadcast-relay
+
+udp-broadcast-relay-redux-install: udp-broadcast-relay-redux
+	install -D udp-broadcast-relay-redux/udp-broadcast-relay $(INSTALLDIR)/udp-broadcast-relay-redux/usr/sbin/udp-broadcast-relay
+	$(STRIP) -s $(INSTALLDIR)/udp-broadcast-relay-redux/usr/sbin/udp-broadcast-relay
 
 nfs-utils/stamp-h1:
 	cd nfs-utils && CPPFLAGS="$(EXTRACFLAGS) -Os" knfsd_cv_bsd_signals=no \
