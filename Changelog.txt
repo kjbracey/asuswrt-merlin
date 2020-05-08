@@ -4,6 +4,10 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_44D2j9527  (08-May-2020) ARM SDK, MIPS,ARM KRACK
+* NEW: build: add udp-broadcast-relay-redux
+
+
 374.43_44D1j9527  (28-April-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: wanduck: add nvram enable for wanduck debug
 * CHANGED: httpd: optimize debug; standardize debug variable name
