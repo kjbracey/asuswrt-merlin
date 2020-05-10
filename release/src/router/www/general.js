@@ -2679,3 +2679,8 @@ function round_to_int(val, rnd){
 	val=val/rnd;
 	return (Math.round(val) * rnd);
 }
+
+String.prototype.regexIndexOf = function(regex){
+var index = this.search(regex);
+return (index >= 0) ? index : -1;
+}

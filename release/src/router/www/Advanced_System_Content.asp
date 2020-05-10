@@ -9,7 +9,7 @@
 <link rel="shortcut icon" href="images/favicon.png">
 <link rel="icon" href="images/favicon.png">
 <title><#Web_Title#> - <#menu5_6_2#></title>
-<link rel="stylesheet" type="text/css" href="index_style.css"> 
+<link rel="stylesheet" type="text/css" href="index_style.css">
 <link rel="stylesheet" type="text/css" href="form_style.css">
 <link rel="stylesheet" type="text/css" href="pwdmeter.css">
 <script language="JavaScript" type="text/javascript" src="/state.js"></script>
@@ -22,11 +22,11 @@
 	border:1px outset #999;
 	background-color:#576D73;
 	position:absolute;
-	*margin-top:27px;	
+	*margin-top:27px;
 	margin-left:121px;
 	*margin-left:-353px;
 	width:345px;
-	text-align:left;	
+	text-align:left;
 	height:auto;
 	overflow-y:auto;
 	z-index:200;
@@ -48,13 +48,13 @@
 	color:#FFF;
 	font-size:12px;
 	font-family:Arial, Helvetica, sans-serif;
-	text-decoration:none;	
+	text-decoration:none;
 }
 #ClientList_Block_PC div:hover, #ClientList_Block a:hover{
 	background-color:#3366FF;
 	color:#FFFFFF;
 	cursor:default;
-}	
+}
 </style>
 <script>
 wan_route_x = '<% nvram_get("wan_route_x"); %>';
@@ -75,7 +75,7 @@ var wireless = [<% wl_auth_list(); %>];	// [[MAC, associated, authorized], ...]
 var http_clientlist_array = '<% nvram_get("http_clientlist"); %>';
 var accounts = [<% get_all_accounts(); %>];
 for(var i=0; i<accounts.length; i++){
-		accounts[i] = decodeURIComponent(accounts[i]);	
+		accounts[i] = decodeURIComponent(accounts[i]);
 }
 if(accounts.length == 0)
 	accounts = ['<% nvram_get("http_username"); %>'];
@@ -121,9 +121,9 @@ function initial(){
 		hide_ntpd_hint(0);
 	else
 		hide_ntpd_hint(1);
-	
+
 	if(svc_ready == "0")
-		$('svc_hint_div').style.display = "";	
+		$('svc_hint_div').style.display = "";
 
 	if(!HTTPS_support){
 		$("https_tr").style.display = "none";
@@ -137,16 +137,16 @@ function initial(){
 		hide_http_lanport(document.form.http_enable.value);
 		hide_https_lanport(document.form.http_enable.value);
 		hide_https_wanport(document.form.http_enable.value);
-	}	
-	
+	}
+
 	if(wifi_tog_btn_support || wifi_hw_sw_support || sw_mode == 2 || sw_mode == 4){		// wifi_tog_btn && wifi_hw_sw && hide WPS button behavior under repeater mode
 			document.form.btn_ez_radiotoggle[0].disabled = true;
 			document.form.btn_ez_radiotoggle[1].disabled = true;
 			document.getElementById('btn_ez_radiotoggle_tr').style.display = "none";
 	}else{
 			document.getElementById('btn_ez_radiotoggle_tr').style.display = "";
-	}	
-	
+	}
+
 	if(sw_mode != 1 || http_option == 0){
 		$('misc_http_x_tr').style.display ="none";
 		hideport(0);
@@ -159,7 +159,7 @@ function initial(){
 	else
 		hideport(document.form.misc_http_x[0].checked);
 
-	var http_option = '<% nvram_get("http_enable"); %>';	
+	var http_option = '<% nvram_get("http_enable"); %>';
 	if(!HTTPS_support || http_option == 0){
 		$("http_lanport").style.display = "";
 		$("https_lanport").style.display = "none";
@@ -202,17 +202,17 @@ function applyRule(){
 		var rule_num = $('http_clientlist_table').rows.length;
 		var item_num = $('http_clientlist_table').rows[0].cells.length;
 		var tmp_value = "";
-	
+
 		for(i=0; i<rule_num; i++){
-			tmp_value += "<"		
-			for(j=0; j<item_num-1; j++){	
+			tmp_value += "<"
+			for(j=0; j<item_num-1; j++){
 				tmp_value += $('http_clientlist_table').rows[i].cells[j].innerHTML;
-				if(j != item_num-2)	
+				if(j != item_num-2)
 					tmp_value += ">";
 			}
 		}
 		if(tmp_value == "<"+"<#IPConnection_VSList_Norule#>" || tmp_value == "<")
-			tmp_value = "";	
+			tmp_value = "";
 		document.form.http_clientlist.value = tmp_value;
 
 		if(document.form.http_clientlist.value == "" && document.form.http_client[0].checked == 1){
@@ -236,22 +236,22 @@ function applyRule(){
 				document.form.time_zone_dstoff.value="";
 				document.form.time_zone.value = document.form.time_zone_select.value;
 		}
-		
+
 		if(document.form.misc_http_x[1].checked == true){
 				document.form.misc_httpport_x.disabled = true;
 				document.form.misc_httpsport_x.disabled = true;
-		}		
-		if(document.form.misc_http_x[0].checked == true 
+		}
+		if(document.form.misc_http_x[0].checked == true
 				&& document.form.http_enable[0].selected == true){
 				document.form.misc_httpport_x.disabled = true;
 				document.form.misc_httpsport_x.disabled = true;
-		}	
-		if(document.form.misc_http_x[0].checked == true 
+		}
+		if(document.form.misc_http_x[0].checked == true
 				&& document.form.http_enable[1].selected == true){
 				document.form.misc_httpport_x.disabled = true;
 		}
 
-		if(document.form.https_lanport.value != '<% nvram_get("https_lanport"); %>' 
+		if(document.form.https_lanport.value != '<% nvram_get("https_lanport"); %>'
 				|| document.form.http_enable.value != '<% nvram_get("http_enable"); %>'
 				|| document.form.misc_httpport_x.value != '<% nvram_get("misc_httpport_x"); %>'
 				|| document.form.misc_httpsport_x.value != '<% nvram_get("misc_httpsport_x"); %>'
@@ -280,7 +280,7 @@ function applyRule(){
 					else
 						document.form.flag.value = "http://" + location.hostname + ":" + document.form.http_lanport.value;
 				}
-			}   
+			}
 		}
 
 		// Set lan_port for firewall rules
@@ -306,7 +306,7 @@ function applyRule(){
 	}
 }
 
-function validForm(){	
+function validForm(){
 	showtext($("alert_msg1"), "");
 	showtext($("alert_msg2"), "");
 
@@ -353,7 +353,7 @@ function validForm(){
 				return false;
 		}
 		else if(accounts.getIndexByValue(document.form.http_username.value) > 0
-				&& document.form.http_username.value != accounts[0]){		
+				&& document.form.http_username.value != accounts[0]){
 				showtext($("alert_msg1"), "<#File_Pop_content_alert_desc5#>");
 				$("alert_msg1").style.display = "";
 				document.form.http_username.focus();
@@ -379,7 +379,7 @@ function validForm(){
 		}else{
 			document.form.v_password2.focus();
 			document.form.v_password2.select();
-		}	
+		}
 
 		return false;
 	}
@@ -447,7 +447,7 @@ function validForm(){
 	else{
 		document.form.misc_httpport_x.value = '<% nvram_get("misc_httpport_x"); %>';
 		document.form.misc_httpsport_x.value = '<% nvram_get("misc_httpsport_x"); %>';
-	}	
+	}
 
 	if(isPortConflict(document.form.misc_httpport_x.value)){
 		alert(isPortConflict(document.form.misc_httpport_x.value));
@@ -512,31 +512,28 @@ function done_validating(action){
 
 function corrected_timezone(){
 	var today = new Date();
-	var StrIndex;	
-	
-	if(today.toString().lastIndexOf("-") > 0)
-		StrIndex = today.toString().lastIndexOf("-");
-	else if(today.toString().lastIndexOf("+") > 0)
-		StrIndex = today.toString().lastIndexOf("+");
+	var gmt_time = new RegExp("[\+\-]([0-9]{4})", "gi");
+	var StrIndex;
 
-	if(StrIndex > 0){		
+	StrIndex = today.toString().regexIndexOf(gmt_time);
+	if(StrIndex > 0){
 		//alert('dstoffset='+dstoffset+', 設定時區='+timezone+' , 當地時區='+today.toString().substring(StrIndex, StrIndex+5))
 		if(timezone != today.toString().substring(StrIndex, StrIndex+5)){
 			$("timezone_hint").style.display = "block";
 			$("timezone_hint").innerHTML = "* <#LANHostConfig_x_TimeZone_itemhint#>";
 		}
 		else
-			return;			
+			return;
 	}
 	else
-		return;	
+		return;
 }
 
 function show_dst_chk(){
 	var tzdst = new RegExp("^[a-z]+[0-9\-\.:]+[a-z]+", "i");
 	// match "[std name][offset][dst name]"
 	if(document.form.time_zone_select.value.match(tzdst)){
-		document.getElementById("chkbox_time_zone_dst").style.display="";	
+		document.getElementById("chkbox_time_zone_dst").style.display="";
 		document.getElementById("adj_dst").innerHTML = "<#System_Change_TimeZone_manual#>";
 		if(!document.getElementById("time_zone_dst_chk").checked){
 				document.form.time_zone_dst.value=0;
@@ -554,7 +551,7 @@ function show_dst_chk(){
 		document.form.time_zone_dst.value=0;
 		document.getElementById("dst_start").style.display="none";
 		document.getElementById("dst_end").style.display="none";
-	}	
+	}
 }
 
 var timezones = [
@@ -680,7 +677,7 @@ function parse_dstoffset(){	//Mm.w.d/h,Mm.w.d/h
 			dstoff_end_d = dstoff_end[2].split("/")[0];
 			dstoff_end_h = dstoff_end[2].split("/")[1];
 }
-															
+
 function load_dst_m_Options(){
 	free_options(document.form.dst_start_m);
 	free_options(document.form.dst_end_m);
@@ -699,16 +696,16 @@ function load_dst_m_Options(){
 		}else{
 			if(dstoff_start_m =='M'+i)
 				add_option(document.form.dst_start_m, dst_month[i], i, 1);
-			else	
+			else
 				add_option(document.form.dst_start_m, dst_month[i], i, 0);
-			
+
 			if(dstoff_end_m =='M'+i)
 				add_option(document.form.dst_end_m, dst_month[i], i, 1);
 			else
-				add_option(document.form.dst_end_m, dst_month[i], i, 0);							
-		}	
-		
-	}	
+				add_option(document.form.dst_end_m, dst_month[i], i, 0);
+		}
+
+	}
 }
 
 function load_dst_w_Options(){
@@ -723,19 +720,19 @@ function load_dst_w_Options(){
 				add_option(document.form.dst_start_w, dst_week[i], i, 0);
 				add_option(document.form.dst_end_w, dst_week[i], i, 0);
 			}
-		}else{		
+		}else{
 			if(dstoff_start_w == i)
 				add_option(document.form.dst_start_w, dst_week[i], i, 1);
-			else	
+			else
 				add_option(document.form.dst_start_w, dst_week[i], i, 0);
-			
+
 			if(dstoff_end_w == i)
 				add_option(document.form.dst_end_w, dst_week[i], i, 1);
 			else
-				add_option(document.form.dst_end_w, dst_week[i], i, 0);			
-		}		
-		
-	}	
+				add_option(document.form.dst_end_w, dst_week[i], i, 0);
+		}
+
+	}
 }
 
 function load_dst_d_Options(){
@@ -753,16 +750,16 @@ function load_dst_d_Options(){
 		}else{
 			if(dstoff_start_d == i)
 				add_option(document.form.dst_start_d, dst_day[i], i, 1);
-			else	
+			else
 				add_option(document.form.dst_start_d, dst_day[i], i, 0);
-			
+
 			if(dstoff_end_d == i)
 				add_option(document.form.dst_end_d, dst_day[i], i, 1);
 			else
-				add_option(document.form.dst_end_d, dst_day[i], i, 0);			
+				add_option(document.form.dst_end_d, dst_day[i], i, 0);
 		}
-			
-	}	
+
+	}
 }
 
 function load_dst_h_Options(){
@@ -780,15 +777,15 @@ function load_dst_h_Options(){
 		}else{
 			if(dstoff_start_h == i)
 				add_option(document.form.dst_start_h, dst_hour[i], i, 1);
-			else	
+			else
 				add_option(document.form.dst_start_h, dst_hour[i], i, 0);
-			
+
 			if(dstoff_end_h == i)
 				add_option(document.form.dst_end_h, dst_hour[i], i, 1);
 			else
-				add_option(document.form.dst_end_h, dst_hour[i], i, 0);			
+				add_option(document.form.dst_end_h, dst_hour[i], i, 0);
 		}
-	}	
+	}
 }
 
 function update_jffs2_msg(){
@@ -797,7 +794,7 @@ function update_jffs2_msg(){
 	$("jffs_script_msg").style.display = (document.form.jffs2_on[0].checked) ? "none" : ((document.form.jffs2_scripts[0].checked) ? "" : "none");
 }
 
-function hide_http_lanport(_value){	
+function hide_http_lanport(_value){
 	var http_lanport_num = "<% nvram_get("http_lanport"); %>";
 	var http_lanport_num_new = (http_lanport_num == "80") ? "" : http_lanport_num;
 	var port_sep = (http_lanport_num == "80") ? "" : ":";
@@ -830,7 +827,7 @@ function hide_https_lanport(_value){
 }
 
 function hide_https_wanport(_value){
-	
+
 	$("misc_http_x_tr").style.display = (_value == "0") ? "none" : "";
 	$("http_port").style.display = "none";
 	$("https_port").style.display = (_value == "0") ? "none" : "";
@@ -847,7 +844,7 @@ function hide_ntpd_hint(_value){
 function show_http_clientlist(){
 	var http_clientlist_row = http_clientlist_array.split('&#60');
 	var code = "";
-	code +='<table width="100%" border="1" cellspacing="0" cellpadding="4" align="center" class="list_table" id="http_clientlist_table">'; 
+	code +='<table width="100%" border="1" cellspacing="0" cellpadding="4" align="center" class="list_table" id="http_clientlist_table">';
 	if(http_clientlist_row.length == 1)
 		code +='<tr><td style="color:#FFCC00;"><#IPConnection_VSList_Norule#></td>';
 	else{
@@ -859,20 +856,20 @@ function show_http_clientlist(){
 		}
 	}
   	code +='</tr></table>';
-	
+
 	$("http_clientlist_Block").innerHTML = code;
 }
 
 function deleteRow(r){
 	var i=r.parentNode.parentNode.rowIndex;
 	$('http_clientlist_table').deleteRow(i);
-  
+
 	var http_clientlist_value = "";
 	for(i=0; i<$('http_clientlist_table').rows.length; i++){
 		http_clientlist_value += "&#60";
 		http_clientlist_value += $('http_clientlist_table').rows[i].cells[0].innerHTML;
 	}
-	
+
 	http_clientlist_array = http_clientlist_value;
 	if(http_clientlist_array == "")
 		show_http_clientlist();
@@ -881,40 +878,40 @@ function deleteRow(r){
 function addRow(obj, upper){
 	if('<% nvram_get("http_client"); %>' != "1")
 		document.form.http_client[0].checked = true;
-		
-	//Viz check max-limit 
+
+	//Viz check max-limit
 	var rule_num = $('http_clientlist_table').rows.length;
-	var item_num = $('http_clientlist_table').rows[0].cells.length;		
+	var item_num = $('http_clientlist_table').rows[0].cells.length;
 	if(rule_num >= upper){
 		alert("<#JS_itemlimit1#> " + upper + " <#JS_itemlimit2#>");
-		return false;	
+		return false;
 	}
-			
+
 	if(obj.value == ""){
 		alert("<#JS_fieldblank#>");
 		obj.focus();
-		obj.select();			
+		obj.select();
 		return false;
 	}
 	else if(valid_IP_form(obj, 0) != true){
 		return false;
 	}
-	else{		
+	else{
 		//Viz check same rule
 		for(i=0; i<rule_num; i++){
 			for(j=0; j<item_num-1; j++){		//only 1 value column
 				if(obj.value == $('http_clientlist_table').rows[i].cells[j].innerHTML){
 					alert("<#JS_duplicate#>");
 					return false;
-				}	
+				}
 			}
 		}
-		
+
 		http_clientlist_array += "&#60";
 		http_clientlist_array += obj.value;
-		obj.value = "";		
+		obj.value = "";
 		show_http_clientlist();
-	}	
+	}
 }
 
 function keyBoardListener(evt){
@@ -928,24 +925,24 @@ function keyBoardListener(evt){
 function showLANIPList(){
 	var code = "";
 	var show_name = "";
-	var client_list_array = '<% get_client_detail_info(); %>';	
-	var client_list_row = client_list_array.split('<');	
+	var client_list_array = '<% get_client_detail_info(); %>';
+	var client_list_row = client_list_array.split('<');
 
 	for(var i = 1; i < client_list_row.length; i++){
 		var client_list_col = client_list_row[i].split('>');
 		if(client_list_col[1] && client_list_col[1].length > 20)
 			show_name = client_list_col[1].substring(0, 16) + "..";
 		else
-			show_name = client_list_col[1];	
+			show_name = client_list_col[1];
 
 		//client_list_col[]  0:type 1:device 2:ip 3:mac 4: 5: 6:
 		code += '<a><div onmouseover="over_var=1;" onmouseout="over_var=0;" onclick="setClientIP(\''+client_list_col[2]+'\');"><strong>'+client_list_col[2]+'</strong> ';
-		
+
 		if(show_name && show_name.length > 0)
 				code += '( '+show_name+')';
 		code += ' </div></a>';
 		}
-	code +='<!--[if lte IE 6.5]><iframe class="hackiframe2"></iframe><![endif]-->';	
+	code +='<!--[if lte IE 6.5]><iframe class="hackiframe2"></iframe><![endif]-->';
 	$("ClientList_Block_PC").innerHTML = code;
 }
 
@@ -965,16 +962,16 @@ function hideClients_Block(){
 }
 
 function pullLANIPList(obj){
-	if(isMenuopen == 0){		
+	if(isMenuopen == 0){
 		obj.src = "/images/arrow-top.gif"
-		$("ClientList_Block_PC").style.display = 'block';		
-		document.form.http_client_ip_x_0.focus();		
+		$("ClientList_Block_PC").style.display = 'block';
+		document.form.http_client_ip_x_0.focus();
 		isMenuopen = 1;
 	}
 	else
 		hideClients_Block();
 }
-//Viz add 2012.02 LAN client ip } end 
+//Viz add 2012.02 LAN client ip } end
 
 function hideport(flag){
 	$("accessfromwan_port").style.display = (flag == 1) ? "" : "none";
@@ -1008,11 +1005,11 @@ function pass_checked(obj){
 function daylight_save_check(){
 	if (document.form.time_zone_dst_chk.checked){
 		document.form.time_zone_dst.value = "1";
-		document.getElementById("dst_start").style.display="";	
-		document.getElementById("dst_end").style.display="";					
+		document.getElementById("dst_start").style.display="";
+		document.getElementById("dst_end").style.display="";
 	}else{
-		document.form.time_zone_dst.value = "0";	
-		document.getElementById("dst_start").style.display="none";	
+		document.form.time_zone_dst.value = "0";
+		document.getElementById("dst_start").style.display="none";
 		document.getElementById("dst_end").style.display="none";
 	}
 }
@@ -1021,7 +1018,7 @@ function select_time_zone(){
 	var tzdst = new RegExp("^[a-z]+[0-9\-\.:]+[a-z]+", "i"); // match "[std name][offset][dst name]"
 
 	if(document.form.time_zone_select.value.match(tzdst)){
-		document.getElementById("chkbox_time_zone_dst").style.display="";	
+		document.getElementById("chkbox_time_zone_dst").style.display="";
 		document.getElementById("adj_dst").innerHTML = "<#System_Change_TimeZone_manual#>";
 		if(!document.getElementById("time_zone_dst_chk").checked){
 			document.form.time_zone_dst.value=0;
@@ -1029,13 +1026,13 @@ function select_time_zone(){
 			document.getElementById("dst_end").style.display="none";
 		}else{
 			document.form.time_zone_dst.value=1;
-			document.getElementById("dst_start").style.display="";	
-			document.getElementById("dst_end").style.display="";						
+			document.getElementById("dst_start").style.display="";
+			document.getElementById("dst_end").style.display="";
 		}
 	}else{
-		document.getElementById("chkbox_time_zone_dst").style.display="none";	
+		document.getElementById("chkbox_time_zone_dst").style.display="none";
 		document.getElementById("time_zone_dst_chk").checked = false;
-		document.form.time_zone_dst.value=0;			
+		document.form.time_zone_dst.value=0;
 		document.getElementById("dst_start").style.display="none";
 		document.getElementById("dst_end").style.display="none";
 	}
@@ -1119,13 +1116,13 @@ function updateDateTime()
 <table class="content" align="center" cellpadding="0" cellspacing="0">
   <tr>
 	<td width="17">&nbsp;</td>
-	
+
 	<!--=====Beginning of Main Menu=====-->
 	<td valign="top" width="202">
 	  <div id="mainMenu"></div>
 	  <div id="subMenu"></div>
 	</td>
-		
+
     <td valign="top">
 	<div id="tabMenu" class="submenuBlock"></div>
 		<!--===================================Beginning of Main Content===========================================-->
@@ -1163,7 +1160,7 @@ function updateDateTime()
             <div id="scorebarBorder" style="margin-left:140px; margin-top:-25px; display:none;" title="<#LANHostConfig_x_Password_itemSecur#>">
             		<div id="score"></div>
             		<div id="scorebar">&nbsp;</div>
-            </div>            
+            </div>
           </td>
         </tr>
 
@@ -1173,7 +1170,7 @@ function updateDateTime()
             <input type="password" readonly autocapitalization="off" name="v_password2" tabindex="3" onFocus=" $(this).removeAttribute('readonly');" onKeyPress="return is_string(this, event);" class="input_15_table" maxlength="64" />
             <div style="margin:-25px 0px 5px 135px;"><input type="checkbox" name="show_pass_1" onclick="pass_checked(document.form.http_passwd2);pass_checked(document.form.v_password2);"><#QIS_show_pass#></div>
             <span id="alert_msg2" style="color:#FC0;margin-left:8px;"></span>
-            
+
           </td>
         </tr>
       </table>
@@ -1199,13 +1196,13 @@ function updateDateTime()
                   <span id="jffs_format_msg" style="display:none;padding-left:20px;">JFFS partition must be enabled</span>
               </td>
           </tr>
-          <tr id="jffs2_scripts_tr"> 
-              <th>Enable JFFS custom scripts and configs</th> 
+          <tr id="jffs2_scripts_tr">
+              <th>Enable JFFS custom scripts and configs</th>
               <td>
-                  <input type="radio" name="jffs2_scripts" class="input" value="1" <% nvram_match("jffs2_scripts", "1", "checked"); %> onchange="update_jffs2_msg();"><#checkbox_Yes#> 
-                  <input type="radio" name="jffs2_scripts" class="input" value="0" <% nvram_match("jffs2_scripts", "0", "checked"); %> onchange="update_jffs2_msg();"><#checkbox_No#> 
+                  <input type="radio" name="jffs2_scripts" class="input" value="1" <% nvram_match("jffs2_scripts", "1", "checked"); %> onchange="update_jffs2_msg();"><#checkbox_Yes#>
+                  <input type="radio" name="jffs2_scripts" class="input" value="0" <% nvram_match("jffs2_scripts", "0", "checked"); %> onchange="update_jffs2_msg();"><#checkbox_No#>
                   <span id="jffs_script_msg" style="display:none;padding-left:20px;">JFFS partition must be enabled</span>
-              </td> 
+              </td>
           </tr>
           <tr style="display:none;" id="jffs2log">
               <th>Save syslog to JFFS</i></th>
@@ -1215,7 +1212,7 @@ function updateDateTime()
                   <span id="jffs_log_msg" style="display:none;padding-left:20px;">JFFS partition must be enabled</span>
               </td>
           </tr>
- 
+
       </table>
 
       <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3"  class="FormTable" style="margin-top:8px;">
@@ -1336,14 +1333,14 @@ function updateDateTime()
 	  <tr>
           <th><a class="hintstyle"  href="javascript:void(0);" onClick="openHint(11,2)"><#LANHostConfig_x_TimeZone_itemname#></a></th>
           <td>
-            <select name="time_zone_select" class="input_option" onchange="select_time_zone();">          
+            <select name="time_zone_select" class="input_option" onchange="select_time_zone();">
             </select>
           	<div>
           		<span id="chkbox_time_zone_dst" style="color:white;display:none;">
           			<input type="checkbox" name="time_zone_dst_chk" id="time_zone_dst_chk" <% nvram_match("time_zone_dst", "1", "checked"); %> class="input" onClick="daylight_save_check();">
           			<label for="time_zone_dst_chk"><span id="adj_dst"></span></label>
           			<br>
-          		</span>	
+			</span>
           		<span id="dst_start" style="color:white;display:none;">
           				<b>DST start time</b>
           				<select name="dst_start_m" class="input_option" onchange=""></select>&nbsp;month &nbsp;
@@ -1359,7 +1356,7 @@ function updateDateTime()
 	          			<select name="dst_end_d" class="input_option" onchange=""></select>&nbsp;weekday &nbsp;
           				<select name="dst_end_h" class="input_option" onchange=""></select>&nbsp;hour &nbsp;
           				<br>
-          		</span>          			
+			</span>
             	<span id="timezone_hint" style="display:none;"></span>
           	</div>
             </td>
@@ -1407,7 +1404,7 @@ function updateDateTime()
 				    <input type="radio" name="telnetd_enable" class="input" value="0" <% nvram_match_x("LANHostConfig", "telnetd_enable", "0", "checked"); %>><#checkbox_No#>
 				  </td>
 				</tr>
-                                
+
 				<tr>
 					<th>Enable SSH</th>
 					<td>
@@ -1415,13 +1412,13 @@ function updateDateTime()
 						<input type="radio" name="sshd_enable" class="input" value="0" <% nvram_match_x("LANHostConfig", "sshd_enable", "0", "checked"); %>><#checkbox_No#>
 					</td>
 				</tr>
-        
+
 				<tr>
 					<th>Allow SSH Port Forwarding</th>
 					<td>
 						<input type="radio" name="sshd_forwarding" class="input" value="1" <% nvram_match_x("LANHostConfig", "sshd_forwarding", "1", "checked"); %>><#checkbox_Yes#>
 						<input type="radio" name="sshd_forwarding" class="input" value="0" <% nvram_match_x("LANHostConfig", "sshd_forwarding", "0", "checked"); %>><#checkbox_No#>
-           
+
 					</td>
 					</tr>
 
@@ -1483,7 +1480,7 @@ function updateDateTime()
 							<option value="0" <% nvram_match("http_enable", "0", "selected"); %>>HTTP</option>
 							<option value="1" <% nvram_match("http_enable", "1", "selected"); %>>HTTPS</option>
 							<option value="2" <% nvram_match("http_enable", "2", "selected"); %>>BOTH</option>
-				  	</select>				  	
+					</select>
 					</td>
 		  	</tr>
 
@@ -1517,15 +1514,15 @@ function updateDateTime()
              		<input type="radio" value="1" name="misc_http_x" class="input" onClick="hideport(1);return change_common_radio(this, 'FirewallConfig', 'misc_http_x', '1')" <% nvram_match("misc_http_x", "1", "checked"); %>><#checkbox_Yes#>
              		<input type="radio" value="0" name="misc_http_x" class="input" onClick="hideport(0);return change_common_radio(this, 'FirewallConfig', 'misc_http_x', '0')" <% nvram_match("misc_http_x", "0", "checked"); %>><#checkbox_No#>
            	</td>
-        </tr>   					
-        
+        </tr>
+
         <tr id="accessfromwan_port">
            	<th align="right"><a class="hintstyle" href="javascript:void(0);" onClick="openHint(8,3);"><#FirewallConfig_x_WanWebPort_itemname#></a></th>
            	<td>
 								<span style="margin-left:5px;" id="http_port">HTTP: <input type="text" maxlength="5" name="misc_httpport_x" class="input_6_table" value="<% nvram_get("misc_httpport_x"); %>" onKeyPress="return is_number(this,event);"/>&nbsp;&nbsp;</span>
 								<span style="margin-left:5px;" id="https_port">HTTPS: <input type="text" maxlength="5" name="misc_httpsport_x" class="input_6_table" value="<% nvram_get("misc_httpsport_x"); %>" onKeyPress="return is_number(this,event);"/></span>
 						</td>
-        </tr>		  	
+        </tr>
 
 		<tr>
 			<th>Auto Logout</th>
@@ -1550,7 +1547,7 @@ function updateDateTime()
 						<td colspan="4"><#System_login_specified_Iplist#>&nbsp;(<#List_limit#>&nbsp;4)</td>
 					</tr>
 				</thead>
-			
+
 			  <tr>
 					<th width="80%"><#ConnectedClient#></th>
 					<th width="20%"><#list_add_delete#></th>
@@ -1560,12 +1557,12 @@ function updateDateTime()
 					<!-- client info -->
 					<td width="80%">
 				 		<input type="text" class="input_32_table" maxlength="15" name="http_client_ip_x_0"  onKeyPress="" onClick="hideClients_Block();" onblur="if(!over_var){hideClients_Block();}">
-						<img id="pull_arrow" height="14px;" src="/images/arrow-down.gif" style="position:absolute;*margin-left:-3px;*margin-top:1px;" onclick="pullLANIPList(this);" title="<#select_client#>" onmouseover="over_var=1;" onmouseout="over_var=0;">	
-						<div id="ClientList_Block_PC" class="ClientList_Block_PC"></div>	
+						<img id="pull_arrow" height="14px;" src="/images/arrow-down.gif" style="position:absolute;*margin-left:-3px;*margin-top:1px;" onclick="pullLANIPList(this);" title="<#select_client#>" onmouseover="over_var=1;" onmouseout="over_var=0;">
+						<div id="ClientList_Block_PC" class="ClientList_Block_PC"></div>
 				 	</td>
-				 	<td width="20%">	
+					<td width="20%">
 				  		<input class="add_btn" type="button" onClick="addRow(document.form.http_client_ip_x_0, 4);" value="">
-				 	</td>	
+					</td>
 				</tr>
 			</table>
      	<div id="http_clientlist_Block"></div>
@@ -1573,7 +1570,7 @@ function updateDateTime()
      	<div class="apply_gen">
      		<input name="button" type="button" class="button_gen" onclick="applyRule();" value="<#CTL_apply#>"/>
      	</div>
-      
+
       </td></tr>
 </tbody>
 
@@ -1583,10 +1580,10 @@ function updateDateTime()
 
 
         </tr>
-      </table>				
-		<!--===================================Ending of Main Content===========================================-->		
+      </table>
+		<!--===================================Ending of Main Content===========================================-->
 	</td>
-		
+
     <td width="10" align="center" valign="top">&nbsp;</td>
 	</tr>
 </table>
