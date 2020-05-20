@@ -81,6 +81,7 @@ void start_sshd(void)
 	dirty |= check_host_key("rsa", "sshd_hostkey", "dropbear/dropbear_rsa_host_key");
 	dirty |= check_host_key("dss", "sshd_dsskey",  "dropbear/dropbear_dss_host_key");
 	dirty |= check_host_key("ecdsa", "sshd_ecdsakey", "dropbear/dropbear_ecdsa_host_key");
+    dirty |= check_host_key("ed25519", "sshd_ed25519key", "dropbear/dropbear_ed25519_host_key");
 	if (dirty)
 		nvram_commit_x();
 
