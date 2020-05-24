@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -50,6 +50,7 @@ use vars qw(
     $sftpcmds
     $hstprvkeyf
     $hstpubkeyf
+    $hstpubmd5f
     $cliprvkeyf
     $clipubkeyf
     @sftppath
@@ -82,6 +83,7 @@ use vars qw(
     $sftpcmds
     $hstprvkeyf
     $hstpubkeyf
+    $hstpubmd5f
     $cliprvkeyf
     $clipubkeyf
     display_sshdconfig
@@ -122,6 +124,7 @@ $sftpcmds        = 'curl_sftp_cmds';         # sftp client commands batch file
 $knownhosts      = 'curl_client_knownhosts'; # ssh knownhosts file
 $hstprvkeyf      = 'curl_host_rsa_key';      # host private key file
 $hstpubkeyf      = 'curl_host_rsa_key.pub';  # host public key file
+$hstpubmd5f      = 'curl_host_rsa_key.pub_md5';  # md5 hash of host public key
 $cliprvkeyf      = 'curl_client_key';        # client private key file
 $clipubkeyf      = 'curl_client_key.pub';    # client public key file
 

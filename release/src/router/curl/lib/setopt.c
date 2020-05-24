@@ -2134,6 +2134,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
       (bool)((arg&CURLSSLOPT_ALLOW_BEAST) ? TRUE : FALSE);
     data->set.ssl.no_revoke = !!(arg & CURLSSLOPT_NO_REVOKE);
     data->set.ssl.no_partialchain = !!(arg & CURLSSLOPT_NO_PARTIALCHAIN);
+    data->set.ssl.revoke_best_effort = !!(arg & CURLSSLOPT_REVOKE_BEST_EFFORT);
     break;
 
 #ifndef CURL_DISABLE_PROXY
@@ -2143,6 +2144,8 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
       (bool)((arg&CURLSSLOPT_ALLOW_BEAST) ? TRUE : FALSE);
     data->set.proxy_ssl.no_revoke = !!(arg & CURLSSLOPT_NO_REVOKE);
     data->set.proxy_ssl.no_partialchain = !!(arg & CURLSSLOPT_NO_PARTIALCHAIN);
+    data->set.proxy_ssl.revoke_best_effort =
+      !!(arg & CURLSSLOPT_REVOKE_BEST_EFFORT);
     break;
 #endif
 
@@ -2583,16 +2586,32 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
 #endif
 #ifdef USE_ARES
   case CURLOPT_DNS_SERVERS:
-    result = Curl_set_dns_servers(data, va_arg(param, char *));
+    result = Curl_setstropt(&data->set.str[STRING_DNS_SERVERS],
+                            va_arg(param, char *));
+    if(result)
+      return result;
+    result = Curl_set_dns_servers(data, data->set.str[STRING_DNS_SERVERS]);
     break;
   case CURLOPT_DNS_INTERFACE:
-    result = Curl_set_dns_interface(data, va_arg(param, char *));
+    result = Curl_setstropt(&data->set.str[STRING_DNS_INTERFACE],
+                            va_arg(param, char *));
+    if(result)
+      return result;
+    result = Curl_set_dns_interface(data, data->set.str[STRING_DNS_INTERFACE]);
     break;
   case CURLOPT_DNS_LOCAL_IP4:
-    result = Curl_set_dns_local_ip4(data, va_arg(param, char *));
+    result = Curl_setstropt(&data->set.str[STRING_DNS_LOCAL_IP4],
+                            va_arg(param, char *));
+    if(result)
+      return result;
+    result = Curl_set_dns_local_ip4(data, data->set.str[STRING_DNS_LOCAL_IP4]);
     break;
   case CURLOPT_DNS_LOCAL_IP6:
-    result = Curl_set_dns_local_ip6(data, va_arg(param, char *));
+    result = Curl_setstropt(&data->set.str[STRING_DNS_LOCAL_IP6],
+                            va_arg(param, char *));
+    if(result)
+      return result;
+    result = Curl_set_dns_local_ip6(data, data->set.str[STRING_DNS_LOCAL_IP6]);
     break;
 #endif
   case CURLOPT_TCP_KEEPALIVE:

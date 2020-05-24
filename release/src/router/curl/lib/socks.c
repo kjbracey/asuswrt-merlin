@@ -62,13 +62,15 @@ int Curl_blockread_all(struct connectdata *conn, /* connection data */
   int result;
   *n = 0;
   for(;;) {
-    timediff_t timeleft = Curl_timeleft(conn->data, NULL, TRUE);
-    if(timeleft < 0) {
+    timediff_t timeout_ms = Curl_timeleft(conn->data, NULL, TRUE);
+    if(timeout_ms < 0) {
       /* we already got the timeout */
       result = CURLE_OPERATION_TIMEDOUT;
       break;
     }
-    if(SOCKET_READABLE(sockfd, timeleft) <= 0) {
+    if(!timeout_ms)
+      timeout_ms = TIME_T_MAX;
+    if(SOCKET_READABLE(sockfd, timeout_ms) <= 0) {
       result = ~CURLE_OK;
       break;
     }
@@ -205,6 +207,8 @@ CURLcode Curl_SOCKS4(const char *proxy_user,
 
   switch(sx->state) {
   case CONNECT_SOCKS_INIT:
+    /* SOCKS4 can only do IPv4, insist! */
+    conn->ip_version = CURL_IPRESOLVE_V4;
     if(conn->bits.httpproxy)
       infof(conn->data, "SOCKS4%s: connecting to HTTP proxy %s port %d\n",
             protocol4a ? "a" : "", hostname, remote_port);
@@ -261,8 +265,8 @@ CURLcode Curl_SOCKS4(const char *proxy_user,
     }
     else {
       result = Curl_resolv_check(data->conn, &dns);
-      /* stay in the state or error out */
-      return result;
+      if(!dns)
+        return result;
     }
     /* FALLTHROUGH */
   CONNECT_RESOLVED:
@@ -763,8 +767,8 @@ CURLcode Curl_SOCKS5(const char *proxy_user,
 
     if(!dns) {
       result = Curl_resolv_check(data->conn, &dns);
-      /* stay in the state or error out */
-      return result;
+      if(!dns)
+        return result;
     }
     /* FALLTHROUGH */
   CONNECT_RESOLVED:
