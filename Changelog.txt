@@ -4,6 +4,25 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_44E4j9527  (24-May-2020) ARM SDK, MIPS,ARM KRACK
+- CHANGED: dropbear: (backport) add Chacha20-Poly1305 authenticated encryption
+- CHANGED: dropbear: (backport) disable 3des & cbc, tune fastopen options
+- CHANGED: others: (backport) update amtm to 3.1.7
+* CHANGED: nettle: update to 3.6
+* CHANGED: curl: update to 7.77.0
+- FIXED: dropbear: (backport) fix ssh client connection with Chacha20-Poly1305
+- FIXED: dropbear: (backport) fix short packet validation in AEAD mode
+- FIXED: dropbear: (backport) fix CBC_MODE can't be fully disabled
+
+
+374.43_44D3j9527  (20-May-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: rc: ssh: (backport) add ed25519 key generation
+* CHANGED: dropbear: (backport) sync accepted ed25519 support from upstream
+* CHANGED: dropbear: (backport) add support for ed25519 as a public key type
+* FIXED: webui: fix timezone test where date() contains a dash in description
+* FIXED: make: fix segfault in hub-ctrl
+
+
 374.43_44D2j9527  (08-May-2020) ARM SDK, MIPS,ARM KRACK
 * NEW: build: add udp-broadcast-relay-redux
 
