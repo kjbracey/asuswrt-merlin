@@ -281,7 +281,7 @@ static int read_packet_init() {
 
 	/* check packet length */
 	if ((len > RECV_MAX_PACKET_LEN) ||
-		(plen < blocksize) ||
+		(len < MIN_PACKET_LEN + macsize) ||
 		(plen % blocksize != 0)) {
 		dropbear_exit("Integrity error (bad packet size %u)", len);
 	}
