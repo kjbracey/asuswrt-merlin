@@ -4,6 +4,12 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_44E5j9527  (27-May-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: Revert "dropbear: (backport) add Chacha20-Poly1305 authenticated encryption"
+* CHANGED: Revert "dropbear: (backport) fix short packet validation in AEAD mode"
+* CHANGED: Revert "dropbear: (backport) fix ssh client connection with Chacha20-Poly1305"
+
+
 374.43_44E4j9527  (24-May-2020) ARM SDK, MIPS,ARM KRACK
 - CHANGED: dropbear: (backport) add Chacha20-Poly1305 authenticated encryption
 - CHANGED: dropbear: (backport) disable 3des & cbc, tune fastopen options
