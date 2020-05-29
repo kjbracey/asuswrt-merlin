@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <html xmlns:v>
 <head>
@@ -109,6 +109,8 @@ function initial(){
 
 	corrected_timezone();
 	load_timezones();
+	autofill_dst();
+	parse_dstoffset();
 	show_dst_chk();
 	load_dst_m_Options();
 	load_dst_w_Options();
@@ -226,7 +228,8 @@ function applyRule(){
 			document.form.http_passwd.disabled = false;
 		}
 
-		if(document.form.time_zone_dst_chk.checked){	// Exist dstoffset
+		if(document.form.time_zone_select.value.search("DST") >= 0 || document.form.time_zone_select.value.search("TDT") >= 0){		// DST area
+				if(!document.getElementById("time_zone_dst_chk").checked) autofill_dst(); //reset to defaults
 				time_zone_tmp = document.form.time_zone_select.value.split("_");	//0:time_zone 1:serial number
 				time_zone_s_tmp = "M"+document.form.dst_start_m.value+"."+document.form.dst_start_w.value+"."+document.form.dst_start_d.value+"/"+document.form.dst_start_h.value;
 				time_zone_e_tmp = "M"+document.form.dst_end_m.value+"."+document.form.dst_end_w.value+"."+document.form.dst_end_d.value+"/"+document.form.dst_end_h.value;
@@ -661,30 +664,137 @@ function load_timezones(){
 			timezones[i][1], timezones[i][0],
 			(document.form.time_zone.value == timezones[i][0]));
 	}
+	select_time_zone();
 }
 
-var dst_month = new Array("", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10", "M11", "M12");
-var dst_week = new Array("", "1", "2", "3", "4", "5");
-var dst_day = new Array("0", "1", "2", "3", "4", "5", "6");
-var dst_hour = new Array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-													"13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23");
+var timezone_dst_changes = {
+	"NAST9DST":	[ 3,2,0,2,  11,1,0,2 ],
+	"PST8DST":	[ 3,2,0,2,  11,1,0,2 ],
+	"MST7DST_1":	[ 3,2,0,2,  11,1,0,2 ],
+	"MST7DST_3":	[ 4,1,0,2,  10,5,0,2 ],
+	"CST6DST_3":	[ 4,1,0,2,  10,5,0,2 ],
+	"CST6DST_3_1":	[ 4,1,0,2,  10,5,0,2 ],
+	"UTC6DST":	[ 3,2,0,2,  11,1,0,2 ],
+	"EST5DST":	[ 3,2,0,2,  11,1,0,2 ],
+	"AST4DST":	[ 3,2,0,2,  11,1,0,2 ],
+	"UTC4DST_2":	[ 8,2,0,0,   5,2,0,0 ],
+	"NST3.30DST":	[ 3,2,0,2,  11,1,0,2 ],
+	"EBST3DST_1":	[11,1,0,0,   2,3,0,0 ],
+	"EBST3DST_2":	[ 3,5,6,22, 10,5,6,23],
+	"EUT1DST":	[ 3,5,0,0,  10,5,0,1 ],
+	"GMT0DST_1":	[ 3,5,0,1,  10,5,0,2 ],
+	"GMT0DST_2":	[ 3,5,0,2,  10,5,0,3 ],
+	"UTC-1DST_1":	[ 3,5,0,2,  10,5,0,3 ],
+	"UTC-1DST_1_1":	[ 3,5,0,2,  10,5,0,3 ],
+	"UTC-1DST_1_2":	[ 3,5,0,2,  10,5,0,3 ],
+	"UTC-1DST_2":	[ 3,5,0,2,  10,5,0,3 ],
+	"MET-1DST":	[ 3,5,0,2,  10,5,0,3 ],
+	"MET-1DST_1":	[ 3,5,0,2,  10,5,0,3 ],
+	"MEZ-1DST":	[ 3,5,0,2,  10,5,0,3 ],
+	"MEZ-1DST_1":	[ 3,5,0,2,  10,5,0,3 ],
+	"UTC-2DST":	[ 3,5,0,3,  10,5,0,4 ],
+	"UTC-2DST_3":	[ 3,5,0,3,  10,5,0,4 ],
+	"UTC-2DST_4":	[ 3,5,0,3,  10,5,0,4 ],
+	"UTC-2DST_2":	[ 3,5,0,3,  10,5,0,4 ],
+	"IST-2DST":	[ 3,5,5,2,  10,5,0,2 ],
+	"EET-2DST":	[ 3,5,0,3,  10,5,0,4 ],
+	"UTC-9.30DST":	[10,1,0,2,   4,1,0,3 ],
+	"UTC-10DST_1":	[10,1,0,2,   4,1,0,3 ],
+	"TST-10TDT":	[10,1,0,2,   4,1,0,3 ],
+	"NZST-12DST":	[ 9,5,0,2,   4,1,0,3 ]
+};
+
+function autofill_dst(){
+	if (document.form.time_zone_select.value.search("DST") >= 0 || document.form.time_zone_select.value.search("TDT") >= 0) {
+		if (timezone_dst_changes[document.form.time_zone_select.value]) {
+			document.form.dst_start_m.value = timezone_dst_changes[document.form.time_zone_select.value][0];
+			document.form.dst_start_w.value = timezone_dst_changes[document.form.time_zone_select.value][1];
+			document.form.dst_start_d.value = timezone_dst_changes[document.form.time_zone_select.value][2];
+			document.form.dst_start_h.value = timezone_dst_changes[document.form.time_zone_select.value][3];
+			document.form.dst_end_m.value = timezone_dst_changes[document.form.time_zone_select.value][4];
+			document.form.dst_end_w.value = timezone_dst_changes[document.form.time_zone_select.value][5];
+			document.form.dst_end_d.value = timezone_dst_changes[document.form.time_zone_select.value][6];
+			document.form.dst_end_h.value = timezone_dst_changes[document.form.time_zone_select.value][7];
+		}
+	}
+}
+var dst_month = new Array("", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "11th", "12th");
+var dst_week = new Array("", "1st", "2nd", "3rd", "4th", "5th");
+var dst_day = new Array("<#date_Sun_itemdesc#>", "<#date_Mon_itemdesc#>", "<#date_Tue_itemdesc#>", "<#date_Wed_itemdesc#>", "<#date_Thu_itemdesc#>", "<#date_Fri_itemdesc#>", "<#date_Sat_itemdesc#>");
+var dst_hour = new Array("12AM", "1AM", "2AM", "3AM", "4AM", "5AM", "6AM", "7AM", "8AM", "9AM", "10AM", "11AM",
+						 "12PM", "1PM", "2PM", "3PM", "4PM", "5PM", "6PM", "7PM", "8PM", "9PM", "10PM", "11PM");
 var dstoff_start_m,dstoff_start_w,dstoff_start_d,dstoff_start_h;
 var dstoff_end_m,dstoff_end_w,dstoff_end_d,dstoff_end_h;
 
-function parse_dstoffset(){	//Mm.w.d/h,Mm.w.d/h
-	var dstoffset_startend = dstoffset.split(",");
-		var dstoffset_start = dstoffset_startend[0];
-		var dstoff_start = dstoffset_start.split(".");
-			dstoff_start_m = dstoff_start[0];
-			dstoff_start_w = dstoff_start[1];
-			dstoff_start_d = dstoff_start[2].split("/")[0];
-			dstoff_start_h = dstoff_start[2].split("/")[1];
-		var dstoffset_end = dstoffset_startend[1];
-		var dstoff_end = dstoffset_end.split(".");
-			dstoff_end_m = dstoff_end[0];
-			dstoff_end_w = dstoff_end[1];
-			dstoff_end_d = dstoff_end[2].split("/")[0];
-			dstoff_end_h = dstoff_end[2].split("/")[1];
+function parse_dstoffset(){     //Mm.w.d/h,Mm.w.d/h
+	if(dstoffset){
+		var dstoffset_startend = dstoffset.split(",");
+
+		if(dstoffset_startend[0] != "" && dstoffset_startend[0] != undefined){
+			var dstoffset_start = trim(dstoffset_startend[0]);
+			var dstoff_start = dstoffset_start.split(".");
+
+			dstoff_start_m = parseInt(dstoff_start[0].substring(1));
+			if(check_range(dstoff_start_m,1,12)){
+				document.form.dst_start_m.value = dstoff_start_m;
+			}
+
+			if(dstoff_start[1] != "" && dstoff_start[1] != undefined){
+				dstoff_start_w = parseInt(dstoff_start[1]);
+				if(check_range(dstoff_start_w,1,5)){
+					document.form.dst_start_w.value = dstoff_start_w;
+				}
+			}
+
+			if(dstoff_start[2] != "" && dstoff_start[2] != undefined){
+				dstoff_start_d = parseInt(dstoff_start[2].split("/")[0]);
+				if(check_range(dstoff_start_d,0,6)){
+					document.form.dst_start_d.value = dstoff_start_d;
+				}
+
+				dstoff_start_h = parseInt(dstoff_start[2].split("/")[1]);
+				if(check_range(dstoff_start_h,0,23)){
+					document.form.dst_start_h.value = dstoff_start_h;
+				}
+			}
+		}
+
+		if(dstoffset_startend[1] != "" && dstoffset_startend[1] != undefined){
+			var dstoffset_end = trim(dstoffset_startend[1]);
+			var dstoff_end = dstoffset_end.split(".");
+
+			dstoff_end_m = parseInt(dstoff_end[0].substring(1));
+			if(check_range(dstoff_end_m,1,12)){
+				document.form.dst_end_m.value = dstoff_end_m;
+			}
+
+			if(dstoff_end[1] != "" && dstoff_end[1] != undefined){
+				dstoff_end_w = parseInt(dstoff_end[1]);
+				if(check_range(dstoff_end_w,1,5)){
+					document.form.dst_end_w.value = dstoff_end_w;
+				}
+			}
+
+			if(dstoff_end[2] != "" && dstoff_end[2] != undefined){
+				dstoff_end_d = parseInt(dstoff_end[2].split("/")[0]);
+				if(check_range(dstoff_end_d,0,6)){
+					document.form.dst_end_d.value = dstoff_end_d;
+				}
+
+				dstoff_end_h = parseInt(dstoff_end[2].split("/")[1]);
+				if(check_range(dstoff_end_h,0,23)){
+					document.form.dst_end_h.value = dstoff_end_h;
+				}
+			}
+		}
+	}
+}
+
+function check_range(obj, first, last){
+	if(obj != "NaN" && first <= obj && obj <= last)
+		return true;
+	else
+		return false;
 }
 
 function load_dst_m_Options(){
@@ -703,12 +813,12 @@ function load_dst_m_Options(){
 				add_option(document.form.dst_end_m, dst_month[i], i, 0);
 			}
 		}else{
-			if(dstoff_start_m =='M'+i)
+			if(dstoff_start_m == i)
 				add_option(document.form.dst_start_m, dst_month[i], i, 1);
 			else
 				add_option(document.form.dst_start_m, dst_month[i], i, 0);
 
-			if(dstoff_end_m =='M'+i)
+			if(dstoff_end_m == i)
 				add_option(document.form.dst_end_m, dst_month[i], i, 1);
 			else
 				add_option(document.form.dst_end_m, dst_month[i], i, 0);
@@ -1039,9 +1149,9 @@ function select_time_zone(){
 			document.getElementById("dst_end").style.display="";
 		}
 	}else{
+		document.form.time_zone_dst.value=0;
 		document.getElementById("chkbox_time_zone_dst").style.display="none";
 		document.getElementById("time_zone_dst_chk").checked = false;
-		document.form.time_zone_dst.value=0;
 		document.getElementById("dst_start").style.display="none";
 		document.getElementById("dst_end").style.display="none";
 	}
@@ -1342,7 +1452,7 @@ function updateDateTime()
 	  <tr>
           <th><a class="hintstyle"  href="javascript:void(0);" onClick="openHint(11,2)"><#LANHostConfig_x_TimeZone_itemname#></a></th>
           <td>
-            <select name="time_zone_select" class="input_option" onchange="select_time_zone();">
+            <select name="time_zone_select" class="input_option" onchange="select_time_zone();autofill_dst();">
             </select>
           	<div>
           		<span id="chkbox_time_zone_dst" style="color:white;display:none;">
