@@ -56,23 +56,23 @@ function initial(){
 	show_menu();
 	$("option5").innerHTML = '<table><tbody><tr><td><div id="index_img5"></div></td><td><div style="width:120px;"><#Menu_usb_application#></div></td></tr></tbody></table>';
 	$("option5").className = "m5_r";
-	
+
 	document.aidiskForm.protocol.value = PROTOCOL;
 
 	if(!WebDav_support)
 		$("clouddiskstr").style.display = "none";
-		
+
 	if (!ufsd_support)
 		$('ntfs_sparse_files').style.display = "none";
 	else
-		$('ntfs_sparse_files').style.display = "";		
-	
+		$('ntfs_sparse_files').style.display = "";
+
 	// show accounts
 	showAccountMenu();
-	
+
 	// show the kinds of permission
 	showPermissionTitle();
-	
+
 	// show mask
 	if(get_manage_type(PROTOCOL)){
 		$("loginMethod").innerHTML = "<#AiDisk_SAMBA_hint_2#>";
@@ -85,12 +85,12 @@ function initial(){
 
 	// show folder's tree
 	setTimeout('get_disk_tree();', 1000);
-	
+
 	// the click event of the buttons
 	onEvent();
 	if(!hadPlugged('storage')){
 //		$("accountbtn").disabled = true;
-//		$("sharebtn").disabled = true;	
+//		$("sharebtn").disabled = true;
 	}
 }
 
@@ -110,29 +110,29 @@ function get_accounts(){
 function switchAppStatus(protocol){  // turn on/off the share
 	var status;
 	var confirm_str_on, confirm_str_off;
-	
+
 	if(protocol == "cifs"){
 		status = this.NN_status;
-		
+
 		confirm_str_off= "<#confirm_disablecifs#>";  //"<#confirm_disableftp_dm#>"+ By Viz 2011.09
 		confirm_str_on = "<#confirm_enablecifs#>";
 	}
 	else if(protocol == "ftp"){
 		status = this.FTP_status;
-		
+
 		confirm_str_off = "<#confirm_disableftp#>";
 		confirm_str_on = "<#confirm_enableftp#>";
 	}
-	
+
 	switch(status){
 		case 1:
 			if(confirm(confirm_str_off)){
 				showLoading();
-				
+
 				document.aidiskForm.action = "/aidisk/switch_AiDisk_app.asp";
 				document.aidiskForm.protocol.value = protocol;
 				document.aidiskForm.flag.value = "off";
-				
+
 				document.aidiskForm.submit();
 			}
 			else{
@@ -142,11 +142,11 @@ function switchAppStatus(protocol){  // turn on/off the share
 		case 0:
 			if(confirm(confirm_str_on)){
 				showLoading();
-				
+
 				document.aidiskForm.action = "/aidisk/switch_AiDisk_app.asp";
 				document.aidiskForm.protocol.value = protocol;
 				document.aidiskForm.flag.value = "on";
-				
+
 				document.aidiskForm.submit();
 			}
 			else{
@@ -163,14 +163,14 @@ function resultOfSwitchAppStatus(){
 function switchAccount(protocol){
 	if(protocol != "cifs" && protocol != "ftp")
 		return;
-	
+
 	switch(get_manage_type(protocol)){
 		case 1:
 			if(confirm("<#AiDisk_SAMBA_hint_3#>")){
 				document.aidiskForm.action = "/aidisk/switch_share_mode.asp";
 				document.aidiskForm.protocol.value = protocol;
 				document.aidiskForm.mode.value = "share";
-				
+
 				showLoading();
 				document.aidiskForm.submit();
 			}
@@ -194,28 +194,28 @@ function resultOfSwitchShareMode(){
 
 function showAccountMenu(){
 	var account_menu_code = "";
-	
+
 	if(this.accounts.length <= 0)
 		account_menu_code += '<div class="noAccount" id="noAccount"><#Noaccount#></div>\n'
 	else{
 		for(var i = 0; i < this.accounts.length; ++i){
 			account_menu_code += '<div class="userIcon" id="';
-			account_menu_code += "account"+i;		
+			account_menu_code += "account"+i;
 			if(decodeURIComponent(this.accounts[i]).length > 18){
 				account_menu_code += '" onClick="setSelectAccount('+i+');" style="white-space:nowrap;font-family:Courier New, Courier, mono;" title="'+decodeURIComponent(this.accounts[i])+'">'
 				account_menu_code += decodeURIComponent(this.accounts[i]).substring(0,15) + '...';
-			}	
+			}
 			else{
 				account_menu_code += '" onClick="setSelectAccount('+i+');" style="white-space:nowrap;font-family:Courier New, Courier, mono;">'
-				account_menu_code += decodeURIComponent(this.accounts[i]);		
+				account_menu_code += decodeURIComponent(this.accounts[i]);
 			}
-			
-			account_menu_code += '</div>\n';	
+
+			account_menu_code += '</div>\n';
 		}
 	}
-	
+
 	$("account_menu").innerHTML = account_menu_code;
-	
+
 	if(this.accounts.length > 0){
 		if(get_manage_type(PROTOCOL) == 1)
 			setSelectAccount(0);
@@ -224,9 +224,9 @@ function showAccountMenu(){
 
 function showPermissionTitle(){
 	var code = "";
-	
+
 	code += '<table width="190"><tr>';
-	
+
 	if(PROTOCOL == "cifs"){
 		code += '<td width="34%" align="center">R/W</td>';
 		code += '<td width="28%" align="center">R</td>';
@@ -237,9 +237,9 @@ function showPermissionTitle(){
 		code += '<td width="22%" align="center">R</td>';
 		code += '<td width="28%" align="center">No</td>';
 	}
-	
+
 	code += '</tr></table>';
-	
+
 	$("permissionTitle").innerHTML = code;
 }
 
@@ -256,9 +256,9 @@ function showApplyBtn(){
 
 function setSelectAccount(account_order){
 	this.selectedAccount = accounts[account_order];
-	
+
 	onEvent();
-	
+
 	show_permissions_of_account(account_order, PROTOCOL);
 	contrastSelectAccount(account_order);
 }
@@ -271,17 +271,17 @@ function show_permissions_of_account(account_order, protocol){
 	var accountName = accounts[account_order];
 	var poolName;
 	var permissions;
-	
+
 	try{
 		for(var i = 0; i < pool_devices().length; ++i){
 			poolName = pool_devices()[i];
 			if(!this.clickedFolderBarCode[poolName])
 				continue;
-			
+
 			permissions = get_account_permissions_in_pool(accountName, poolName);
 			for(var k = 1; k < permissions.length; ++k){
 				var folderBarCode = get_folderBarCode_in_pool(poolName, permissions[k][0]);
-				
+
 				if(protocol == "cifs")
 					showPermissionRadio(folderBarCode, permissions[k][1]);
 				else if(protocol == "ftp")
@@ -300,7 +300,7 @@ function show_permissions_of_account(account_order, protocol){
 
 function get_permission_of_folder(accountName, poolName, folderName, protocol){
 	var permissions = get_account_permissions_in_pool(accountName, poolName);
-	
+
 	for(var i = 1; i < permissions.length; ++i)
 		if(permissions[i][0] == folderName){
 			if(protocol == "cifs")
@@ -312,7 +312,7 @@ function get_permission_of_folder(accountName, poolName, folderName, protocol){
 				return;
 			}
 		}
-	
+
 	alert("Wrong folderName when get permission!");	// system error msg. must not be translate
 }
 
@@ -320,9 +320,9 @@ function contrastSelectAccount(account_order){
 	if(this.lastClickedAccount != 0){
 		this.lastClickedAccount.className = "userIcon";
 	}
-	
+
 	var selectedObj = $("account"+account_order);
-	
+
 	selectedObj.className = "userIcon_click";
 	this.lastClickedAccount = selectedObj;
 }
@@ -331,39 +331,39 @@ function submitChangePermission(protocol){
 	var orig_permission;
 	var target_account = null;
 	var target_folder = null;
-	
+
 	for(var i = -1; i < accounts.length; ++i){
 		if(i == -1)
 			target_account = "guest";
 		else
 			target_account = accounts[i];
-		
+
 		if(!this.changedPermissions[target_account])
 			continue;
-		
+
 		for(var j = 0; j < pool_devices().length; ++j){
 			if(!this.changedPermissions[target_account][pool_devices()[j]])
 				continue;
-			
+
 			folderlist = get_sharedfolder_in_pool(pool_devices()[j]);
-			
+
 			for(var k = 0; k < folderlist.length; ++k){
 				target_folder = folderlist[k];
-				
+
 				if(!this.changedPermissions[target_account][pool_devices()[j]][target_folder])
 					continue;
-				
+
 				if(target_account == "guest")
 					orig_permission = get_permission_of_folder(null, pool_devices()[j], target_folder, PROTOCOL);
 				else
 					orig_permission = get_permission_of_folder(target_account, pool_devices()[j], target_folder, PROTOCOL);
 				if(this.changedPermissions[target_account][pool_devices()[j]][target_folder] == orig_permission)
 					continue;
-				
+
 				// the item which was set already
 				if(this.changedPermissions[target_account][pool_devices()[j]][target_folder] == -1)
 					continue;
-				
+
 				document.aidiskForm.action = "/aidisk/set_account_permission.asp";
 				if(target_account == "guest")
 					$("account").disabled = 1;
@@ -380,7 +380,7 @@ function submitChangePermission(protocol){
 				}
 				$("protocol").value = protocol;
 				$("permission").value = this.changedPermissions[target_account][pool_devices()[j]][target_folder];
-				
+
 				// mark this item which is set
 				this.changedPermissions[target_account][pool_devices()[j]][target_folder] = -1;
 				/*alert("account = "+$("account").value+"\n"+
@@ -394,7 +394,7 @@ function submitChangePermission(protocol){
 			}
 		}
 	}
-	
+
 	refreshpage();
 }
 
@@ -403,16 +403,16 @@ function changeActionButton(selectedObj, type, action, flag){
 		if(this.accounts.length <= 0)
 			if(action == "Del" || action == "Mod")
 				return;
-	
+
 	if(typeof(flag) == "number"){
 		if(flag == 0)
 			selectedObj.className = selectedObj.id + '_add';
-		else 
+		else
 			selectedObj.className = selectedObj.id + '_hover';
-	}	
+	}
 	else{
 		selectedObj.className = selectedObj.id;
-	}	
+	}
 }
 
 function resultOfCreateAccount(){
@@ -423,7 +423,7 @@ function onEvent(){
 	// account action buttons
 	if(get_manage_type(PROTOCOL) == 1 && accounts.length < 6){
 		changeActionButton($("createAccountBtn"), 'User', 'Add', 0);
-		
+
 		$("createAccountBtn").onclick = function(){
 				popupWindow('OverlayMask','/aidisk/popCreateAccount.asp');
 			};
@@ -436,22 +436,22 @@ function onEvent(){
 	}
 	else{
 		changeActionButton($("createAccountBtn"), 'User', 'Add');
-		
+
 		$("createAccountBtn").onclick = function(){};
 		$("createAccountBtn").onmouseover = function(){};
 		$("createAccountBtn").onmouseout = function(){};
 		$("createAccountBtn").title = (accounts.length < 6)?"<#AddAccountTitle#>":"<#account_overflow#>";
 	}
-	
+
 	if(this.accounts.length > 0 && this.selectedAccount != null && this.selectedAccount.length > 0 && this.accounts[0] != this.selectedAccount){
 		changeActionButton($("modifyAccountBtn"), 'User', 'Mod', 0);
-		
+
 		$("modifyAccountBtn").onclick = function(){
 				if(!selectedAccount){
 					alert("<#AiDisk_unselected_account#>");
 					return;
 				}
-				
+
 				popupWindow('OverlayMask','/aidisk/popModifyAccount.asp');
 			};
 		$("modifyAccountBtn").onmouseover = function(){
@@ -463,21 +463,21 @@ function onEvent(){
 	}
 	else{
 		changeActionButton($("modifyAccountBtn"), 'User', 'Mod');
-		
+
 		$("modifyAccountBtn").onclick = function(){};
 		$("modifyAccountBtn").onmouseover = function(){};
 		$("modifyAccountBtn").onmouseout = function(){};
 	}
-	
+
 	if(this.accounts.length > 1 && this.selectedAccount != null && this.selectedAccount.length > 0 && this.accounts[0] != this.selectedAccount){
 		changeActionButton($("deleteAccountBtn"), 'User', 'Del', 0);
-		
+
 		$("deleteAccountBtn").onclick = function(){
 				if(!selectedAccount){
 					alert("<#AiDisk_unselected_account#>");
 					return;
 				}
-				
+
 				popupWindow('OverlayMask','/aidisk/popDeleteAccount.asp');
 			};
 		$("deleteAccountBtn").onmouseover = function(){
@@ -489,16 +489,16 @@ function onEvent(){
 	}
 	else{
 		changeActionButton($("deleteAccountBtn"), 'User', 'Del');
-		
+
 		$("deleteAccountBtn").onclick = function(){};
 		$("deleteAccountBtn").onmouseover = function(){};
 		$("deleteAccountBtn").onmouseout = function(){};
 	}
-	
+
 	// folder action buttons
 	if(this.selectedPoolOrder >= 0 && this.selectedFolderOrder < 0){
 		changeActionButton($("createFolderBtn"), 'Folder', 'Add', 0);
-		
+
 		$("createFolderBtn").onclick = function(){
 				if(selectedDiskOrder < 0){
 					alert("<#AiDisk_unselected_disk#>");
@@ -508,7 +508,7 @@ function onEvent(){
 					alert("<#AiDisk_unselected_partition#>");
 					return;
 				}
-				
+
 				popupWindow('OverlayMask','/aidisk/popCreateFolder.asp');
 			};
 		$("createFolderBtn").onmouseover = function(){
@@ -520,22 +520,22 @@ function onEvent(){
 	}
 	else{
 		changeActionButton($("createFolderBtn"), 'Folder', 'Add');
-		
+
 		$("createFolderBtn").onclick = function(){};
 		$("createFolderBtn").onmouseover = function(){};
 		$("createFolderBtn").onmouseout = function(){};
 	}
-	
+
 	if(this.selectedFolderOrder >= 0){
 		changeActionButton($("deleteFolderBtn"), 'Folder', 'Del', 0);
 		changeActionButton($("modifyFolderBtn"), 'Folder', 'Mod', 0);
-		
+
 		$("deleteFolderBtn").onclick = function(){
 				if(selectedFolderOrder < 0){
 					alert("<#AiDisk_unselected_folder#>");
 					return;
 				}
-				
+
 				popupWindow('OverlayMask','/aidisk/popDeleteFolder.asp');
 			};
 		$("deleteFolderBtn").onmouseover = function(){
@@ -544,13 +544,13 @@ function onEvent(){
 		$("deleteFolderBtn").onmouseout = function(){
 				changeActionButton(this, 'Folder', 'Del', 0);
 			};
-		
+
 		$("modifyFolderBtn").onclick = function(){
 				if(selectedFolderOrder < 0){
 					alert("<#AiDisk_unselected_folder#>");
 					return;
 				}
-				
+
 				popupWindow('OverlayMask','/aidisk/popModifyFolder.asp');
 			};
 		$("modifyFolderBtn").onmouseover = function(){
@@ -563,16 +563,16 @@ function onEvent(){
 	else{
 		changeActionButton($("deleteFolderBtn"), 'Folder', 'Del');
 		changeActionButton($("modifyFolderBtn"), 'Folder', 'Mod');
-		
+
 		$("deleteFolderBtn").onclick = function(){};
 		$("deleteFolderBtn").onmouseover = function(){};
 		$("deleteFolderBtn").onmouseout = function(){};
-		
+
 		$("modifyFolderBtn").onclick = function(){};
 		$("modifyFolderBtn").onmouseover = function(){};
 		$("modifyFolderBtn").onmouseout = function(){};
 	}
-	
+
 	$("changePermissionBtn").onclick = function(){
 			submitChangePermission(PROTOCOL);
 		};
@@ -582,23 +582,23 @@ function unload_body(){
 	$("createAccountBtn").onclick = function(){};
 	$("createAccountBtn").onmouseover = function(){};
 	$("createAccountBtn").onmouseout = function(){};
-	
+
 	$("deleteAccountBtn").onclick = function(){};
 	$("deleteAccountBtn").onmouseover = function(){};
 	$("deleteAccountBtn").onmouseout = function(){};
-	
+
 	$("modifyAccountBtn").onclick = function(){};
 	$("modifyAccountBtn").onmouseover = function(){};
 	$("modifyAccountBtn").onmouseout = function(){};
-	
+
 	$("createFolderBtn").onclick = function(){};
 	$("createFolderBtn").onmouseover = function(){};
 	$("createFolderBtn").onmouseout = function(){};
-	
+
 	$("deleteFolderBtn").onclick = function(){};
 	$("deleteFolderBtn").onmouseover = function(){};
 	$("deleteFolderBtn").onmouseout = function(){};
-	
+
 	$("modifyFolderBtn").onclick = function(){};
 	$("modifyFolderBtn").onmouseover = function(){};
 	$("modifyFolderBtn").onmouseout = function(){};
@@ -608,7 +608,7 @@ function applyRule(){
     if(validForm()){
 				if(document.form.usb_fs_ntfs_sparse.value != "<% nvram_get("usb_fs_ntfs_sparse"); %>")
         		FormActions("start_apply.htm", "apply", "reboot", "<% get_default_reboot_time(); %>");
-        
+
         showLoading();
 				document.form.submit();
      }
@@ -621,7 +621,7 @@ function validForm(){
 		document.form.st_max_user.select();
 		return false;
 	}
-	
+
 	if(document.form.computer_name.value.length == 0){
 		showtext($("alert_msg1"), "<#JS_fieldblank#>");
 		document.form.computer_name.focus();
@@ -629,7 +629,7 @@ function validForm(){
 		return false;
 	}
 	else{
-		
+
 		var alert_str = validate_hostname(document.form.computer_name);
 		if(alert_str != ""){
 			showtext($("alert_msg1"), alert_str);
@@ -643,21 +643,21 @@ function validForm(){
 
 		document.form.computer_name.value = trim(document.form.computer_name.value);
 	}
-				  
+
 	if(document.form.st_samba_workgroup.value.length == 0){
 		alert("<#JS_fieldblank#>");
 		document.form.st_samba_workgroup.focus();
 		document.form.st_samba_workgroup.select();
-		return false;	
+		return false;
 	}
   else{
 	var workgroup_check = new RegExp('^[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-\_\.]+$','gi');
   	if(!workgroup_check.test(document.form.st_samba_workgroup.value)){
-			alert("<#JS_validchar#>");               
+			alert("<#JS_validchar#>");
 			document.form.st_samba_workgroup.focus();
 			document.form.st_samba_workgroup.select();
 			return false;
-		}   
+		}
 	}
 
   return true;
@@ -695,13 +695,13 @@ function validForm(){
 
 <table width="983" border="0" align="center" cellpadding="0" cellspacing="0" class="content">
   <tr>
-	<td width="17">&nbsp;</td>				
-	
+	<td width="17">&nbsp;</td>
+
 	<td valign="top" width="202">
 	  <div id="mainMenu"></div>
 	  <div id="subMenu"></div>
 	</td>
-	
+
 	<td valign="top">
 	  <div id="tabMenu" class="submenuBlock"></div>
 	  <!--=====Beginning of Main Content=====-->
@@ -738,7 +738,7 @@ function validForm(){
 						<div class="left" style="width:94px; float:left; cursor:pointer;" id="radio_samba_enable"></div>
 						<div class="iphone_switch_container" style="height:32px; width:74px; position: relative; overflow: hidden">
 							<script type="text/javascript">
-								$j('#radio_samba_enable').iphoneSwitch(NN_status, 
+								$j('#radio_samba_enable').iphoneSwitch(NN_status,
 									 function() {
 									 	switchAppStatus(PROTOCOL);
 									 },
@@ -749,10 +749,10 @@ function validForm(){
 										switch_on_container_path: '/switcherplugin/iphone_switch_container_off.png'
 									 }
 								);
-							</script>			
-						</div>	
+							</script>
+						</div>
 					</td>
-				</tr>										
+				</tr>
 
 				<tr style="height:60px;">
 				<th><#AiDisk_Guest_Login#></th>
@@ -760,7 +760,7 @@ function validForm(){
 						<div class="left" style="margin-top:5px;width:94px;float:left; cursor:pointer;" id="radio_anonymous_enable"></div>
 						<div class="iphone_switch_container" style="display:table-cell;vertical-align:middle;height:45px;position:relative;overflow:hidden">
 							<script type="text/javascript">
-								$j('#radio_anonymous_enable').iphoneSwitch(!get_manage_type(PROTOCOL), 
+								$j('#radio_anonymous_enable').iphoneSwitch(!get_manage_type(PROTOCOL),
 									 function() {
 									 	switchAccount(PROTOCOL);
 									 },
@@ -771,7 +771,7 @@ function validForm(){
 										switch_on_container_path: '/switcherplugin/iphone_switch_container_off.png'
 									 }
 								);
-							</script>			
+							</script>
 							<span id="loginMethod" style="color:#FC0"></span>
 						</div>
 					</td>
@@ -789,7 +789,7 @@ function validForm(){
 						<a class="hintstyle" href="javascript:void(0);" onClick="openHint(17,2);"><#ShareNode_DeviceName_itemname#></a>
 					</th>
 					<td>
-						<div><input type="text" name="computer_name" id="computer_name" class="input_20_table" maxlength="20" value="<% nvram_get("computer_name"); %>"><br/><span id="alert_msg1" style="color:#FC0;"></span></div>
+						<div><input type="text" name="computer_name" id="computer_name" class="input_20_table" maxlength="15" value="<% nvram_get("computer_name"); %>"><br/><span id="alert_msg1" style="color:#FC0;"></span></div>
 					</td>
 				</tr>
 				<tr>
@@ -852,12 +852,12 @@ function validForm(){
 								<option class="content_input_fd" value="1" <% nvram_match("usb_fs_ntfs_sparse", "1","selected"); %>><#WLANConfig11b_WirelessCtrl_button1name#></option>
 							</select>
 					</td>
-				</tr>				
+				</tr>
 			</table>
-			
+
 			<div class="apply_gen">
 					<input type="button" class="button_gen" value="<#CTL_apply#>" onclick="applyRule();">
-			</div>			
+			</div>
 
 			<!-- The table of share. -->
 			<div id="shareStatus">
@@ -865,23 +865,23 @@ function validForm(){
 			<div id="tableMask"></div>
 			<!-- The mask of accounts. -->
 			<div id="accountMask"></div>
-		  
+
 			<!-- The action buttons of accounts and folders. -->
 	    	<!-- <table height="35" cellpadding="2" cellspacing="0" class="accountBar"> -->
 	    	<table width="740px"  height="35" cellpadding="2" cellspacing="0" class="accountBar">
 		    <tr>
 			  <!-- The action buttons of accounts. -->
     	      <!-- <td width="300" height="25" valign="bottom">	 -->
-    	        <td width="25%" style="border: 1px solid #222;">	
+	        <td width="25%" style="border: 1px solid #222;">
 		        	<table align="right">
 						<tr>
 							<td><div id="createAccountBtn" title="<#AddAccountTitle#>"></div></td>
 							<td><div id="deleteAccountBtn" title="<#DelAccountTitle#>"></div></td>
 							<td><div id="modifyAccountBtn" title="<#ModAccountTitle#>"></div></td>
 						</tr>
-					</table>						
+					</table>
 				</td>
-			  
+
 			  <!-- The action buttons of folders. -->
 				<td>
 					<table align="right">
@@ -890,22 +890,22 @@ function validForm(){
 							<td><div id="deleteFolderBtn" title="<#DelFolderTitle#>"></div></td>
 							<td><div id="modifyFolderBtn" title="<#ModFolderTitle#>"></div></td>
 						</tr>
-					</table>						
+					</table>
 		  		</td>
   			</tr>
 	  	  </table>
 	  	</div>
-	    
+
 		<!-- The table of accounts and folders. -->
 	    <!-- <table width="99%" height="400"  border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#999999">-->
-	      <table width="740px" height="200" align="center"  border="1" cellpadding="4" cellspacing="0" class="AiDiskTable"> 	    
+	      <table width="740px" height="200" align="center"  border="1" cellpadding="4" cellspacing="0" class="AiDiskTable">
   		  <tr>
 		    <!-- The table of accounts. -->
     	    <!-- <td valign="top" bgcolor="#F8F8F8">-->
     	        	  <th align="left" valign="top">
 			  	<div id="account_menu"></div>
 		    	  </th>
-		    
+
 			<!-- The table of folders. -->
     	    		<td valign="top">
 			    <table width="480"  border="0" cellspacing="0" cellpadding="0" class="FileStatusTitle">
@@ -918,10 +918,10 @@ function validForm(){
 				  </td>
 		    	</tr>
 			  </table>
-			  
+
 			  <!-- the tree of folders -->
 			  <div id="e0" style="font-size:10pt; margin-top:2px;"></div>
-			  
+
 			  <div style="text-align:center; margin:10px auto; border-top:1px dotted #CCC; width:95%; padding:2px;">
 			    <input name="changePermissionBtn" id="changePermissionBtn" type="button" value="Save Permission" class="button_gen_long_dis" disabled="disabled">
 			  </div>
@@ -929,7 +929,7 @@ function validForm(){
           </tr>
 	    </table>
 	  </td>
-	 
+
 	</tr>
   </tbody>
 </table>
