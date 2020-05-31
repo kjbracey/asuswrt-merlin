@@ -56,7 +56,7 @@ function initial(){
 			if (server1stt == 2)
 				$("server1_Block_Running").innerHTML = state_r;
 			else if (server1stt == -1)
-				$("server1_Block_Running").innerHTML = state_e;		
+				$("server1_Block_Running").innerHTML = state_e;
 			else
 				$("server1_Block_Running").innerHTML = state_i;
 		} else
@@ -108,8 +108,8 @@ function initial(){
 				$("client2_Block_Running").innerHTML += " - Authorization failure";
 		}
 		if (client2blk == 1)
-			$("client2_Block_Running").innerHTML += state_b;		
-		
+			$("client2_Block_Running").innerHTML += state_b;
+
 		parseStatus(document.form.status_server1.value, "server1_Block");
 		parseStatus(document.form.status_client1.value, "client1_Block");
 		parseStatus(document.form.status_server2.value, "server2_Block");
@@ -352,14 +352,18 @@ function parseStatus(text, block){
 		code += '<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable_table"><thead><tr><td colspan="4">Statistics</td></tr></thead>';
 
 		var label_order = [ 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 ];
-		var data_order = [ 1, 5, 0, 6, 2, 7, 3, 8, 4, 9 ];
-		for (i = 0; i < staticstatsTableEntries.length; ++i)
+		var data_order = [ 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 ];
+		var table_length = staticstatsTableEntries.length;
+		for (i = 0; i < table_length; ++i)
 		{
 			j = label_order[i];
 			k = data_order[i];
 			if (i % 2 == 0) code += '<tr>';
-			code += '<th width="80%" style="text-align:left;">' + staticstatsTableEntries[j][0] +'</th>';
-			code += '<td width="20%" align="left" style="text-align:left;">' + Number(staticstatsTableEntries[k][1]).toLocaleString() +'</td>';
+			if (j < table_length && k < table_length)
+			{
+				code += "<th width=\"80%\" style=\"text-align:left;\">" + staticstatsTableEntries[j][0] +"</th>";
+				code += "<td width=\"20%\" align=\"left\" style=\"text-align:left;\">" + Number(staticstatsTableEntries[k][1]).toLocaleString() +"</td>";
+			}
 			if (i % 2 == 1) code += '</tr>';
 		}
 		if (i % 2 == 0) code += '</tr>';
