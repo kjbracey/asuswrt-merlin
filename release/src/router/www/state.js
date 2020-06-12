@@ -1081,7 +1081,7 @@ function show_menu(){
 */
 		notification.upgrade = 0;
 
-	if(band2g_support && noti_auth_mode_2g == 'open'){ //case3-1
+	if(band2g_support && noti_auth_mode_2g == 'open' && sw_mode != 4 && wlan0_radio_flag != 0){ //case3-1
 			notification.array[2] = 'noti_wifi_2g';
 			notification.wifi_2g = 1;
 			notification.desc[2] = '<#ASUSGATE_note3#>';
@@ -1090,7 +1090,7 @@ function show_menu(){
 	}else
 		notification.wifi_2g = 0;
 
-	if(band5g_support && noti_auth_mode_5g == 'open'){	//case3-2
+	if(band5g_support && noti_auth_mode_5g == 'open' && sw_mode != 4 && wlan1_radio_flag != 0){	//case3-2
 			notification.array[3] = 'noti_wifi_5g';
 			notification.wifi_5g = 1;
 			notification.desc[3] = '<#ASUSGATE_note3#>';
