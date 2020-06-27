@@ -4,7 +4,18 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
-374.43_44D6j9527  (xx-May-2020) ARM SDK, MIPS,ARM KRACK
+374.43_44E7j9527  (27-June-2020) ARM SDK, MIPS,ARM KRACK
+- CHANGED: busybox: (backport) updated a few options to match upstream settings
+* CHANGED: webui: (backport) add support for default DST/TDT timezone change data
+* CHANGED: webui: add protection for locale parsing error in vpnstatus
+* CHANGED: openssl: update CA bundle to 2020 June 1st version
+- CHANGED: nano: (backport) update to 4.9.3
+- CHANGED: www: (backport) update oui database
+* FIXED: webui: limit computername in samba ui to 15 chars
+* FIXED: webui: do not alert on open wifi if media bridge mode or radio disabled
+
+
+374.43_44D6j9527  (29-May-2020) ARM SDK, MIPS,ARM KRACK
 - CHANGED: dropbear: (backport) add Chacha20-Poly1305 authenticated encryption
 - CHANGED: dropbear: (backport) fix ssh client connection with Chacha20-Poly1305
 - CHANGED: dropbear: (backport) fix short packet validation in AEAD mode
