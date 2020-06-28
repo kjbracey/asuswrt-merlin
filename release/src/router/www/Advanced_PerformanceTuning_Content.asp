@@ -5,13 +5,13 @@
 <meta HTTP-EQUIV="Pragma" CONTENT="no-cache">
 <meta HTTP-EQUIV="Expires" CONTENT="-1">
 <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7, IE=EmulateIE10"/>
-<meta name="svg.render.forceflash" content="false" />	
+<meta name="svg.render.forceflash" content="false" />
 <link rel="shortcut icon" href="images/favicon.png">
 <link rel="icon" href="images/favicon.png">
 <title><#Web_Title#> - Performance tuning</title>
-<link rel="stylesheet" type="text/css" href="index_style.css"> 
+<link rel="stylesheet" type="text/css" href="index_style.css">
 <link rel="stylesheet" type="text/css" href="form_style.css">
-<script src='svg.js' data-path="/svghtc/" data-debug="false"></script>	
+<script src='svg.js' data-path="/svghtc/" data-debug="false"></script>
 <script language="JavaScript" type="text/javascript" src="/state.js"></script>
 <script language="JavaScript" type="text/javascript" src="/help.js"></script>
 <script language="JavaScript" type="text/javascript" src="/general.js"></script>
@@ -23,7 +23,7 @@ wan_route_x = '<% nvram_get("wan_route_x"); %>';
 wan_nat_x = '<% nvram_get("wan_nat_x"); %>';
 wan_proto = '<% nvram_get("wan_proto"); %>';
 curr_coreTmp_2 = "<% sysinfo("temperature.2"); %>".replace("&deg;C", "");
-curr_coreTmp_5 = "<% sysinfo("temperature.5"); %>".replace("&deg;C", ""); 
+curr_coreTmp_5 = "<% sysinfo("temperature.5"); %>".replace("&deg;C", "");
 curr_coreTmp_cpu = "<% get_cpu_temperature(); %>";
 var coreTmp_2 = new Array();
 var coreTmp_5 = new Array();
@@ -33,6 +33,9 @@ coreTmp_5 = [curr_coreTmp_5];
 coreTmp_cpu = [curr_coreTmp_cpu];
 var wl_control_channel = <% wl_control_channel(); %>;
 var $j = jQuery.noConflict();
+
+// disable auto log out
+AUTOLOGOUT_MAX_MINUTE = 0;
 
 function initial(){
 	var code1, code2;
@@ -54,15 +57,15 @@ function initial(){
 function update_coretmp(e){
   $j.ajax({
     url: '/ajax_coretmp.asp',
-    dataType: 'script', 
-	
+    dataType: 'script',
+
     error: function(xhr){
       update_coretmp();
     },
     success: function(response){
 			updateNum(curr_coreTmp_2, curr_coreTmp_5, curr_coreTmp_cpu);
 			setTimeout("update_coretmp();", 5000);
-		}    
+		}
   });
 }
 
@@ -100,14 +103,14 @@ function setCookie(num){
 
 function getCookie(c_name)
 {
-	if (document.cookie.length > 0){ 
+	if (document.cookie.length > 0){
 		c_start=document.cookie.indexOf(c_name + "=")
-		if (c_start!=-1){ 
-			c_start=c_start + c_name.length+1 
+		if (c_start!=-1){
+			c_start=c_start + c_name.length+1
 			c_end=document.cookie.indexOf(";",c_start)
 			if (c_end==-1) c_end=document.cookie.length
 			return unescape(document.cookie.substring(c_start,c_end))
-		} 
+		}
 	}
 	return null
 }
@@ -121,14 +124,14 @@ function getCookie(c_name)
 <form method="post" name="form" id="ruleForm" action="/start_apply.htm" target="hidden_frame">
 <table class="content" align="center" cellpadding="0" cellspacing="0">
 	<tr>
-		<td width="17">&nbsp;</td>		
-		<td valign="top" width="202">				
-			<div id="mainMenu"></div>	
-			<div id="subMenu"></div>		
-		</td>						
+		<td width="17">&nbsp;</td>
+		<td valign="top" width="202">
+			<div id="mainMenu"></div>
+			<div id="subMenu"></div>
+		</td>
     <td valign="top">
 			<div id="tabMenu" class="submenuBlock"></div>
-			
+
 			<!--===================================Beginning of Main Content===========================================-->
 			<input type="hidden" name="current_page" value="Advanced_PerformanceTuning_Content.asp">
 			<input type="hidden" name="next_page" value="Advanced_PerformanceTuning_Content.asp">
@@ -164,7 +167,7 @@ function getCookie(c_name)
 												<td colspan="2">Cooler status</td>
 											</tr>
 											</thead>
-											
+
 											<tr>
 												<td valign="top">
 													<div style="margin-left:-10px;">
