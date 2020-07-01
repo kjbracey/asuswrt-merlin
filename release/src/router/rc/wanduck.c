@@ -1194,30 +1194,6 @@ void parse_dst_url(char *page_src){
 	sprintf(dst_url, "%s/%s", host, dest);
 }
 
-void parse_req_queries(char *content, char *lp, int len, int *reply_size){
-	int i, rn;
-
-	rn = *(reply_size);
-	for(i = 0; i < len; ++i){
-		content[rn+i] = lp[i];
-		if(lp[i] == 0){
-			++i;
-			break;
-		}
-	}
-
-	if(i >= len)
-		return;
-
-	content[rn+i] = lp[i];
-	content[rn+i+1] = lp[i+1];
-	content[rn+i+2] = lp[i+2];
-	content[rn+i+3] = lp[i+3];
-	i += 4;
-
-	*reply_size += i;
-}
-
 void handle_http_req(int sfd, char *line){
 	int len;
 
@@ -1240,65 +1216,133 @@ void handle_http_req(int sfd, char *line){
 		close_socket(sfd, T_HTTP);
 }
 
-void handle_dns_req(int sfd, char *line, int maxlen, struct sockaddr *pcliaddr, int clen){
-	dns_query_packet d_req;
-	dns_response_packet d_reply;
-	int reply_size;
-	char reply_content[MAXLINE];
-
-	reply_size = 0;
-	memset(reply_content, 0, MAXLINE);
-	memset(&d_req, 0, sizeof(d_req));
-	memcpy(&d_req.header, line, sizeof(d_req.header));
-
-	// header
-	memcpy(&d_reply.header, &d_req.header, sizeof(dns_header));
-	d_reply.header.flag_set.flag_num = htons(0x8580);
-	//d_reply.header.flag_set.flag_num = htons(0x8180);
-	d_reply.header.answer_rrs = htons(0x0001);
-	memcpy(reply_content, &d_reply.header, sizeof(d_reply.header));
-	reply_size += sizeof(d_reply.header);
-
-	reply_content[5] = 1;	// Questions
-	reply_content[7] = 1;	// Answer RRS
-	reply_content[9] = 0;	// Authority RRS
-	reply_content[11] = 0;	// Additional RRS
-
-	// queries
-	parse_req_queries(reply_content, line+sizeof(dns_header), maxlen-sizeof(dns_header), &reply_size);
-
-	// answers
-	d_reply.answers.name = htons(0xc00c);
-	d_reply.answers.type = htons(0x0001);
-	d_reply.answers.ip_class = htons(0x0001);
-	//d_reply.answers.ttl = htonl(0x00000001);
-	d_reply.answers.ttl = htonl(0x00000000);
-	d_reply.answers.data_len = htons(0x0004);
-
-	char query_name[PATHLEN];
-	int len, i;
-
-	strncpy(query_name, line+sizeof(dns_header)+1, PATHLEN);
-	len = strlen(query_name);
-	for(i = 0; i < len; ++i)
-		if(query_name[i] < 32)
-			query_name[i] = '.';
-
-	if(!upper_strcmp(query_name, router_name)){
-#ifdef RTCONFIG_WIRELESSREPEATER
-		if(nvram_get_int("sw_mode") == SW_MODE_REPEATER && nvram_match("lan_proto", "dhcp") && nvram_get_int("lan_state_t") != LAN_STATE_CONNECTED)
-			d_reply.answers.addr = inet_addr_(nvram_default_get("lan_ipaddr"));
-		else
+void handle_dns_req(int sfd, unsigned char *request, int maxlen, struct sockaddr *pcliaddr, int clen){
+#if !defined(RTCONFIG_FINDASUS)
+	const static unsigned char auth_name_srv[] = {
+		0x00, 0x00, 0x06, 0x00, 0x01, 0x00,
+		0x00, 0x2a, 0x30, 0x00, 0x40, 0x01, 0x61, 0x0c,
+		0x72, 0x6f, 0x6f, 0x74, 0x2d, 0x73, 0x65, 0x72,
+		0x76, 0x65, 0x72, 0x73, 0x03, 0x6e, 0x65, 0x74,
+		0x00, 0x05, 0x6e, 0x73, 0x74, 0x6c, 0x64, 0x0c,
+		0x76, 0x65, 0x72, 0x69, 0x73, 0x69, 0x67, 0x6e,
+		0x2d, 0x67, 0x72, 0x73, 0x03, 0x63, 0x6f, 0x6d,
+		0x00, 0x78, 0x1b, 0x1a, 0xfd, 0x00, 0x00, 0x07,
+		0x08, 0x00, 0x00, 0x03, 0x84, 0x00, 0x09, 0x3a,
+		0x80, 0x00, 0x01, 0x51, 0x80
+	};
 #endif
-			d_reply.answers.addr = inet_addr_(nvram_safe_get("lan_ipaddr"));	// router's ip
+	unsigned char reply_content[MAXLINE], *ptr, *end;
+	char *nptr, *nend;
+	dns_header *d_req, *d_reply;
+	dns_queries queries;
+	dns_answer answer;
+	uint16_t opcode;
+
+	/* validation */
+	d_req = (dns_header *)request;
+	if (maxlen <= sizeof(dns_header) ||			/* incomplete header */
+	    d_req->flag_set.flag_num & htons(0x8000) ||		/* not query */
+	    d_req->questions == 0)				/* no questions */
+		return;
+	opcode = d_req->flag_set.flag_num & htons(0x7800);
+	ptr = request + sizeof(dns_header);
+	end = request + maxlen;
+
+	/* query, only first so far */
+	memset(&queries, 0, sizeof(queries));
+	nptr = queries.name;
+	nend = queries.name + sizeof(queries.name) - 1;
+	while (ptr < end) {
+		size_t len = *ptr++;
+		if (len > 63 || end - ptr < (len ? : 4))
+			return;
+		if (len == 0) {
+			memcpy(&queries.type, ptr, 2);
+			memcpy(&queries.ip_class, ptr + 2, 2);
+			ptr += 4;
+			break;
+		}
+		if (nptr < nend && *queries.name)
+			*nptr++ = '.';
+		if (nptr < nend)
+			nptr = stpncpy(nptr, (char *)ptr, min(len, nend - nptr));
+		ptr += len;
 	}
-	else
-		d_reply.answers.addr = htonl(0x0a000001);	// 10.0.0.1
+	if (queries.type == 0 || queries.ip_class == 0 || strlen(queries.name) > 1025)
+		return;
+	maxlen = ptr - request;
 
-	memcpy(reply_content+reply_size, &d_reply.answers, sizeof(d_reply.answers));
-	reply_size += sizeof(d_reply.answers);
+	/* reply */
+	if (maxlen > sizeof(reply_content))
+		return;
+	ptr = memcpy(reply_content, request, maxlen) + maxlen;
+	end = reply_content + sizeof(reply_content);
 
-	sendto(sfd, reply_content, reply_size, 0, pcliaddr, clen);
+	/* header */
+	d_reply = (dns_header *)reply_content;
+	d_reply->flag_set.flag_num = htons(0x8180);
+	d_reply->questions = htons(1);
+	d_reply->answer_rrs = htons(0);
+	d_reply->auth_rrs = htons(0);
+	d_reply->additional_rss = htons(0);
+
+	/* answer */
+	memset(&answer, 0, sizeof(answer));
+	answer.name = htons(0xc00c);
+	answer.type = queries.type;
+	answer.ip_class = queries.ip_class;
+	answer.ttl = htonl(0);
+	answer.data_len = htons(4);
+
+	sw_mode = nvram_get_int("sw_mode");
+	if (opcode != 0) {
+		/* not implemented, non-Query op */
+		d_reply->flag_set.flag_num = htons(0x8184) | opcode;
+	} else if (queries.ip_class == htons(1) && queries.type == htons(1)) {
+		/* class IN type A */
+		if (strcasecmp(queries.name, router_name) == 0
+#ifdef RTCONFIG_FINDASUS
+		 || strcasecmp(queries.name, "findasus.local") == 0
+#endif
+		) {
+			/* no error, authoritative */
+			d_reply->flag_set.flag_num = htons(0x8580);
+			d_reply->answer_rrs = htons(1);
+			if ((sw_mode == SW_MODE_REPEATER || ((sw_mode == SW_MODE_AP) && nvram_get_int("wlc_psta"))) && /* client mode */
+			    nvram_match("lan_proto", "dhcp") && nvram_get_int("lan_state_t") != LAN_STATE_CONNECTED)
+				answer.addr = inet_addr_(nvram_default_get("lan_ipaddr"));
+			else
+				answer.addr = inet_addr_(nvram_safe_get("lan_ipaddr"));
+#if !defined(RTCONFIG_FINDASUS)
+		} else if (strcasecmp(queries.name, "findasus.local") == 0) {
+			/* non existent domain */
+			d_reply->flag_set.flag_num = htons(0x8183);
+			d_reply->auth_rrs = htons(1);
+#endif
+		} else if (*queries.name) {
+			/* no error */
+			d_reply->answer_rrs = htons(1);
+			answer.addr = htonl(0x0a000001);	// 10.0.0.1
+		}
+	} else {
+		/* not implemented */
+		d_reply->flag_set.flag_num = htons(0x8184);
+	}
+
+	if (d_reply->answer_rrs) {
+		if (end - ptr < sizeof(answer))
+			return;
+		ptr = memcpy(ptr, &answer, sizeof(answer)) + sizeof(answer);
+	}
+#if !defined(RTCONFIG_FINDASUS)
+	if (d_reply->auth_rrs) {
+		if (end - ptr < sizeof(auth_name_srv))
+			return;
+		ptr = memcpy(ptr, auth_name_srv, sizeof(auth_name_srv)) + sizeof(auth_name_srv);
+	}
+#endif
+
+	sendto(sfd, reply_content, ptr - reply_content, 0, pcliaddr, clen);
 }
 
 void run_http_serv(int sockfd){
@@ -1325,18 +1369,14 @@ void run_http_serv(int sockfd){
 }
 
 void run_dns_serv(int sockfd){
-	int n;
-	char line[MAXLINE];
+	unsigned char line[MAXLINE];
 	struct sockaddr_in cliaddr;
-	unsigned int clilen = sizeof(cliaddr);
+	int n, clilen = sizeof(cliaddr);
 
-	memset(line, 0, MAXLINE);
-	memset(&cliaddr, 0, clilen);
-
-	if((n = recvfrom(sockfd, line, MAXLINE, 0, (struct sockaddr *)&cliaddr, &clilen)) == 0)	// client close
+	if((n = recvfrom(sockfd, line, MAXLINE, 0, (struct sockaddr *)&cliaddr, (socklen_t *)&clilen)) == 0)	// client close
 		return;
 	else if(n < 0){
-		perror("wanduck read");
+		perror("wanduck serv dns");
 		return;
 	}
 	else
