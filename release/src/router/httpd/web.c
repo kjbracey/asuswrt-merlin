@@ -10021,6 +10021,10 @@ get_nat_vserver_table(int eid, webs_t wp, int argc, char_t **argv)
 		}
 		if (str_escape_quotes(desc2, desc, sizeof(desc2)) == 0)
 			strlcpy(desc2, desc, sizeof(desc2));
+		if(strlen(desc2) > 36) {
+			strcpy(desc2 + 33, "...");
+			name[36] = '\0';
+		}
 
 		fwdfnd = 1;
 		ret += websWrite(wp,
