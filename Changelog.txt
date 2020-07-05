@@ -4,6 +4,12 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_44D8j9527  (1-July-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: webui: disable autologout for temp monitor
+- CHANGED: rc: (backport) rework dns stub CVE-2018-20336
+* FIXED: openvpn: fix removal of firewall rules on stop server/client
+
+
 374.43_44E7j9527  (27-June-2020) ARM SDK, MIPS,ARM KRACK
 - CHANGED: busybox: (backport) updated a few options to match upstream settings
 * CHANGED: webui: (backport) add support for default DST/TDT timezone change data
