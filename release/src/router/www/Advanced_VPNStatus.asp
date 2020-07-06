@@ -354,7 +354,8 @@ function parseStatus(text, block){
 		var label_order = [ 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 ];
 		var data_order = [ 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 ];
 		var table_length = staticstatsTableEntries.length;
-		for (i = 0; i < table_length; ++i)
+		var max_table_length = 10;
+		for (i = 0; i < max_table_length; ++i)
 		{
 			j = label_order[i];
 			k = data_order[i];
