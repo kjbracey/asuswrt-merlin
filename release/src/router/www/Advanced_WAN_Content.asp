@@ -333,6 +333,7 @@ if (!document.form.dnssec_strict_ckb.checked
 
 function display_upnp_range(){
 	$("upnp_secure_mode").style.display = (document.form.wan_upnp_enable[0].checked) ? "" : "none";
+	$("upnp_stun_enable").style.display = (document.form.wan_upnp_enable[0].checked) ? "" : "none";
 	$("upnp_range_int").style.display = (document.form.wan_upnp_enable[0].checked) ? "" : "none";
 	$("upnp_range_ext").style.display = (document.form.wan_upnp_enable[0].checked) ? "" : "none";
 	$("upnp_flush_leases").style.display = (document.form.wan_upnp_enable[0].checked) ? "" : "none";
@@ -1201,6 +1202,13 @@ function pass_checked(obj){
 									<td>
 										<input type="radio" name="upnp_secure" class="input" value="1" <% nvram_match_x("", "upnp_secure", "1", "checked"); %>><#checkbox_Yes#>
 										<input type="radio" name="upnp_secure" class="input" value="0" <% nvram_match_x("", "upnp_secure", "0", "checked"); %>><#checkbox_No#>
+									</td>
+							</tr>
+							<tr id="upnp_stun_enable">
+								<th>UPNP: Use STUN for external address</th>
+									<td>
+										<input type="radio" name="upnp_stun" class="input" value="1" <% nvram_match_x("", "upnp_stun", "1", "checked"); %>><#checkbox_Yes#>
+										<input type="radio" name="upnp_stun" class="input" value="0" <% nvram_match_x("", "upnp_stun", "0", "checked"); %>><#checkbox_No#>
 									</td>
 							</tr>
 							<tr id="upnp_range_int">

@@ -799,6 +799,7 @@ struct nvram_tuple router_defaults[] = {
 	// For miniupnpd, so far default value only
 	{ "upnp_enable", "1" },
 	{ "upnp_secure", "1" },
+	{ "upnp_stun", "0" },
 	{ "upnp_flush", "0" },
 	{ "upnp_port", "0" },
 	{ "upnp_ssdp_interval", "60" },

@@ -3718,6 +3718,9 @@ void start_upnp(void)
 
 				fprintf(f,
 					"ext_ifname=%s\n"
+					"ext_perform_stun=%s\n"
+					"ext_stun_host=stun.stunprotocol.org\n"
+					"ext_stun_port=3478\n"
 					"listening_ip=%s\n"
 					"port=%d\n"
 					"enable_upnp=%s\n"
@@ -3735,6 +3738,7 @@ void start_upnp(void)
 					"\n"
 					,
 					get_wan_ifname(wan_primary_ifunit()),
+					nvram_get_int("upnp_stun") ? "yes" : "no",	// upnp stun
 					nvram_safe_get("lan_ifname"),	// was lanip, lanmask,
 					upnp_port,
 					upnp_enable ? "yes" : "no",	// upnp enable
