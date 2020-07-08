@@ -550,7 +550,7 @@ static int add_filter_rule2(const char *ifname, const char *rhost, const char *i
 	iaddr = iaddr;
 	iport = iport;
 	desc = desc;
-	snprintf(buffer, sizeof(buffer), "/sbin/iptables -t filter -I INPUT -p %d --dport %hu -j ACCEPT", proto, eport);
+	snprintf(buffer, sizeof(buffer), "/usr/sbin/iptables -t filter -I INPUT -p %d --dport %hu -j ACCEPT", proto, eport);
 	printf("Executing: %s\n", buffer);
 	return system(buffer);
 }
@@ -559,7 +559,7 @@ static int delete_filter_rule(const char * ifname, unsigned short port, int prot
 {
 	char buffer[100];
 	ifname = ifname;
-	snprintf(buffer, sizeof(buffer), "/sbin/iptables -t filter -D INPUT -p %d --dport %hu -j ACCEPT", proto, port);
+	snprintf(buffer, sizeof(buffer), "/usr/sbin/iptables -t filter -D INPUT -p %d --dport %hu -j ACCEPT", proto, port);
 	printf("Executing: %s\n", buffer);
 	return system(buffer);
 }
