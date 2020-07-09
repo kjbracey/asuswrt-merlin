@@ -494,14 +494,13 @@ int perform_stun(const char *if_name, const char *if_addr, const char *stun_host
 		return -1;
 	}
 
-	*restrictive_nat = 0;
+	*restrictive_nat = (have_mapped_addr > 0) ? 0 : 1;
 
 	if (mapped_addrs_count < 4) {
 		/* We have not received all four responses,
 		 * therefore NAT or firewall is doing some filtering */
-		syslog(LOG_NOTICE, "%s: %d response out of 4 received",
+		syslog(LOG_DEBUG, "%s: %d response out of 4 received",
 		       "perform_stun", mapped_addrs_count);
-		*restrictive_nat = 1;
 	}
 
 	if (memcmp(&remote_addr, &peer_addrs[0], sizeof(peer_addrs[0])) != 0) {

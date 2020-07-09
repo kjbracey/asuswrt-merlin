@@ -1056,11 +1056,14 @@ int update_ext_ip_addr_from_stun(int init)
 
 	if ((init || disable_port_forwarding) && !restrictive_nat) {
 		if (addr_is_reserved(&if_addr))
-			syslog(LOG_INFO, "STUN: ext interface %s with IP address %s is now behind unrestricted NAT 1:1 with public IP address %s: Port forwarding is now enabled", ext_if_name, if_addr_str, ext_addr_str);
+			syslog(LOG_NOTICE, "STUN: ext interface %s with IP address %s is now behind public IP address %s: Port forwarding is now enabled", ext_if_name, if_addr_str, ext_addr_str);
 		else
-			syslog(LOG_INFO, "STUN: ext interface %s has now public IP address %s: Port forwarding is now enabled", ext_if_name, if_addr_str);
+			syslog(LOG_NOTICE, "STUN: ext interface %s with public IP address %s: Port forwarding is now enabled", ext_if_name, if_addr_str);
 	} else if ((init || !disable_port_forwarding) && restrictive_nat) {
-		syslog(LOG_WARNING, "STUN: ext interface %s with IP address %s is now behind restrictive NAT with public IP address %s: Port forwarding might not work properly", ext_if_name, if_addr_str, ext_addr_str);
+		if (addr_is_reserved(&if_addr))
+			syslog(LOG_WARNING, "STUN: ext interface %s with restrictive NAT IP address %s is now behind public IP address %s: Port forwarding is disabled", ext_if_name, if_addr_str, ext_addr_str);
+		else
+			syslog(LOG_NOTICE, "STUN: ext interface %s with restrictive NAT public IP address %s: Port forwarding is disabled", ext_if_name, if_addr_str);
 	} else {
 		syslog(LOG_INFO, "STUN: ... done");
 	}
