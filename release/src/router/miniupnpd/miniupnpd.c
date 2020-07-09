@@ -1120,6 +1120,7 @@ init(int argc, char * * argv, struct runtime_vars * v)
 	int i;
 	int pid;
 	int debug_flag = 0;
+	int log_level = -1;
 	int openlog_option;
 	struct in_addr addr;
 	struct sigaction sa;
@@ -1394,6 +1395,12 @@ init(int argc, char * * argv, struct runtime_vars * v)
 				}
 				break;
 #endif
+			case UPNPLOGLEVEL:
+				log_level = atoi(ary_options[i].value);
+				if (log_level > 7 || log_level < 0)
+					fprintf(stderr, "log_level must be between 0 and 7\n");
+				break;
+
 			default:
 				fprintf(stderr, "Unknown option in file %s\n",
 				        optionsfile);
@@ -1755,8 +1762,35 @@ init(int argc, char * * argv, struct runtime_vars * v)
 
 	if(!debug_flag)
 	{
-		/* speed things up and ignore LOG_INFO and LOG_DEBUG */
-		setlogmask(LOG_UPTO(LOG_NOTICE));
+		switch(log_level) {
+			case 7:
+				setlogmask(LOG_UPTO(LOG_DEBUG));
+				break;
+			case 6:
+				setlogmask(LOG_UPTO(LOG_INFO));
+				break;
+			case 5:
+				setlogmask(LOG_UPTO(LOG_NOTICE));
+				break;
+			case 4:
+				setlogmask(LOG_UPTO(LOG_WARNING));
+				break;
+			case 3:
+				setlogmask(LOG_UPTO(LOG_ERR));
+				break;
+			case 2:
+				setlogmask(LOG_UPTO(LOG_CRIT));
+				break;
+			case 1:
+				setlogmask(LOG_UPTO(LOG_ALERT));
+				break;
+			case 0:
+				setlogmask(LOG_UPTO(LOG_EMERG));
+				break;
+
+			default: /* default (-1) - speed things up and ignore LOG_INFO and LOG_DEBUG */
+				setlogmask(LOG_UPTO(LOG_NOTICE));
+		}
 	}
 
 	if(checkforrunning(pidfilename) < 0)

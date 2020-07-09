@@ -69,6 +69,7 @@ enum upnpconfigoptions {
 	UPNPQUICKRULES,			/* quickrules */
 #endif
 	UPNPSECUREMODE,			/* secure_mode */
+	UPNPLOGLEVEL,			/* syslog level */
 #ifdef ENABLE_LEASEFILE
 	UPNPLEASEFILE,			/* lease_file */
 #endif

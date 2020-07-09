@@ -97,7 +97,8 @@ static const struct {
 	{ UPNPFORCEIGDDESCV1, "force_igd_desc_v1"},
 #endif
 	{ UPNPMINISSDPDSOCKET, "minissdpdsocket"},
-	{ UPNPSECUREMODE, "secure_mode"}
+	{ UPNPSECUREMODE, "secure_mode"},
+	{ UPNPLOGLEVEL, "log_level"}
 };
 
 int
