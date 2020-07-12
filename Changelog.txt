@@ -4,6 +4,23 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_44EAj9527  (12-July-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: miniupnpd: (upstream) update upnpstun.c to 2.2RC1
+* CHANGED: miniupnpd: webui: rc: add support for stun resolve of external address
+* CHANGED: miniupnpd: allow port forwarding on any successful STUN server response
+* CHANGED: miniupnpd: add config file option to set log_level
+* CHANGED: miniupnpd: change default stun server to google
+* FIXED: miniupnpd: use correct path for iptables
+* FIXED: webui: fix openvpn stats for configs which do not return compression data
+* FIXED: rc: wan: avoid unnecessary upnp restart during boot
+
+
+374.43_44D9j9527  (06-July-2020) ARM SDK, MIPS,ARM KRACK
+- CHANGED: miniupnpd: (backport) update to 20190824; allow cgnat wan address
+* CHANGED: miniupnpc: update to 20200605 snapshot
+* CHANGED: webui: truncate long port forward descriptions with ellipsis
+
+
 374.43_44D8j9527  (1-July-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: webui: disable autologout for temp monitor
 - CHANGED: rc: (backport) rework dns stub CVE-2018-20336
