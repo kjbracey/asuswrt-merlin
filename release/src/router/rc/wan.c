@@ -2002,7 +2002,7 @@ int update_resolvconf(void)
 				if (i==unit) {
 					if (strcmp(word,"none"))
 						foreach(word, (*wan_dns ? wan_dns : wan_xdns), next)
-							fprintf(fp, "nameserver %s\n", word); 
+							fprintf(fp, "nameserver %s\n", word);
 				}
 				i++;
 			}
@@ -2059,7 +2059,7 @@ int update_resolvconf(void)
 #else
 	restart_dns();
 #endif
-	
+
 	return 0;
 }
 
@@ -2423,8 +2423,8 @@ wan_up(char *wan_ifname)	// oleg patch, replace
 	//add_iQosRules(wan_ifname);
 	start_iQos();
 
-	stop_upnp();
-	start_upnp();
+	if (!pids("miniupnpd") && nvram_get_int("ntp_sync"))
+		start_upnp();
 
 	stop_ddns();
 	start_ddns();
