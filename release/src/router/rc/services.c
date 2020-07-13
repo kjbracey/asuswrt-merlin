@@ -3719,8 +3719,8 @@ void start_upnp(void)
 				fprintf(f,
 					"ext_ifname=%s\n"
 					"ext_perform_stun=%s\n"
-					"ext_stun_host=stun.stunprotocol.org\n"
-					"ext_stun_port=3478\n"
+					"ext_stun_host=stun.l.google.com\n"
+					"ext_stun_port=19302\n"
 					"listening_ip=%s\n"
 					"port=%d\n"
 					"enable_upnp=%s\n"
