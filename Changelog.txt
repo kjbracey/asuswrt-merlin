@@ -4,6 +4,10 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_44EBj9527  (18-July-2020) ARM SDK, MIPS,ARM KRACK
+* FIXED:  webui: update state.js with fixed timezone test; remove local copy from Admin page
+
+
 374.43_44EAj9527  (12-July-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: miniupnpd: (upstream) update upnpstun.c to 2.2RC1
 * CHANGED: miniupnpd: webui: rc: add support for stun resolve of external address
