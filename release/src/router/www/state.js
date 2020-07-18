@@ -3119,12 +3119,10 @@ function switchType(obj, showText, chkBox){
 
 function corrected_timezone(){
 	var today = new Date();
+	var gmt_time = new RegExp("[\+\-]([0-9]{4})", "gi");
 	var StrIndex;
-	if(today.toString().lastIndexOf("-") > 0)
-		StrIndex = today.toString().lastIndexOf("-");
-	else if(today.toString().lastIndexOf("+") > 0)
-		StrIndex = today.toString().lastIndexOf("+");
 
+	StrIndex = today.toString().regexIndexOf(gmt_time);
 	if(StrIndex > 0){
 		if(timezone != today.toString().substring(StrIndex, StrIndex+5)){
 			$("timezone_hint_div").style.display = "";

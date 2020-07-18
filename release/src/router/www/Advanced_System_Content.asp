@@ -513,25 +513,6 @@ function done_validating(action){
 	refreshpage();
 }
 
-function corrected_timezone(){
-	var today = new Date();
-	var gmt_time = new RegExp("[\+\-]([0-9]{4})", "gi");
-	var StrIndex;
-
-	StrIndex = today.toString().regexIndexOf(gmt_time);
-	if(StrIndex > 0){
-		//alert('dstoffset='+dstoffset+', 設定時區='+timezone+' , 當地時區='+today.toString().substring(StrIndex, StrIndex+5))
-		if(timezone != today.toString().substring(StrIndex, StrIndex+5)){
-			$("timezone_hint").style.display = "block";
-			$("timezone_hint").innerHTML = "* <#LANHostConfig_x_TimeZone_itemhint#>";
-		}
-		else
-			return;
-	}
-	else
-		return;
-}
-
 function show_dst_chk(){
 	var tzdst = new RegExp("^[a-z]+[0-9\-\.:]+[a-z]+", "i");
 	// match "[std name][offset][dst name]"
@@ -1476,7 +1457,7 @@ function updateDateTime()
           				<select name="dst_end_h" class="input_option" onchange=""></select>&nbsp;hour &nbsp;
           				<br>
 			</span>
-            	<span id="timezone_hint" style="display:none;"></span>
+		  		<div id="timezone_hint_div" style="display:none;"><span id="timezone_hint"></span></div>
           	</div>
             </td>
         </tr>
