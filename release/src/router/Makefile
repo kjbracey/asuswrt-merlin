@@ -1033,13 +1033,17 @@ oldconfig oldconf: koldconf roldconf bboldconf
 #
 
 busybox: dummy
-	@$(MAKE) -C busybox EXTRA_CFLAGS="-fPIC $(EXTRACFLAGS)" $(PARALLEL_BUILD)
+	@$(MAKE) -C busybox $(PARALLEL_BUILD) \
+	EXTRA_CFLAGS="-fPIC $(EXTRACFLAGS) -I$(STAGEDIR)/usr/include -idirafter $(KDIR)/include \
+		$(if $(RTCONFIG_BWDPI),-DBWDPI_LOGWAR,)" \
+	EXTRA_LDFLAGS="-L$(STAGEDIR)/usr/lib"
 
 # V=1
 
 busybox-install:
 	rm -rf $(INSTALLDIR)/busybox
 	$(MAKE) -C busybox install EXTRA_CFLAGS="-fPIC $(EXTRACFLAGS)" CONFIG_PREFIX=$(INSTALLDIR)/busybox
+	chmod 4755 $(INSTALLDIR)/busybox/bin/busybox
 
 busybox-clean:
 	$(MAKE) -C busybox distclean
