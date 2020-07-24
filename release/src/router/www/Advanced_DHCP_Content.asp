@@ -110,12 +110,19 @@ function initial(){
 			}
 	}
 
-	if(mdns_force == "1"){
-		document.getElementById("mdns_select").style.display = "none";
-		document.getElementById("mdns_force").style.display = "";
-	}else{
-		document.getElementById("mdns_select").style.display = "";
-		document.getElementById("mdns_force").style.display = "none";
+	if(based_modelid == "RT-AC56U" || based_modelid == "RT-AC68U" || based_modelid == "RT-AC68U_V2"){
+		/* Enable avahi select for ARM routers */
+		document.getElementById("mdns_option").style.display = "";
+		if(mdns_force == "1"){
+			document.getElementById("mdns_select").style.display = "none";
+			document.getElementById("mdns_force").style.display = "";
+		}else{
+			document.getElementById("mdns_select").style.display = "";
+			document.getElementById("mdns_force").style.display = "none";
+		}
+	}
+	else{
+		document.getElementById("mdns_option").style.display = "none";
 	}
 
 	// aswild 2015.11
@@ -736,8 +743,8 @@ function check_vpn(){		//true: (DHCP ip pool & static ip ) conflict with VPN cli
 				</td>
 			  </tr>
 
-			  <tr>
-				<th>Enable multicast DNS (Avahi mDNS)</a></th>
+			  <tr id="mdns_option">
+				<th>Enable multicast DNS (Avahi mDNS)</th>
 				<td colspan="2" id="mdns_select">
 					<input type="radio" value="1" name="mdns_enable" class="content_input_fd" onclick="return change_common_radio(this, 'LANHostConfig', 'mdns_enable', '1')" <% nvram_match("mdns_enable", "1", "checked"); %> /><#checkbox_Yes#>
 					<input type="radio" value="0" name="mdns_enable" class="content_input_fd" onclick="return change_common_radio(this, 'LANHostConfig', 'mdns_enable', '0')" <% nvram_match("mdns_enable", "0", "checked"); %> /><#checkbox_No#>
