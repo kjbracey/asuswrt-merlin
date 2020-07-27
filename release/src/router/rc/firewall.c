@@ -628,6 +628,9 @@ int timematch_conv(char *mstr, char *nv_date, char *nv_time)
 	if (strncmp(date, "1111111", 7)==0 &&
 	    strncmp(time, "00002359", 8)==0) goto no_match;
 
+	memset(timestart, 0, sizeof(timestart));
+    memset(timestop, 0, sizeof(timestop));
+
 	i=0;
 	strncpy(timestart, time, 2);
 	i+=2;
@@ -737,6 +740,14 @@ int timematch_conv2(char *mstr, char *nv_date, char *nv_time, char *nv_time2)
 	for(i=0;i<=6;i++){
 		dow += (date[i]-'0') << (6-i);
 	}
+
+	// initialize
+	memset(datetime, 0, sizeof(datetime));
+	memset(timestart, 0, sizeof(timestart));
+    memset(timestop, 0, sizeof(timestop));
+    memset(timestart2, 0, sizeof(timestart2));
+    memset(timestop2, 0, sizeof(timestop2));
+
 	// weekdays time
 	strncpy(timestart, time, 4);
 	strncpy(timestop, time+4, 4);
@@ -744,8 +755,6 @@ int timematch_conv2(char *mstr, char *nv_date, char *nv_time, char *nv_time2)
 	strncpy(timestart2, time2, 4);
 	strncpy(timestop2, time2+4, 4);
 
-	// initialize
-	memset(datetime, 0, sizeof(datetime));
 	//cprintf("%s: dow=%d, timestart=%d, timestop=%d, timestart2=%d, timestop2=%d, sizeof(datetime)=%d\n", __FUNCTION__, dow, atoi(timestart), atoi(timestop), atoi(timestart2), atoi(timestop2), sizeof(datetime)); //tmp test
 
 	// Sunday
