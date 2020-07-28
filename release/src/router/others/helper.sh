@@ -4,7 +4,7 @@
 # For use with Postconf or addon scripts
 
 _quote() {
-	echo $1 | sed 's/[]\/$*.^|[]/\\&/g'
+	printf "%s\n" "$1" | sed 's/[]\/$*.^&[]/\\&/g'
 }
 
 # This function looks for a string, and inserts a specified string after it inside a given file
@@ -45,14 +45,17 @@ pc_delete() {
 # of the first available mount point, the filename your page is already using,
 # or "none" if there are no available mount points.
 am_get_webui_page() {
-	for i in 1 2 3 4 5 6 7 8 9 10; do
-		page="/www/user/user$i.asp"
-		if [ ! -f "$page" ] || [ "$(md5sum < "$1")" = "$(md5sum < "$page")" ]; then
-			am_webui_page="user$i.asp"
-			return
-		fi
-	done
-	am_webui_page="none"
+        am_webui_page="none"
+        # look for a match first in case the page is already there
+        for i in 1 2 3 4 5 6 7 8 9 10; do
+                page="/www/user/user$i.asp"
+                if [ -f "$page" ] && [ "$(md5sum < "$1")" = "$(md5sum < "$page")" ]; then
+                        am_webui_page="user$i.asp"
+                        return
+                elif [ "$am_webui_page" = "none" ] && [ ! -f "$page" ]; then
+                        am_webui_page="user$i.asp"
+                fi
+        done
 }
 
 
