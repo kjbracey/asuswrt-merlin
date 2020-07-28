@@ -4,12 +4,12 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; version 2 dated June, 1991, or
    (at your option) version 3 dated 29 June, 2007.
-
+ 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+     
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -86,16 +86,16 @@ static inline void add_attr(struct nlmsghdr *nlh, uint16_t type, size_t len, con
 void ipset_init(void)
 {
   old_kernel = (daemon->kernel_version < KERNEL_VERSION(2,6,32));
-
+  
   if (old_kernel && (ipset_sock = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) != -1)
     return;
-
-  if (!old_kernel &&
+  
+  if (!old_kernel && 
       (buffer = safe_malloc(BUFF_SZ)) &&
       (ipset_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_NETFILTER)) != -1 &&
       (bind(ipset_sock, (struct sockaddr *)&snl, sizeof(snl)) != -1))
     return;
-
+  
   die (_("failed to create IPset control socket: %s"), NULL, EC_MISC);
 }
 
@@ -107,25 +107,25 @@ static int new_add_to_ipset(const char *setname, const union all_addr *ipaddr, i
   uint8_t proto;
   int addrsz = (af == AF_INET6) ? IN6ADDRSZ : INADDRSZ;
 
-  if (strlen(setname) >= IPSET_MAXNAMELEN)
+  if (strlen(setname) >= IPSET_MAXNAMELEN) 
     {
       errno = ENAMETOOLONG;
       return -1;
     }
-
+  
   memset(buffer, 0, BUFF_SZ);
 
   nlh = (struct nlmsghdr *)buffer;
   nlh->nlmsg_len = NL_ALIGN(sizeof(struct nlmsghdr));
   nlh->nlmsg_type = (remove ? IPSET_CMD_DEL : IPSET_CMD_ADD) | (NFNL_SUBSYS_IPSET << 8);
   nlh->nlmsg_flags = NLM_F_REQUEST;
-
+  
   nfg = (struct my_nfgenmsg *)(buffer + nlh->nlmsg_len);
   nlh->nlmsg_len += NL_ALIGN(sizeof(struct my_nfgenmsg));
   nfg->nfgen_family = af;
   nfg->version = NFNETLINK_V0;
   nfg->res_id = htons(0);
-
+  
   proto = IPSET_PROTOCOL;
   add_attr(nlh, IPSET_ATTR_PROTOCOL, sizeof(proto), &proto);
   add_attr(nlh, IPSET_ATTR_SETNAME, strlen(setname) + 1, setname);
@@ -135,15 +135,15 @@ static int new_add_to_ipset(const char *setname, const union all_addr *ipaddr, i
   nested[1] = (struct my_nlattr *)(buffer + NL_ALIGN(nlh->nlmsg_len));
   nlh->nlmsg_len += NL_ALIGN(sizeof(struct my_nlattr));
   nested[1]->nla_type = NLA_F_NESTED | IPSET_ATTR_IP;
-  add_attr(nlh,
+  add_attr(nlh, 
 	   (af == AF_INET ? IPSET_ATTR_IPADDR_IPV4 : IPSET_ATTR_IPADDR_IPV6) | NLA_F_NET_BYTEORDER,
 	   addrsz, ipaddr);
   nested[1]->nla_len = (void *)buffer + NL_ALIGN(nlh->nlmsg_len) - (void *)nested[1];
   nested[0]->nla_len = (void *)buffer + NL_ALIGN(nlh->nlmsg_len) - (void *)nested[0];
-
+	
   while (retry_send(sendto(ipset_sock, buffer, nlh->nlmsg_len, 0,
 			   (struct sockaddr *)&snl, sizeof(snl))));
-
+								    
   return errno == 0 ? 0 : -1;
 }
 
@@ -165,13 +165,13 @@ static int old_add_to_ipset(const char *setname, const union all_addr *ipaddr, i
     uint16_t index;
     uint32_t ip;
   } req_adt;
-
-  if (strlen(setname) >= sizeof(req_adt_get.set.name))
+  
+  if (strlen(setname) >= sizeof(req_adt_get.set.name)) 
     {
       errno = ENAMETOOLONG;
       return -1;
     }
-
+  
   req_adt_get.op = 0x10;
   req_adt_get.version = 3;
   strcpy(req_adt_get.set.name, setname);
@@ -183,7 +183,7 @@ static int old_add_to_ipset(const char *setname, const union all_addr *ipaddr, i
   req_adt.ip = ntohl(ipaddr->addr4.s_addr);
   if (setsockopt(ipset_sock, SOL_IP, 83, &req_adt, sizeof(req_adt)) < 0)
     return -1;
-
+  
   return 0;
 }
 
@@ -203,8 +203,8 @@ int add_to_ipset(const char *setname, const union all_addr *ipaddr, int flags, i
 	  ret = -1;
 	}
     }
-
-  if (ret != -1)
+  
+  if (ret != -1) 
     ret = old_kernel ? old_add_to_ipset(setname, ipaddr, remove) : new_add_to_ipset(setname, ipaddr, af, remove);
 
   if (ret == -1)

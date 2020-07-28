@@ -58,7 +58,8 @@ int main (int argc, char **argv)
   char *bound_device = NULL;
   int did_bind = 0;
   struct server *serv;
-#endif
+  char *netlink_warn;
+#endif 
 #if defined(HAVE_DHCP) || defined(HAVE_DHCP6)
   struct dhcp_context *context;
   struct dhcp_relay *relay;
@@ -83,7 +84,7 @@ int main (int argc, char **argv)
   sigaction(SIGALRM, &sigact, NULL);
   sigaction(SIGCHLD, &sigact, NULL);
   sigaction(SIGINT, &sigact, NULL);
-
+  
   /* ignore SIGPIPE */
   sigact.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &sigact, NULL);
@@ -91,9 +92,9 @@ int main (int argc, char **argv)
   umask(022); /* known umask, create leases and pid files as 0644 */
 
   rand_init(); /* Must precede read_opts() */
-
+  
   read_opts(argc, argv, compile_opts);
-
+ 
 #ifdef HAVE_LINUX_NETWORK
   daemon->kernel_version = kernel_version();
 #endif
@@ -101,25 +102,25 @@ int main (int argc, char **argv)
   if (daemon->edns_pktsz < PACKETSZ)
     daemon->edns_pktsz = PACKETSZ;
 
-  /* Min buffer size: we check after adding each record, so there must be
+  /* Min buffer size: we check after adding each record, so there must be 
      memory for the largest packet, and the largest record so the
      min for DNS is PACKETSZ+MAXDNAME+RRFIXEDSZ which is < 1000.
-     This might be increased is EDNS packet size if greater than the minimum. */
+     This might be increased is EDNS packet size if greater than the minimum. */ 
   daemon->packet_buff_sz = daemon->edns_pktsz + MAXDNAME + RRFIXEDSZ;
   daemon->packet = safe_malloc(daemon->packet_buff_sz);
-
+  
   daemon->addrbuff = safe_malloc(ADDRSTRLEN);
   if (option_bool(OPT_EXTRALOG))
     daemon->addrbuff2 = safe_malloc(ADDRSTRLEN);
-
+  
 #ifdef HAVE_DNSSEC
   if (option_bool(OPT_DNSSEC_VALID))
     {
       /* Note that both /000 and '.' are allowed within labels. These get
 	 represented in presentation format using NAME_ESCAPE as an escape
-	 character when in DNSSEC mode.
+	 character when in DNSSEC mode. 
 	 In theory, if all the characters in a name were /000 or
-	 '.' or NAME_ESCAPE then all would have to be escaped, so the
+	 '.' or NAME_ESCAPE then all would have to be escaped, so the 
 	 presentation format would be twice as long as the spec.
 
 	 daemon->namebuff was previously allocated by the option-reading
@@ -327,7 +328,7 @@ int main (int argc, char **argv)
 #endif
 
 #if  defined(HAVE_LINUX_NETWORK)
-  netlink_init();
+  netlink_warn = netlink_init();
 #elif defined(HAVE_BSD_NETWORK)
   route_init();
 #endif
@@ -946,6 +947,9 @@ int main (int argc, char **argv)
 #  ifdef HAVE_LINUX_NETWORK
   if (did_bind)
     my_syslog(MS_DHCP | LOG_INFO, _("DHCP, sockets bound exclusively to interface %s"), bound_device);
+
+  if (netlink_warn)
+    my_syslog(LOG_WARNING, netlink_warn);
 #  endif
 
   /* after dhcp_construct_contexts */
@@ -1689,25 +1693,25 @@ static int set_dns_listeners(time_t now)
 	poll_listen(transfer->sockfd, POLLIN);
       }
 #endif
-
+  
   /* will we be able to get memory? */
   if (daemon->port != 0)
-    get_new_frec(now, &wait, 0);
-
+    get_new_frec(now, &wait, NULL);
+  
   for (serverfdp = daemon->sfds; serverfdp; serverfdp = serverfdp->next)
     poll_listen(serverfdp->fd, POLLIN);
-
+    
   if (daemon->port != 0 && !daemon->osport)
     for (i = 0; i < RANDOM_SOCKS; i++)
       if (daemon->randomsocks[i].refcount != 0)
 	poll_listen(daemon->randomsocks[i].fd, POLLIN);
-
+	  
   for (listener = daemon->listeners; listener; listener = listener->next)
     {
       /* only listen for queries if we have resources */
       if (listener->fd != -1 && wait == 0)
 	poll_listen(listener->fd, POLLIN);
-
+	
       /* death of a child goes through the select loop, so
 	 we don't need to explicitly arrange to wake up here */
       if  (listener->tcpfd != -1)
@@ -1807,54 +1811,55 @@ static void check_dns_listeners(time_t now)
 	     have no effect. This avoids two processes reading from the same
 	     netlink fd and screwing the pooch entirely.
 	  */
-
+ 
 	  enumerate_interfaces(0);
-
+	  
 	  if (option_bool(OPT_NOWILD))
 	    iface = listener->iface; /* May be NULL */
-	  else
+	  else 
 	    {
 	      int if_index;
 	      char intr_name[IF_NAMESIZE];
-
+	      
 	      /* if we can find the arrival interface, check it's one that's allowed */
 	      if ((if_index = tcp_interface(confd, tcp_addr.sa.sa_family)) != 0 &&
 		  indextoname(listener->tcpfd, if_index, intr_name))
 		{
 		  union all_addr addr;
-
+		  
 		  if (tcp_addr.sa.sa_family == AF_INET6)
 		    addr.addr6 = tcp_addr.in6.sin6_addr;
 		  else
 		    addr.addr4 = tcp_addr.in.sin_addr;
-
+		  
 		  for (iface = daemon->interfaces; iface; iface = iface->next)
-		    if (iface->index == if_index)
+		    if (iface->index == if_index &&
+		        iface->addr.sa.sa_family == tcp_addr.sa.sa_family)
 		      break;
-
+		  
 		  if (!iface && !loopback_exception(listener->tcpfd, tcp_addr.sa.sa_family, &addr, intr_name))
 		    client_ok = 0;
 		}
-
+	      
 	      if (option_bool(OPT_CLEVERBIND))
 		iface = listener->iface; /* May be NULL */
 	      else
 		{
 		  /* Check for allowed interfaces when binding the wildcard address:
-		     we do this by looking for an interface with the same address as
+		     we do this by looking for an interface with the same address as 
 		     the local address of the TCP connection, then looking to see if that's
 		     an allowed interface. As a side effect, we get the netmask of the
 		     interface too, for localisation. */
-
+		  
 		  for (iface = daemon->interfaces; iface; iface = iface->next)
 		    if (sockaddr_isequal(&iface->addr, &tcp_addr))
 		      break;
-
+		  
 		  if (!iface)
 		    client_ok = 0;
 		}
 	    }
-
+	  
 	  if (!client_ok)
 	    {
 	      shutdown(confd, SHUT_RDWR);
@@ -1868,31 +1873,30 @@ static void check_dns_listeners(time_t now)
 	      else
 		{
 		  int i;
+#ifdef HAVE_LINUX_NETWORK
+		  /* The child process inherits the netlink socket, 
+		     which it never uses, but when the parent (us) 
+		     uses it in the future, the answer may go to the 
+		     child, resulting in the parent blocking
+		     forever awaiting the result. To avoid this
+		     the child closes the netlink socket, but there's
+		     a nasty race, since the parent may use netlink
+		     before the child has done the close.
+		     
+		     To avoid this, the parent blocks here until a 
+		     single byte comes back up the pipe, which
+		     is sent by the child after it has closed the
+		     netlink socket. */
+		  
+		  unsigned char a;
+		  read_write(pipefd[0], &a, 1, 1);
+#endif
 
 		  for (i = 0; i < MAX_PROCS; i++)
 		    if (daemon->tcp_pids[i] == 0 && daemon->tcp_pipes[i] == -1)
 		      {
-			char a;
-			(void)a; /* suppress potential unused warning */
-
 			daemon->tcp_pids[i] = p;
 			daemon->tcp_pipes[i] = pipefd[0];
-#ifdef HAVE_LINUX_NETWORK
-			/* The child process inherits the netlink socket,
-			   which it never uses, but when the parent (us)
-			   uses it in the future, the answer may go to the
-			   child, resulting in the parent blocking
-			   forever awaiting the result. To avoid this
-			   the child closes the netlink socket, but there's
-			   a nasty race, since the parent may use netlink
-			   before the child has done the close.
-
-			   To avoid this, the parent blocks here until a
-			   single byte comes back up the pipe, which
-			   is sent by the child after it has closed the
-			   netlink socket. */
-			retry_send(read(pipefd[0], &a, 1));
-#endif
 			break;
 		      }
 		}
@@ -1924,16 +1928,16 @@ static void check_dns_listeners(time_t now)
 		 terminate the process. */
 	      if (!option_bool(OPT_DEBUG))
 		{
-		  char a = 0;
-		  (void)a; /* suppress potential unused warning */
+#ifdef HAVE_LINUX_NETWORK
+		  /* See comment above re: netlink socket. */
+		  unsigned char a = 0;
+
+		  close(daemon->netlinkfd);
+		  read_write(pipefd[1], &a, 1, 0);
+#endif		  
 		  alarm(CHILD_LIFETIME);
 		  close(pipefd[0]); /* close read end in child. */
 		  daemon->pipe_to_parent = pipefd[1];
-#ifdef HAVE_LINUX_NETWORK
-		  /* See comment above re netlink socket. */
-		  close(daemon->netlinkfd);
-		  retry_send(write(pipefd[1], &a, 1));
-#endif
 		}
 
 	      /* start with no upstream connections. */
@@ -1960,8 +1964,10 @@ static void check_dns_listeners(time_t now)
 		    shutdown(s->tcpfd, SHUT_RDWR);
 		    close(s->tcpfd);
 		  }
+	      
 	      if (!option_bool(OPT_DEBUG))
 		{
+		  close(daemon->pipe_to_parent);
 		  flush_log();
 		  _exit(0);
 		}
@@ -2121,5 +2127,4 @@ int delay_dhcp(time_t start, int sec, int fd, uint32_t addr, unsigned short id)
 
   return 0;
 }
-#endif
-
+#endif /* HAVE_DHCP */

@@ -40,9 +40,11 @@
 #define DHCP_PACKET_MAX 16384 /* hard limit on DHCP packet size */
 #define SMALLDNAME 50 /* most domain names are smaller than this */
 #define CNAME_CHAIN 10 /* chains longer than this atr dropped for loop protection */
+#define DNSSEC_MIN_TTL 60 /* DNSKEY and DS records in cache last at least this long */
 #define HOSTSFILE "/etc/hosts"
 #define ETHERSFILE "/etc/ethers"
-#define DEFLEASE 3600 /* default lease time, 1 hour */
+#define DEFLEASE 3600 /* default DHCPv4 lease time, one hour */
+#define DEFLEASE6 (3600*24) /* default lease time for DHCPv6. One day. */
 #define CHUSER "nobody"
 #define CHGRP "dip"
 #define TFTP_MAX_CONNECTIONS 50 /* max simultaneous connections */
@@ -152,8 +154,6 @@ NO_INOTIFY
    with something like "make COPTS=-DNO_SCRIPT" will do the trick.
 NO_GMP
    Don't use and link against libgmp, Useful if nettle is built with --enable-mini-gmp.
-NO_GOST
-   Disable DNSSEC GOST algo support.
 
 LEASEFILE
 CONFFILE
@@ -195,6 +195,7 @@ RESOLVFILE
 /* #define HAVE_LIBIDN2 */
 /* #define HAVE_CONNTRACK */
 /* #define HAVE_DNSSEC */
+
 
 /* Default locations for important system files. */
 

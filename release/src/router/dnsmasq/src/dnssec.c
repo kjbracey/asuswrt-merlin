@@ -995,27 +995,27 @@ int dnssec_validate_ds(time_t now, struct dns_header *header, size_t plen, char 
   else
     {
       int flags = F_FORWARD | F_DS | F_NEG | F_DNSSECOK;
-
+            
       if (RCODE(header) == NXDOMAIN)
 	flags |= F_NXDOMAIN;
-
-      /* We only cache validated DS records, DNSSECOK flag hijacked
+      
+      /* We only cache validated DS records, DNSSECOK flag hijacked 
 	 to store presence/absence of NS. */
       if (nons)
 	flags &= ~F_DNSSECOK;
-
+      
       cache_start_insert();
-
+	  
       /* Use TTL from NSEC for negative cache entries */
       if (!cache_insert(name, NULL, class, now, neg_ttl, flags))
 	return STAT_BOGUS;
-
-      cache_end_insert();
-
-      log_query(F_NOEXTRA | F_UPSTREAM, name, NULL, "no DS");
+      
+      cache_end_insert();  
+      
+      log_query(F_NOEXTRA | F_UPSTREAM, name, NULL, nons ? "no DS/cut" : "no DS");
     }
 
-  insecure_count = 0;
+  insecure_count = 0;      
   return STAT_OK;
 }
 

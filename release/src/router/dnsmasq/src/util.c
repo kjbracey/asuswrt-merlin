@@ -830,10 +830,10 @@ int kernel_version(void)
   struct utsname utsname;
   int version;
   char *split;
-
+  
   if (uname(&utsname) < 0)
     die(_("failed to find kernel version: %s"), NULL, EC_MISC);
-
+  
   split = strtok(utsname.release, ".");
   version = (split ? atoi(split) : 0);
   split = strtok(NULL, ".");
