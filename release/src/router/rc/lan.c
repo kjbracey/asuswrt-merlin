@@ -3365,6 +3365,8 @@ void lanaccess_wl(void)
 	}
 #endif
 	setup_leds();   // Refresh LED state if in Stealth Mode
+
+	run_custom_script("lan-start", NULL);
 }
 
 void update_vpn_state(void)
