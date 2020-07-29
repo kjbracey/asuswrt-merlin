@@ -347,7 +347,7 @@ function Ctrl_LANIPList(obj){
 <input type="hidden" name="modified" value="0">
 <input type="hidden" name="action_mode" value="apply_new">
 <input type="hidden" name="action_wait" value="60">
-<input type="hidden" name="action_script" value="restart_net">
+<input type="hidden" name="action_script" value="restart_allnet">
 <input type="hidden" name="first_time" value="">
 <input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get("preferred_lang"); %>">
 <input type="hidden" name="firmver" value="<% nvram_get("firmver"); %>">
