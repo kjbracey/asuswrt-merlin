@@ -640,7 +640,7 @@ const char *get_wan6face(void)
 	}
 
 	if (!ipv6_enabled())
-		return "";
+		return "\0";
 }
 
 int update_6rd_info(void)
