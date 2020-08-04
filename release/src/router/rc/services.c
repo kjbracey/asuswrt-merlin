@@ -4427,7 +4427,7 @@ start_services(void)
 	start_samba();	// We might need it for wins/browsing services
 #endif
 
-	run_custom_script("services-start", NULL);
+	run_custom_script_blocking("services-start", NULL, NULL);
 
 	return 0;
 }
@@ -4450,7 +4450,7 @@ void
 stop_services(void)
 {
 
-	run_custom_script("services-stop", NULL);
+	run_custom_script_blocking("services-stop", NULL, NULL);
 
 #ifdef RTCONFIG_WEBDAV
 	stop_webdav();
@@ -4864,7 +4864,7 @@ again:
 		g_reboot = 1;
 		nvram_set("login_ip_restart", nvram_safe_get("login_ip"));  //save ip initiating reboot
 		nvram_commit();
-		run_custom_script("services-stop", NULL);
+		run_custom_script_blocking("services-stop", NULL, NULL);
 		stop_wan();
 #ifdef RTCONFIG_USB
 		if (get_model() == MODEL_RTN53){
@@ -4890,7 +4890,7 @@ again:
 	}
 	else if (strcmp(script, "resetdefault") == 0) {
 		g_reboot = 1;
-		run_custom_script("services-stop", NULL);
+		run_custom_script_blocking("services-stop", NULL, NULL);
 		stop_wan();
 #ifdef RTCONFIG_USB
 		if (get_model() == MODEL_RTN53){
@@ -4920,7 +4920,7 @@ again:
 		if(action&RC_SERVICE_STOP) {
 			nvram_set("login_ip_restart", nvram_safe_get("login_ip"));  //save ip initiating upgrade
 			nvram_commit();
-			run_custom_script("services-stop", NULL);
+			run_custom_script_blocking("services-stop", NULL, NULL);
 #ifdef RTCONFIG_WIRELESSREPEATER
 		if(nvram_get_int("sw_mode") == SW_MODE_REPEATER)
 			stop_wlcconnect();
