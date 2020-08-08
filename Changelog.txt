@@ -4,6 +4,29 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_45D4j9527  (8-August-2020) ARM SDK, MIPS,ARM KRACK
+* NEW: lan: add support for lan-start custom script
+* CHANGED: services: change services-start, services-stop to blocking scripts
+* CHANGED: services: kill watchdog02 during reboot
+* FIXED: ipv6: return null instead of empty string when wan6 interface disabled
+
+
+374.43_45D3j9527  (28-July-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: dnsmasq: update to 2.82
+* CHANGED: webui: restart_allnet instead off restart_net when changing static routes
+- FIXED: other: fix am_get_webui_page() returning new mount point before matching existing file
+* FIXED: webui: hide disable avahi option on mips routers
+* FIXED: firewall: properly initialize start and stop vars for nsf
+* FIXED: ddns: check certificate when updating googledns
+
+
+374.43_45D2j9527  (20-July-2020) ARM SDK, MIPS,ARM KRACK
+- CHANGED: make: dnsmasq: add default edns_pktsz
+- CHANGED: busybox: sync config options with merlin
+- CHANGED: make: busybox: update build recipe; set permissions on install
+* CHANGED: build: arm: enable proc_page_monitor for top memory report
+
+
 374.43_44EBj9527  (18-July-2020) ARM SDK, MIPS,ARM KRACK
 * FIXED:  webui: update state.js with fixed timezone test; remove local copy from Admin page
 
