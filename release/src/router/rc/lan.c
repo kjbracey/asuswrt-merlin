@@ -314,6 +314,11 @@ GEN_CONF:
 			eval("wl", "-i", ifname, "txbf_imp", "1");	// driver default setting
 		else
 			eval("wl", "-i", ifname, "txbf_imp", "0");
+
+		if (nvram_match(strcat_r(prefix, "obss_coex", tmp), "1"))
+			eval("wl", "-i", ifname, "obss_coex", "1");
+		else
+			eval("wl", "-i", ifname, "obss_coex", "0");
 #endif
 #else
 // Disabled since we are still using 5.100
@@ -708,7 +713,7 @@ void wlconf_pre()
 void wlconf_post(const char *ifname)
 {
 	int unit = -1;
-	char prefix[] = "wlXXXXXXXXXX_";
+	char tmp[100], prefix[] = "wlXXXXXXXXXX_";
 
 	if (ifname == NULL) return;
 
@@ -719,7 +724,6 @@ void wlconf_post(const char *ifname)
 	snprintf(prefix, sizeof(prefix), "wl%d_", unit);
 
 #ifdef RTAC66U
-	char tmp[100];
 	if (!strcmp(ifname, "eth2")) {
 		if (nvram_match(strcat_r(prefix, "country_code", tmp), "Q2") &&
 			nvram_match(strcat_r(prefix, "country_rev", tmp), "33"))
@@ -737,6 +741,7 @@ void wlconf_post(const char *ifname)
 #ifdef RTCONFIG_BCMWL6
 	if (is_ure(unit))
 		eval("wl", "-i", (char *) ifname, "allmulti", "1");
+	eval("wl", "-i", ifname, "obss_coex", nvram_get(strcat_r(prefix, "obss_coex", tmp)));
 #endif
 
 #ifdef RTCONFIG_BCM_7114

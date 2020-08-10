@@ -467,6 +467,7 @@ set40M_Channel_2G(char *channel)
 	eval("wlconf", "eth1", "down" );
 	eval("wlconf", "eth1", "up" );
 	eval("wlconf", "eth1", "start" );
+	eval("wl", "-i", "eth1", "obss_coex", "0");  //workaround auto bandwidth bug
 	puts("1");
 	return 1;
 }
@@ -498,6 +499,7 @@ set40M_Channel_5G(char *channel)
 	eval("wlconf", "eth2", "down" );
 	eval("wlconf", "eth2", "up" );
 	eval("wlconf", "eth2", "start" );
+	eval("wl", "-i", "eth2", "obss_coex", "0");  //workaround auto bandwidth bug
 	puts("1");
 	return 1;
 }
@@ -528,6 +530,7 @@ set80M_Channel_5G(char *channel)
 	eval("wlconf", "eth2", "down" );
 	eval("wlconf", "eth2", "up" );
 	eval("wlconf", "eth2", "start" );
+	eval("wl", "-i", "eth2", "obss_coex", "0");  //workaround auto bandwidth bug
 	puts("1");
 	return 1;
 }
