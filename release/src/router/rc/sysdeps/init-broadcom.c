@@ -4315,7 +4315,7 @@ void generate_wl_para(int unit, int subunit)
 		else if (nvram_match(strcat_r(prefix, "bw", tmp), "1"))		// 20M
 		{
 			nvram_set(strcat_r(prefix, "bw_cap", tmp), "1");
-			nvram_set(strcat_r(prefix, "obss_coex", tmp), "1");
+			nvram_set(strcat_r(prefix, "obss_coex", tmp), "0");
 		}
 		else if (nvram_match(strcat_r(prefix, "bw", tmp), "2"))		// 40M
 		{
