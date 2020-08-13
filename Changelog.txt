@@ -4,6 +4,12 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_45D5j9527  (13-August-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: getdns: (upstream) Issue #430 listeners reply returned wireformat
+* CHANGED: wl: don't set obss_coex for fixed 20M bandwidth
+* FIXED: wl: workaround auto bandwidth bug in wireless bringup
+
+
 374.43_45D4j9527  (8-August-2020) ARM SDK, MIPS,ARM KRACK
 * NEW: lan: add support for lan-start custom script
 * CHANGED: services: change services-start, services-stop to blocking scripts
