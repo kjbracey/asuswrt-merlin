@@ -25,7 +25,9 @@ function initial(){
 	wlstatus = '<pre>' + wlstatus.replace(/[\n]/g, '<br />');
 	wlstatus = wlstatus.replace(/<client>/g, '<span style=\"color:#58FA58;\">');
 	wlstatus = wlstatus.replace(/<eclient>/g, '</span>');
-	wlstatus = wlstatus.replace(/<guest>/g, '<span style=\"color:#FFCC00;\">');
+	wlstatus = wlstatus.replace(/<guest1>/g, '<span style=\"color:#FFCC00;\">');
+	wlstatus = wlstatus.replace(/<guest2>/g, '<span style=\"color:#88FEFE;\">');
+	wlstatus = wlstatus.replace(/<guest3>/g, '<span style=\"color:#33CCFF;\">');
 	wlstatus = wlstatus.replace(/<eguest>/g, '</span>');
 	$('wltext').innerHTML = wlstatus;
 	show_menu();	

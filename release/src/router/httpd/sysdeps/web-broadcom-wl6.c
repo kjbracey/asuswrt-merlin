@@ -1261,6 +1261,7 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 	char tmp[128], prefix[] = "wlXXXXXXXXXX_";
 	char *name;
 	char name_vif[] = "wlX.Y_XXXXXXXXXX";
+	char subunit[] = "GGGGGGYYYYG";
 	struct maclist *auth, *assoc, *authorized;
 	int max_sta_count, maclist_size;
 	int i, j, val = 0, ret = 0;
@@ -1573,6 +1574,7 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 		if (nvram_match(strcat_r(prefix, "bss_enabled", tmp), "1"))
 		{
 			sprintf(name_vif, "wl%d.%d", unit, i);
+			sprintf(subunit, "<guest%d>", i);
 
 			/* query wl for authenticated sta list */
 			strcpy((char*)auth, "authe_sta_list");
@@ -1591,7 +1593,7 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 
 			for (ii = 0; ii < auth->count; ii++) {
 
-				ret += websWrite(wp, "%s%-18s", "<guest>", ether_etoa((void *)&auth->ea[ii], ea));
+				ret += websWrite(wp, "%s%-18s", subunit, ether_etoa((void *)&auth->ea[ii], ea));
 
 				found = 0;
 				if (arplist) {
@@ -1708,9 +1710,9 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 					}
 				}
 
-				ret += websWrite(wp, "%s%s%s%s\n",
+				ret += websWrite(wp, "%s%s%s%d%s\n",
 					(is_associated ? "A" : " "),
-					(is_authorized ? "U" : " "), "G", "<eguest>");  // Add guest flag
+					(is_authorized ? "U" : " "), "G", i, "<eguest>");  // Add guest flag
 			}
 		}
 	}
