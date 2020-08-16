@@ -220,18 +220,23 @@ then
 		logger -t "openvpn-updown" "Removed ISP DNS rules for non-VPN clients"
 	fi
 
+	vpn_off=$(nvram get vpn_client${instance}_off)
+	vpn_force=$(nvram get vpn_client${instance}_enforce)
 	if [ $ipv6_enabled == 1 ]
 	then
-#		/usr/sbin/ip6tables -D INPUT -i $lan_if -p tcp -m tcp --dport 53 -j REJECT
-#		/usr/sbin/ip6tables -D INPUT -i $lan_if -p udp -m udp --dport 53 -j REJECT
-#		/usr/sbin/ip6tables -D FORWARD -i $lan_if -p tcp -m tcp --dport 53 -j REJECT
-#		/usr/sbin/ip6tables -D FORWARD -i $lan_if -p udp -m udp --dport 53 -j REJECT
-		/usr/sbin/ip6tables -D FORWARD -i $lan_if -o $ipv6_if -j REJECT
-		if [ $vpn_block_ipv6 != 1 ]
+		if [ $vpn_force == 0 ] || [ $vpn_force == 2 -a $vpn_off == 1 ]
 		then
-#			logger -t "openvpn-updown" "Removed IPv6 DNS blocking"
-#		else
-			logger -t "openvpn-updown" "Removed IPv6 blocking"
+#			/usr/sbin/ip6tables -D INPUT -i $lan_if -p tcp -m tcp --dport 53 -j REJECT
+#			/usr/sbin/ip6tables -D INPUT -i $lan_if -p udp -m udp --dport 53 -j REJECT
+#			/usr/sbin/ip6tables -D FORWARD -i $lan_if -p tcp -m tcp --dport 53 -j REJECT
+#			/usr/sbin/ip6tables -D FORWARD -i $lan_if -p udp -m udp --dport 53 -j REJECT
+			/usr/sbin/ip6tables -D FORWARD -i $lan_if -o $ipv6_if -j REJECT
+			if [ $vpn_block_ipv6 != 1 ]
+			then
+#				logger -t "openvpn-updown" "Removed IPv6 DNS blocking"
+#			else
+				logger -t "openvpn-updown" "Removed IPv6 blocking"
+			fi
 		fi
 	fi
 fi

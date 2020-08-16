@@ -1011,6 +1011,7 @@ function defaultSettings() {
 <input type="hidden" name="dnsfilter_enable_x" value="<% nvram_get("dnsfilter_enable_x"); %>">
 <input type="hidden" name="vpn_reverse_strict" value="<% nvram_get("vpn_reverse_strict"); %>">
 <input type="hidden" name="vpn_client_enabled" value="<% nvram_get("vpn_client_enabled"); %>">
+<input type="hidden" name="vpn_client_off" value="<% nvram_get("vpn_client_off"); %>">
 
 <table class="content" align="center" cellpadding="0" cellspacing="0">
   <tr>
@@ -1073,6 +1074,7 @@ function defaultSettings() {
 										return true;
 									 },
 									 function() {
+										document.form.vpn_client_off.value = 1;
 										document.form.action_wait.value = 15;
 										document.form.action_script.value = "stop_vpnclient" + openvpn_unit;
 										document.form.showloading_x.value = (document.form.showloading_x.value == "1") ? "0" : "1";

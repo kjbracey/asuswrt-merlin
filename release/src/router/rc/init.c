@@ -1040,6 +1040,8 @@ restore_defaults(void)
 	nvram_set("vpn_client1_enabled", "0");
 	nvram_set("vpn_client2_enabled", "0");
 	nvram_set("vpn_clientx_enabled", "0");
+	nvram_set("vpn_client1_off", "0");
+	nvram_set("vpn_client2_off", "0");
 	nvram_set("vpn_client1_block", "0");
 	nvram_set("vpn_client2_block", "0");
 

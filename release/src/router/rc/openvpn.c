@@ -525,6 +525,8 @@ void start_vpnclient(int clientNum)
 	// Start the VPN client
 	sprintf(&buffer[0], "vpn_client%d_enabled", clientNum);
 	nvram_set(&buffer[0], "1");
+	sprintf(&buffer[0], "vpn_client%d_off", clientNum);
+	nvram_set(&buffer[0], "0");
 	sprintf(&buffer[0], "vpn_clientx_enabled");
 	nvram_set_int(&buffer[0], (nvram_get_int(&buffer[0])+1));
 #ifdef RTCONFIG_BCMARM
@@ -595,13 +597,14 @@ void stop_vpnclient(int clientNum)
 
 	// Stop the VPN client
 	vpnlog(VPN_LOG_EXTRA,"Stopping OpenVPN client.");
-	sprintf(&buffer[0], "vpn_client%d_enabled", clientNum);
-	nvram_set(&buffer[0], "0");
-	sprintf(&buffer[0], "vpn_clientx_enabled");
-	nvram_set_int(&buffer[0], (nvram_get_int(&buffer[0])-1));
 	sprintf(&buffer[0], "vpnclient%d", clientNum);
-	if ( !ovpn_waitfor(&buffer[0]) )
+	if ( !ovpn_waitfor(&buffer[0]) ) {
 		vpnlog(VPN_LOG_EXTRA,"OpenVPN client stopped.");
+		sprintf(&buffer[0], "vpn_client%d_enabled", clientNum);
+		nvram_set(&buffer[0], "0");
+		sprintf(&buffer[0], "vpn_clientx_enabled");
+		nvram_set_int(&buffer[0], (nvram_get_int(&buffer[0])-1));
+	}
 
 	// NVRAM setting for device type could have changed, just try to remove both
 	vpnlog(VPN_LOG_EXTRA,"Removing VPN device.");
@@ -661,6 +664,9 @@ void stop_vpnclient(int clientNum)
 
 	//update_resolvconf();	//dnsmasq handled in updown.sh
 	//start_dnsmasq(0);
+
+	// Setup client routing in case some are set to be blocked when tunnel is down
+	update_vpnrouting(clientNum);
 
 	vpnlog(VPN_LOG_INFO,"VPN GUI client backend stopped.");
 }
@@ -1668,13 +1674,14 @@ void stop_vpnserver(int serverNum)
 
 	// Stop the VPN server
 	vpnlog(VPN_LOG_EXTRA,"Stopping OpenVPN server.");
-	sprintf(&buffer[0], "vpn_server%d_enabled", serverNum);
-	nvram_set(&buffer[0], "0");
-	sprintf(&buffer[0], "vpn_serverx_enabled");
-	nvram_set_int(&buffer[0], (nvram_get_int(&buffer[0])-1));
 	sprintf(&buffer[0], "vpnserver%d", serverNum);
-	if ( !ovpn_waitfor(&buffer[0]) )
+	if ( !ovpn_waitfor(&buffer[0]) ) {
 		vpnlog(VPN_LOG_EXTRA,"OpenVPN server stopped.");
+		sprintf(&buffer[0], "vpn_server%d_enabled", serverNum);
+		nvram_set(&buffer[0], "0");
+		sprintf(&buffer[0], "vpn_serverx_enabled");
+		nvram_set_int(&buffer[0], (nvram_get_int(&buffer[0])-1));
+	}
 
 	// NVRAM setting for device type could have changed, just try to remove both
 	vpnlog(VPN_LOG_EXTRA,"Removing VPN device.");

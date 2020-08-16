@@ -107,6 +107,7 @@ then
 	VPN_REDIR=$(nvram get vpn_client1_rgw)
 	VPN_FORCE=$(nvram get vpn_client1_enforce)
 	VPN_ENABLED=$(nvram get vpn_client1_enabled)
+	VPN_OFF=$(nvram get vpn_client1_off)
 	VPN_INSTANCE=1
 
 elif [ "$dev" == "tun12" ]
@@ -116,6 +117,7 @@ then
 	VPN_REDIR=$(nvram get vpn_client2_rgw)
 	VPN_FORCE=$(nvram get vpn_client2_enforce)
 	VPN_ENABLED=$(nvram get vpn_client2_enabled)
+	VPN_OFF=$(nvram get vpn_client2_off)
 	VPN_INSTANCE=2
 else
 	run_custom_script
@@ -139,7 +141,7 @@ then
 
 	if [ "$VPN_REDIR" == "2" ]
 	then
-		if [ "$VPN_FORCE" == "1" -o "$VPN_FORCE" == "2" -a "$VPN_ENABLED" == "1" ]
+		if [ "$VPN_FORCE" == "1" ] || [ "$VPN_FORCE" == "2" -a "$VPN_OFF" == "0" ]
 		then
 			init_table
 			logger -t "openvpn-routing" "Tunnel down - VPN client access blocked"
@@ -172,7 +174,7 @@ then
 
 	if [ "$VPN_REDIR" == "2" ]
 	then
-		if [ "$VPN_FORCE" == "1" -o "$VPN_FORCE" == "2" -a "$VPN_ENABLED" == "1" ]
+		if [ "$VPN_FORCE" == "1" ] || [ "$VPN_FORCE" == "2" -a "$VPN_OFF" == "0" ]
 		then
 			logger -t "openvpn-routing" "Tunnel down - VPN client access blocked"
 			ip route change prohibit default table $VPN_TBL
@@ -219,7 +221,7 @@ then
 		else
 			logger -t "openvpn-routing" "WARNING: no VPN gateway provided, routing might not work properly!"
 		fi
-		
+
 		if [ "$trusted_ip" != "" ]
 		then
 			logger -t "openvpn-routing" "VPN WAN address is $trusted_ip"
