@@ -4,6 +4,11 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_45E6j9527  (16-August-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: webui: color code each guest wireless network in wireless log
+* FIXED: openvpn: fix kill switch (block routed clients)
+
+
 374.43_45D5j9527  (13-August-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: getdns: (upstream) Issue #430 listeners reply returned wireformat
 * CHANGED: wl: don't set obss_coex for fixed 20M bandwidth
