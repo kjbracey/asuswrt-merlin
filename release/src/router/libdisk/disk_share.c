@@ -1690,7 +1690,7 @@ extern int add_account(const char *const account, const char *const password){
 	acc_num = nvram_get_int("acc_num");
 	if(acc_num < 0)
 		acc_num = 0;
-	if(acc_num >= MAX_ACCOUNT_NUM){
+	if(acc_num > MAX_ACCOUNT_NUM){
 		usb_dbg("Too many accounts are created.\n");
 		return -1;
 	}

@@ -462,7 +462,7 @@ function resultOfSwitchWanStatus(){
 
 function onEvent(){
 	// account action buttons
-	if(get_manage_type(PROTOCOL) == 1 && accounts.length < 6){
+	if(get_manage_type(PROTOCOL) == 1 && accounts.length <= 15){
 		changeActionButton($("createAccountBtn"), 'User', 'Add', 0);
 
 		$("createAccountBtn").onclick = function(){
@@ -481,7 +481,7 @@ function onEvent(){
 		$("createAccountBtn").onclick = function(){};
 		$("createAccountBtn").onmouseover = function(){};
 		$("createAccountBtn").onmouseout = function(){};
-		$("createAccountBtn").title = (accounts.length < 6)?"<#AddAccountTitle#>":"<#account_overflow#>";
+		$("createAccountBtn").title = (accounts.length <= 15)?"<#AddAccountTitle#>":"<#account_overflow#>";
 	}
 
 	if(this.accounts.length > 0 && this.selectedAccount != null && this.selectedAccount.length > 0 && this.accounts[0] != this.selectedAccount){
