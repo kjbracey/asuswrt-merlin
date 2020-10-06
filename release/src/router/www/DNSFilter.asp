@@ -133,6 +133,8 @@ function gen_modeselect(name, value, onchange){
 //	code +='<option value="2"'+(value == 2 ? "selected" : "")+'>Norton Safe</option>';
 //	code +='<option value="3"'+(value == 3 ? "selected" : "")+'>Norton Family</option>';
 //	code +='<option value="4"'+(value == 4 ? "selected" : "")+'>Norton Children</option>';
+	code +='<option value="19"'+(value == 19 ? "selected" : "")+'>Adguard Default</option>';
+	code +='<option value="20"'+(value == 20 ? "selected" : "")+'>Adguard Family</option>';
 	code +='<option value="5"'+(value == 5 ? "selected" : "")+'>Yandex Safe</option>';
 	code +='<option value="6"'+(value == 6 ? "selected" : "")+'>Yandex Family</option>';
 	code +='<option value="12"'+(value == 12? "selected" : "")+'>Comodo Secure DNS</option>';
@@ -434,6 +436,8 @@ function changeRow_main(r){
 <!--							<option value="2" <% nvram_match("dnsfilter_mode", "2", "selected"); %>>Norton Safe</option> -->
 <!--							<option value="3" <% nvram_match("dnsfilter_mode", "3", "selected"); %>>Norton Family</option> -->
 <!--							<option value="4" <% nvram_match("dnsfilter_mode", "4", "selected"); %>>Norton Children</option> -->
+							<option value="19" <% nvram_match("dnsfilter_mode", "19", "selected"); %>>Adguard Default</option>
+							<option value="20" <% nvram_match("dnsfilter_mode", "20", "selected"); %>>Adguard Family</option>
 							<option value="5" <% nvram_match("dnsfilter_mode", "5", "selected"); %>>Yandex Safe</option>
 							<option value="6" <% nvram_match("dnsfilter_mode", "6", "selected"); %>>Yandex Family</option>
 							<option value="12" <% nvram_match("dnsfilter_mode", "12", "selected"); %>>Comodo Secure DNS</option>
