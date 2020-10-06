@@ -4,6 +4,18 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_45E8j9527  (6-October-2020) ARM SDK, MIPS,ARM KRACK
+- CHANGED: (backport) masquerade all client outbound traffic regardless of source subnet
+- CHANGED: rc: (backport) suppress logging of failed modprobes
+* CHANGED: dnsfilter: add adguard servers
+* CHANGED: stubby: update resolvers csv with adguard changes (20201006)
+* CHANGED: openssl11: update to 1.1.1h
+
+
+374.43_45D7j9527  (25-August-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: aidisk: increase max number of samba/ftp user accounts to 15
+
+
 374.43_45E6j9527  (16-August-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: webui: color code each guest wireless network in wireless log
 * FIXED: openvpn: fix kill switch (block routed clients)
