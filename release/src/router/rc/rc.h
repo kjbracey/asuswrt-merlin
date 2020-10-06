@@ -540,7 +540,7 @@ extern int start_ots(void);
 // common.c
 extern in_addr_t inet_addr_(const char *cp);	// oleg patch
 extern void usage_exit(const char *cmd, const char *help) __attribute__ ((noreturn));
-#define modprobe(mod, args...) ({ char *argv[] = { "modprobe", "-s", mod, ## args, NULL }; _eval(argv, NULL, 0, NULL); })
+#define modprobe(mod, args...) ({ char *argv[] = { "modprobe", "-q", "-s", mod, ## args, NULL }; _eval(argv, NULL, 0, NULL); })
 extern int modprobe_r(const char *mod);
 #define xstart(args...)	_xstart(args, NULL)
 extern int _xstart(const char *cmd, ...);
