@@ -384,6 +384,7 @@ obj-$(RTCONFIG_SSH) += dropbear
 #obj-$(RTCONFIG_ZEBRA) += zebra
 #	obj-$(RTCONFIG_IPP2P) += ipp2p
 obj-$(RTCONFIG_LZO) += lzo
+obj-$(RTCONFIG_OPENVPN) += lz4
 obj-$(RTCONFIG_OPENVPN) += openpam
 obj-$(RTCONFIG_OPENVPN) += openvpn
 obj-$(RTCONFIG_OPENVPN) += ministun
@@ -2869,6 +2870,15 @@ lzo-install: lzo
 	$(STRIP) $(INSTALLDIR)/lzo/usr/lib/liblzo2.so.2
 	cd $(INSTALLDIR)/lzo/usr/lib && ln -sf liblzo2.so.2 liblzo2.so
 
+lz4:
+	$(MAKE) -C $@ $(PARALLEL_BUILD)
+
+lz4-install:
+	install -D lz4/lib/liblz4.so.1.9.2 $(INSTALLDIR)/lz4/usr/lib/liblz4.so.1.9.2
+	$(STRIP) $(INSTALLDIR)/lz4/usr/lib/liblz4.so.1.9.2
+	cd $(INSTALLDIR)/lz4/usr/lib && ln -sf liblz4.so.1.9.2 liblz4.so.1
+	cd $(INSTALLDIR)/lz4/usr/lib && ln -sf liblz4.so.1.9.2 liblz4.so
+
 openpam: openpam/Makefile
 	$(MAKE) -C $@ $(PARALLEL_BUILD) && $(MAKE) $@-stage
 
@@ -2897,8 +2907,14 @@ openvpn/Makefile:
 	OPENSSL_CFLAGS="-I$(TOP)/openssl-1.1/include" \
 	OPENSSL_LIBS="-L$(TOP)/openssl-1.1 -lssl -lcrypto" \
 	CFLAGS="-O3 -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -I$(TOP)/openssl-1.1/include/openssl $(if $(RTCONFIG_BCMARM),,-std=gnu99)" \
-	LDFLAGS="$(EXTRALDFLAGS) -L$(TOP)/nvram$(BCMEX) -lnvram -L$(TOP)/shared -lshared $(if $(RTCONFIG_QTN),-L$(TOP)/libqcsapi_client -lqcsapi_client) $(if $(RTCONFIG_HTTPS),-L$(TOP)/openssl-1.1 -lssl -lcrypto) -L$(TOP)/zlib -lz -lpthread -ldl -L$(TOP)/lzo/src/.libs -L$(TOP)/openpam/lib/libpam/.libs -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	CPPFLAGS="-I$(TOP)/lzo/include -I$(TOP)/openssl-1.1/include -I$(TOP)/openpam/include -I$(TOP)/shared -I$(SRCBASE)/include" \
+	LIBPAM_CFLAGS="-I$(TOP)/openpam/include" \
+	LIBPAM_LIBS="-L$(TOP)/openpam/lib/libpam/.libs -lpam" \
+	LZO_CFLAGS="-I$(TOP)/lzo/include" \
+	LZO_LIBS="-L$(TOP)/lzo/src/.libs -llzo2" \
+	LZ4_CFLAGS="-I$(TOP)/lz4/lib" \
+	LZ4_LIBS="-L$(TOP)/lz4/lib -llz4" \
+	LDFLAGS="$(EXTRALDFLAGS) -L$(TOP)/nvram$(BCMEX) -lnvram -L$(TOP)/shared -lshared $(if $(RTCONFIG_HTTPS),-L$(TOP)/openssl-1.1 -lssl -lcrypto) -L$(TOP)/zlib -lz -lpthread -ldl -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	IPROUTE="/usr/sbin/ip" IFCONFIG="/sbin/ifconfig" ROUTE="/sbin/route" \
 	$(CONFIGURE) --prefix=/usr --bindir=/usr/sbin --libdir=/usr/lib  --enable-iproute2 \
 	--disable-debug --enable-management \
