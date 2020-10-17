@@ -2600,7 +2600,7 @@ zlib/stamp-h1:
 	touch $@
 
 zlib: zlib/stamp-h1
-	@$(MAKE) -C zlib CC=$(CC) AR="ar rc" RANLIB=$(RANLIB) LD=$(LD) all $(PARALLEL_BUILD)
+	@$(MAKE) -C zlib CC=$(CC) AR="ar" RANLIB=$(RANLIB) LD=$(LD) all $(PARALLEL_BUILD)
 
 zlib-clean:
 	-@$(MAKE) -C zlib clean
