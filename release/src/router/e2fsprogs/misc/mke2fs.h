@@ -25,3 +25,6 @@ extern int int_log10(unsigned long long arg);
 
 /* mk_hugefiles.c */
 extern errcode_t mk_hugefiles(ext2_filsys fs, const char *device_name);
+
+
+
