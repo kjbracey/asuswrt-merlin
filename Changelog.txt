@@ -4,6 +4,14 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_45E9j9527  (17-October-2020) ARM SDK, MIPS,ARM KRACK
+- CHANGED: nano: update to 5.2
+- CHANGED: curl: update to 7.72.0
+- CHANGED: zlib: update to 1.2.11
+- CHANGED: e2fsprogs: update to 1.45.6
+* CHANGED: e2fsprogs: define missing ULLONG_MAX on mips (from nano)
+
+
 374.43_45E8j9527  (6-October-2020) ARM SDK, MIPS,ARM KRACK
 - CHANGED: (backport) masquerade all client outbound traffic regardless of source subnet
 - CHANGED: rc: (backport) suppress logging of failed modprobes
