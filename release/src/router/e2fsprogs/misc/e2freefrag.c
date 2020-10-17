@@ -48,6 +48,34 @@ extern int optind;
 #define PATH_MAX 4096
 #endif
 
+#ifndef LLONG_MIN
+# if defined LONG_LONG_MIN /* HP-UX 11.31 */
+#  define LLONG_MIN LONG_LONG_MIN
+# elif defined LONGLONG_MIN /* IRIX 6.5 */
+#  define LLONG_MIN LONGLONG_MIN
+# elif defined __GNUC__
+#  define LLONG_MIN (- __LONG_LONG_MAX__ - 1LL)
+# endif
+#endif
+#ifndef LLONG_MAX
+# if defined LONG_LONG_MAX /* HP-UX 11.31 */
+#  define LLONG_MAX LONG_LONG_MAX
+# elif defined LONGLONG_MAX /* IRIX 6.5 */
+#  define LLONG_MAX LONGLONG_MAX
+# elif defined __GNUC__
+#  define LLONG_MAX __LONG_LONG_MAX__
+# endif
+#endif
+#ifndef ULLONG_MAX
+# if defined ULONG_LONG_MAX /* HP-UX 11.31 */
+#  define ULLONG_MAX ULONG_LONG_MAX
+# elif defined ULONGLONG_MAX /* IRIX 6.5 */
+#  define ULLONG_MAX ULONGLONG_MAX
+# elif defined __GNUC__
+#  define ULLONG_MAX (__LONG_LONG_MAX__ * 2ULL + 1ULL)
+# endif
+#endif
+
 static void usage(const char *prog)
 {
 	fprintf(stderr, "usage: %s [-c chunksize in kb] [-h] "
