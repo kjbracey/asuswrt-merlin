@@ -2595,7 +2595,7 @@ endif
 
 zlib/stamp-h1:
 	cd zlib && \
-	CC=$(CC) AR="ar rc" RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS) -fPIC" LDSHAREDLIBC="$(EXTRALDFLAGS)" \
+	CC=$(CC) AR="ar" RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS) -fPIC" LDSHAREDLIBC="$(EXTRALDFLAGS)" \
 	./configure --shared --prefix=/usr --libdir=/usr/lib
 	touch $@
 
