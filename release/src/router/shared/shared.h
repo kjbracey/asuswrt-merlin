@@ -17,6 +17,7 @@
 
 #include <sys/stat.h>
 #include <ftw.h>
+#include "network_utility.h"
 
 #ifdef RTCONFIG_PUSH_EMAIL
 #define logmessage logmessage_push

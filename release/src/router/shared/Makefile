@@ -54,6 +54,7 @@ endif
 CFLAGS += -DTRAFFIC_MGMT
 
 OBJS = shutils.o linux_timer.o defaults.o model.o rtstate.o boardapi.o
+OBJS += network_utility.o
 OBJS += misc.o version.o files.o strings.o process.o 
 OBJS += bin_sem_asus.o semaphore.o pids.o notify_rc.o discover.o
 OBJS += base64.o
