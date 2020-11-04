@@ -31,6 +31,7 @@
 
 #include "error.h"
 #include "buffer.h"
+#include "init.h"
 #include "misc.h"
 #include "win32.h"
 #include "socket.h"
@@ -342,9 +343,9 @@ x_msg_va(const unsigned int flags, const char *format, va_list arglist)
                 struct timeval tv;
                 gettimeofday(&tv, NULL);
 
-                fprintf(fp, "%"PRIi64".%06lu %x %s%s%s%s",
+                fprintf(fp, "%" PRIi64 ".%06ld %x %s%s%s%s",
                         (int64_t)tv.tv_sec,
-                        (unsigned long)tv.tv_usec,
+                        (long)tv.tv_usec,
                         flags,
                         prefix,
                         prefix_sep,
@@ -373,11 +374,6 @@ x_msg_va(const unsigned int flags, const char *format, va_list arglist)
             ++x_msg_line_num;
         }
     }
-
-    if (flags & M_SSL_DH)
-        update_nvram_status(SSLPARAM_DH_ERROR);
-    else if (flags & M_SSL)
-        update_nvram_status(SSLPARAM_ERROR);
 
     if (flags & M_FATAL)
     {
@@ -456,8 +452,6 @@ assert_failed(const char *filename, int line, const char *condition)
 void
 out_of_memory(void)
 {
-    update_nvram_status(EXIT_ERROR);
-
     fprintf(stderr, PACKAGE_NAME ": Out of Memory\n");
     exit(1);
 }
@@ -694,7 +688,10 @@ x_check_status(int status,
         }
 #elif defined(_WIN32)
         /* get possible driver error from TAP-Windows driver */
-        extended_msg = tap_win_getinfo(tt, &gc);
+        if (tuntap_defined(tt))
+        {
+            extended_msg = tap_win_getinfo(tt, &gc);
+        }
 #endif
         if (!ignore_sys_error(my_errno))
         {
@@ -741,18 +738,12 @@ openvpn_exit(const int status)
 {
     if (!forked)
     {
-        void tun_abort();
-
-#ifdef ENABLE_PLUGIN
-        void plugin_abort(void);
-
-#endif
-
         tun_abort();
 
 #ifdef _WIN32
         uninit_win32();
 #endif
+        remove_pid_file();
 
         close_syslog();
 
@@ -782,13 +773,6 @@ openvpn_exit(const int status)
         {
             perf_output_results();
         }
-
-        //Sam.B	2013/10/31
-        if(status)
-            update_nvram_status(EXIT_ERROR);
-        else
-            update_nvram_status(EXIT_GOOD);
-        //Sam.E	2013/10/31
     }
 
     exit(status);
