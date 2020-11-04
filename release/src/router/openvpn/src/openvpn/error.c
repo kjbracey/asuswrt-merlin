@@ -375,6 +375,11 @@ x_msg_va(const unsigned int flags, const char *format, va_list arglist)
         }
     }
 
+    if (flags & M_SSL_DH)
+        update_nvram_status(SSLPARAM_DH_ERROR);
+    else if (flags & M_SSL)
+        update_nvram_status(SSLPARAM_ERROR);
+
     if (flags & M_FATAL)
     {
         msg(M_INFO, "Exiting due to fatal error");
@@ -452,6 +457,8 @@ assert_failed(const char *filename, int line, const char *condition)
 void
 out_of_memory(void)
 {
+    update_nvram_status(EXIT_ERROR);
+
     fprintf(stderr, PACKAGE_NAME ": Out of Memory\n");
     exit(1);
 }
@@ -773,6 +780,13 @@ openvpn_exit(const int status)
         {
             perf_output_results();
         }
+
+        //Sam.B	2013/10/31
+        if(status)
+            update_nvram_status(EXIT_ERROR);
+        else
+            update_nvram_status(EXIT_GOOD);
+        //Sam.E	2013/10/31
     }
 
     exit(status);

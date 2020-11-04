@@ -11,6 +11,7 @@
 #include "syshead.h"
 #include "error.h"
 #include "misc.h"
+#include "status.h"
 #include "run_command.h"
 #include "lladdr.h"
 
@@ -25,6 +26,14 @@ set_lladdr(const char *ifname, const char *lladdr,
     {
         return -1;
     }
+
+    //Sam.B      2013/10/31
+    if(current_addr(inet_addr(lladdr))) {
+        msg (M_WARN, "ifconfig params '%s' conflicted", lladdr);
+        update_nvram_status(ADDR_CONFLICTED);
+        return -1;
+    }
+    //Sam.E      2013/10/31
 
 #if defined(TARGET_LINUX)
 #ifdef ENABLE_IPROUTE
