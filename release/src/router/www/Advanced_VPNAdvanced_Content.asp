@@ -1317,6 +1317,7 @@ function defaultSettings() {
 												<option value="0" <% nvram_match("vpn_server_hmac","0","selected"); %> >Incoming Auth (0)</option>
 												<option value="1" <% nvram_match("vpn_server_hmac","1","selected"); %> >Outgoing Auth (1)</option>
 												<option value="3" <% nvram_match("vpn_server_hmac","3","selected"); %> >Encrypt channel</option>
+												<option value="4" <% nvram_match("vpn_server_hmac","4","selected"); %> >Encrypt channel V2</option>
 										</select>
 										<span id="tlscrypt_24_warn"><br>The exported client ovpn file will require OpenVPN 2.4.0 or newer.</span>
 			   							</td>

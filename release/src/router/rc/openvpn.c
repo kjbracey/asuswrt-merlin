@@ -331,6 +331,8 @@ void start_vpnclient(int clientNum)
 		{
 			if (nvi == 3)
 				fprintf(fp, "tls-crypt static.key");
+			else if (nvi == 4)
+				fprintf(fp, "tls-crypt-v2 static.key");
 			else
 				fprintf(fp, "tls-auth static.key");
 
@@ -1112,6 +1114,8 @@ void start_vpnserver(int serverNum)
 		{
 			if (nvi == 3)
 				fprintf(fp, "tls-crypt static.key");
+			else if (nvi == 4)
+				fprintf(fp, "tls-crypt-v2 static.key");
 			else
 				fprintf(fp, "tls-auth static.key");
 
@@ -1510,6 +1514,8 @@ void start_vpnserver(int serverNum)
 		if(cryptMode == TLS)
 			if (nvi == 3)
 				fprintf(fp_client, "<tls-crypt>\n");
+			else if (nvi == 4)
+				fprintf(fp_client, "<tls-crypt-v2>\n");
 			else
 				fprintf(fp_client, "<tls-auth>\n");
 		else if(cryptMode == SECRET)
@@ -1521,6 +1527,8 @@ void start_vpnserver(int serverNum)
 		if(cryptMode == TLS) {
 			if (nvi == 3)
 				fprintf(fp_client, "</tls-crypt>\n");
+			else if (nvi == 4)
+				fprintf(fp_client, "<tls-crypt-v2>\n");
 			else
 				fprintf(fp_client, "</tls-auth>\n");
 

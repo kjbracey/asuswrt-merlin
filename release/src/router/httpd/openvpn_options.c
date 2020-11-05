@@ -559,6 +559,24 @@ add_option (char *p[], int line, int unit)
 			return VPN_UPLOAD_NEED_STATIC;
 		}
 	}
+	else if (streq (p[0], "tls-crypt-v2") && p[1])
+	{
+		if (streq (p[1], INLINE_FILE_TAG) && p[2])
+		{
+			sprintf(buf, "vpn_crt_client%d_static", unit);
+			write_encoded_crt(buf, strstr(p[2], "-----BEGIN"));
+			sprintf(buf, "vpn_client%d_hmac", unit);
+			nvram_set(buf, "4");	//Enable tls-crypt-v2
+		}
+		else
+		{
+			if(p[2]) {
+				sprintf(buf, "vpn_client%d_hmac", unit);
+				nvram_set(buf, p[2]);
+			}
+			return VPN_UPLOAD_NEED_STATIC;
+		}
+	}
 	else if (streq (p[0], "secret") && p[1])
 	{
 		sprintf(buf, "vpn_client%d_crypt", unit);
