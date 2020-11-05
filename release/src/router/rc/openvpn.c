@@ -267,7 +267,7 @@ void start_vpnclient(int clientNum)
 		sprintf(&buffer[0], "vpn_client%d_ncp_ciphers", clientNum);
 		strlcpy(buffer2, nvram_safe_get(&buffer[0]), sizeof (buffer2));
 		if ((nvi > 0) && (buffer2[0] != '\0')) {
-			fprintf(fp, "ncp-ciphers %s\n", buffer2);
+			fprintf(fp, "data-ciphers %s\n", buffer2);
 		} else {
 			fprintf(fp, "ncp-disable\n");
 			nvi = 0;
@@ -279,7 +279,7 @@ void start_vpnclient(int clientNum)
 	if (nvi != 2) {
 		sprintf(&buffer[0], "vpn_client%d_cipher", clientNum);
 		if ( !nvram_contains_word(&buffer[0], "default") )
-			fprintf(fp, "cipher %s\n", nvram_safe_get(&buffer[0]));
+			fprintf(fp, "data-ciphers-fallback %s\n", nvram_safe_get(&buffer[0]));
 	}
 
 	sprintf(&buffer[0], "vpn_client%d_digest", clientNum);
@@ -921,8 +921,8 @@ void start_vpnserver(int serverNum)
 		sprintf(&buffer[0], "vpn_server%d_ncp_ciphers", serverNum);
 		strlcpy(buffer2, nvram_safe_get(&buffer[0]), sizeof (buffer2));
 		if ((nvi > 0) && (buffer2[0] != '\0')) {
-			fprintf(fp, "ncp-ciphers %s\n", buffer2);
-			fprintf(fp_client, "ncp-ciphers %s\n", buffer2);
+			fprintf(fp, "data-ciphers %s\n", buffer2);
+			fprintf(fp_client, "data-ciphers %s\n", buffer2);
 		} else {
 			fprintf(fp, "ncp-disable\n");
 			nvi = 0;
@@ -933,8 +933,8 @@ void start_vpnserver(int serverNum)
 	if (nvi != 2) {
 		sprintf(&buffer[0], "vpn_server%d_cipher", serverNum);
 		if ( !nvram_contains_word(&buffer[0], "default") ) {
-			fprintf(fp, "cipher %s\n", nvram_safe_get(&buffer[0]));
-			fprintf(fp_client, "cipher %s\n", nvram_safe_get(&buffer[0]));
+			fprintf(fp, "data-ciphers-fallback %s\n", nvram_safe_get(&buffer[0]));
+			fprintf(fp_client, "data-ciphers-fallback %s\n", nvram_safe_get(&buffer[0]));
 		}
  	}
 
@@ -1496,7 +1496,7 @@ void start_vpnserver(int serverNum)
 		else
 		{	//generate openvpn static key
 			sprintf(fpath, "/etc/openvpn/server%d/static.key", serverNum);
-			eval("openvpn", "--genkey", "--secret", fpath);
+			eval("openvpn", "--genkey", "secret", fpath);
 			fp = fopen(fpath, "r");
 			if(fp) {
 				set_crt_parsed(&buffer[0], fpath);
