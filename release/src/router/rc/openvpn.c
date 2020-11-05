@@ -250,7 +250,7 @@ void start_vpnclient(int clientNum)
 	sprintf(&buffer[0], "vpn_client%d_comp", clientNum);
 	strlcpy(buffer2, nvram_safe_get(&buffer[0]), sizeof (buffer2));
 	if (strcmp(buffer2, "-1")) {
-		if (!strcmp(buffer2, "lz4") || !strcmp(buffer2, "lz4-v2")) {
+		if (!strcmp(buffer2, "lz4") || !strcmp(buffer2, "lz4-v2") || !strcmp(buffer2, "stub") || !strcmp(buffer2, "stub-v2")) {
 			fprintf(fp, "compress %s\n", buffer2);
 		} else if (!strcmp(buffer2, "yes")) {
 			fprintf(fp, "compress lzo\n");
@@ -952,7 +952,7 @@ void start_vpnserver(int serverNum)
 	strlcpy(buffer2, nvram_safe_get(&buffer[0]), sizeof (buffer2));
 
 	if (strcmp(buffer2, "-1")) {
-		if (!strcmp(buffer2, "lz4") || !strcmp(buffer2, "lz4-v2")) {
+		if (!strcmp(buffer2, "lz4") || !strcmp(buffer2, "lz4-v2") || !strcmp(buffer2, "stub") || !strcmp(buffer2, "stub-v2")) {
 			fprintf(fp, "compress %s\n", buffer2);
 			fprintf(fp_client, "compress %s\n", buffer2);
 		} else if (!strcmp(buffer2, "yes")) {

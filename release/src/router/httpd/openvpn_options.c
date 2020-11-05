@@ -434,6 +434,10 @@ add_option (char *p[], int line, int unit)
 				nvram_set(buf, "lz4");
 			else if (streq (p[1], "lz4-v2"))
 				nvram_set(buf, "lz4-v2");
+			else if (streq (p[1], "stub"))
+				nvram_set(buf, "stub");
+			else if (streq (p[1], "stub-v2"))
+				nvram_set(buf, "stub-v2");
 		} else {
 			nvram_set(buf, "no");
 		}

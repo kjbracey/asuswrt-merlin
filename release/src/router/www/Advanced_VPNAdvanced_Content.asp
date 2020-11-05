@@ -1447,6 +1447,8 @@ function defaultSettings() {
 												<option value="adaptive" <% nvram_match("vpn_server_comp","adaptive","selected"); %> > LZO Adaptive</option>
 												<option value="lz4" <% nvram_match("vpn_server_comp","lz4","selected"); %> >LZ4</option>
 												<option value="lz4-v2" <% nvram_match("vpn_server_comp","lz4-v2","selected"); %> >LZ4-V2</option>
+												<option value="stub" <% nvram_match("vpn_server_comp","stub","selected"); %> >Stub</option>
+												<option value="stub-v2" <% nvram_match("vpn_server_comp","stub-v2","selected"); %> >Stub-V2</option>
 											</select>
 											<span id="comp_24_warn"><br>The exported client ovpn file will require OpenVPN 2.4.0 or newer.</span>
 			   							</td>
