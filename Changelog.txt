@@ -4,6 +4,11 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_45EBj9527  (8-November-2020) ARM SDK, MIPS,ARM KRACK
+* FIXED: webui: suppress ntp server sync reminder when ntp_update disabled
+* FIXED: e2fsprogs: revert mke2fs.conf.in due to unsupported 64bit and metadata_csum options for ext4
+
+
 374.43_45EAj9527  (29-October-2020) ARM SDK, MIPS,ARM KRACK
 - CHANGED: webui: (backport) increase number of addons mount points to 20
 - CHANGED: shared: (backport) add shared network_utility functions
