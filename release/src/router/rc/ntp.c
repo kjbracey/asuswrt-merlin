@@ -203,6 +203,7 @@ int ntp_main(int argc, char *argv[])
 		{ //handle manual setting of time
 			nvram_set("ntp_ready", "1");
 			nvram_set("ntp_sync", "1");
+			nvram_set("svc_ready", "1");
 			nvram_set("ntp_server_tried", "none");
 			stop_ntpc();
 		}
