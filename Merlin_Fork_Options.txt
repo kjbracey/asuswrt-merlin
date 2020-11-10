@@ -250,19 +250,6 @@ Set NTP alternate time server
                                 A value of '0' disables NTP updates and the time must be set manually (Update-16)
 
 ----------------------------------------------------------------------------------------------------------------
-Special support for Private Internet Access (PIA) OpenVPN Client
-
-        Can be set in gui:      Yes (Administration/System/NTP Server (Alternate))
-        Enable via NVRAM:       N/A (see pia_openvpn_options.zip in the download directory)
-
-        Routers Supported:      All
-        Released:               Update-16
-        Reboot Required:        No
-        Notes:                  You can now set cipher, authentication and encryption options via the router as you would
-                                  using the PIA app.
-                                You need to add a line to the custom config section and replace the ca with a new cert
-                                  (included in the zip) in addition to setting the appropriate OpenVPN options.
-----------------------------------------------------------------------------------------------------------------
 Set number of threads for NVS server
 
         Can be set in gui:      No
@@ -426,6 +413,9 @@ Move certs from NVRAM to JFFS
                                 To move the SSH (dropbear certs), enter
                                 sshd2jffs or
                                 sshd2nvram
+								When moving the SSH keys to jffs (sshd2jffs), the data is normally copied from the default nvram variables.
+                                Using 'sshd2jffs copyall' will initialize jffs reading the data from the internal system directory and force
+                                  a replacement of the keys during the next boot.
 
                                 To move the OpenVPN certs, enter
                                 ovpn2jffs  [server1|server2|client1|client2] or
