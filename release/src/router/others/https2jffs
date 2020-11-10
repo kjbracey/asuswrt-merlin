@@ -6,7 +6,7 @@ https_jffs="/jffs/ssl"
 https_jffs_old="/jffs/https"
 https_certs="/etc/cert.pem /etc/key.pem"
 lighttpd_certkey="/etc/server.pem"
-OLDIF=IFS; IFS=" ";
+OLDIFS=IFS; IFS=" ";
 
 mkdir -p "$https_jffs"
 err=0

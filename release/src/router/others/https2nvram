@@ -5,7 +5,7 @@ https_file="cert.tgz"
 https_jffs="/jffs/ssl/"
 https_jffs_old="/jffs/https/"
 https_dir=""
-OLDIF=IFS; IFS=" ";
+OLDIFS=IFS; IFS=" ";
 
 err=0
 

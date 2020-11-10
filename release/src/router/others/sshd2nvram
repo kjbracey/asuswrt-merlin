@@ -3,7 +3,7 @@
 sshd_vars="sshd_authkeys sshd_hostkey sshd_dsskey sshd_ecdsakey"
 sshd_files="sshd_authkeys dropbear_rsa_host_key dropbear_dss_host_key dropbear_ecdsa_host_key"
 sshd_dir="/jffs/dropbear/"
-OLDIF=IFS; IFS=" ";
+OLDIFS=IFS; IFS=" ";
 
 err=0
 let count=1
