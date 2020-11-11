@@ -4252,6 +4252,9 @@ int init_main(int argc, char *argv[])
 		asm1042_upgrade(1);	// check whether upgrade firmware of ASM1042
 #endif
 
+		if(!f_exists("/etc/machine-id"))
+			system("echo $(nvram get lan_hwaddr) | md5sum | cut -b -32 > /etc/machine-id"); // Set unique system id
+
 		run_custom_script("init-start", NULL);
 		chpass(nvram_safe_get("http_username"), nvram_safe_get("http_passwd"));	// Re-apply now that jffs is up, in case of custom configs
 		use_custom_config("fstab", "/etc/fstab");
