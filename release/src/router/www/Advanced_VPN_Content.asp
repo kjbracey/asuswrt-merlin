@@ -925,10 +925,10 @@ function enable_openvpn(state){
 											If you configure OpenVPN with username/password authentication, <#Web_Title2#> can automatically generate a ovpn file including Certification Authority key.  You can deliver this file with username and password to clients making them connect to your VPN server. If you need a more advanced authenticaton method (such as using signed certs), please go to VPN details.  You will need to manually prepare and provide signed certificates then.<br>
 											Please refer to below FAQ for your client side setting.
 											<ol>
-												<li><a href="http://www.asus.com/support/Knowledge-Detail/11/2/RTAC68U/1A935B95-C237-4281-AE86-C824737D11F9/" target="_blank" style="text-decoration:underline;">Windows</a>
-												<li><a href="http://www.asus.com/support/Knowledge-Detail/11/2/RTAC68U/C77ADCBF-F5C4-46B4-8A0D-B64F09AB881F/" target="_blank" style="text-decoration:underline;">Mac OS</a>
-												<li><a href="http://www.asus.com/support/Knowledge-Detail/11/2/RTAC68U/37EC8F08-3F50-4F82-807E-6D2DCFE5146A/" target="_blank" style="text-decoration:underline;">iPhone/iPad</a>
-												<li><a href="http://www.asus.com/support/Knowledge-Detail/11/2/RTAC68U/8DCA7DA6-E5A0-40C2-8AED-B9361E89C844/" target="_blank" style="text-decoration:underline;">Android</a>
+												<li><a href="https://www.asus.com/support/FAQ/1004469/" target="_blank" style="text-decoration:underline;">Windows</a>
+												<li><a href="https://www.asus.com/support/FAQ/1004472/" target="_blank" style="text-decoration:underline;">Mac OS</a>
+												<li><a href="https://www.asus.com/support/FAQ/1004471/" target="_blank" style="text-decoration:underline;">iPhone/iPad</a>
+												<li><a href="https://www.asus.com/support/FAQ/1004466/" target="_blank" style="text-decoration:underline;">Android</a>
 											<ol>
 										</div>
 										<div id="openvpn_userauth_warn" style="display:none; color:#FFCC00;">NOTE: To use Username/Password based authtication you must first enable it on the VPN Details page.</div>
