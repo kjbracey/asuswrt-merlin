@@ -2178,7 +2178,7 @@ _dprintf("%s: cmd=%s.\n", __FUNCTION__, cmd);
 	logmessage("Samba Server", "daemon is started");
 
 	/* Start wsdd2 */
-	start_wsdd();
+	// start_wsdd();
 
 	return;
 }
@@ -4090,10 +4090,10 @@ void start_wsdd()
 				NULL,	// boot parameters
 				NULL };
 
+	stop_wsdd();
+
 	if (!nvram_get_int("wsdd_enable"))
 		return;
-
-	stop_wsdd();
 
 	strcpy(serial, nvram_safe_get("lan_hwaddr"));
 	if (strlen(serial)) {
@@ -4117,7 +4117,7 @@ void start_wsdd()
 
 	_eval(wsdd_argv, NULL, 0, &pid);
 
-	logmessage("WSD Discovery Server", "daemon is started");
+//	logmessage("WSD Discovery Server", "daemon is started");
 
 	return;
 }
@@ -4126,7 +4126,7 @@ void stop_wsdd() {
 	if (pids("wsdd2")) {
 		killall_tk("wsdd2");
 
-		logmessage("WSD Discovery Server", "daemon is stopped");
+//		logmessage("WSD Discovery Server", "daemon is stopped");
 	}
 	return;
 }

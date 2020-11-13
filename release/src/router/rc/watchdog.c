@@ -1582,6 +1582,24 @@ void ntpd_check()
 	}
 }
 
+static int wsddflag = 0;
+void wsdd_check()
+{
+	if (nvram_match("link_internet", "1") && !g_reboot) {
+		if (!pids("wsdd2")){
+			wsddflag = 0;
+			logmessage("watchdog", "restart wsdd");
+			start_wsdd();
+		}
+	}
+	else {
+		if (!wsddflag) {
+			wsddflag = 1;
+			logmessage("watchdog", "waiting \"start_wsdd\"");
+		}
+	}
+}
+
 static int qos_flag = 0;
 void qos_check()
 {
@@ -2169,6 +2187,10 @@ void watchdog(int sig)
 
 	if (nvram_match("ntpd_server", "1"))
 		ntpd_check();
+
+	if (nvram_match("wsdd_enable", "1") && pids("smbd"))
+		wsdd_check();
+
 	ddns_check();
 #ifdef RTCONFIG_SSH
 	if (nvram_match("sshd_enable", "1"))
