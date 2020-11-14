@@ -4180,6 +4180,9 @@ int start_mdns()
 	char *avahi_daemon_argv[] = {"avahi-daemon", "-D", NULL};
 	pid_t pid;
 
+	if (g_reboot)
+		return 0;
+
 	if ((pids("afpd") && nvram_match("timemachine_enable", "1")) ||
 		(nvram_match("daapd_enable", "1") && pids("mt-daapd")))
 			mdns_force = 1;
