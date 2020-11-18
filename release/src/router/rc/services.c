@@ -7133,8 +7133,8 @@ const char *dns_filter(int mode)
 		"185.228.168.10",	/* 15: CleanBrowsing Adult */
 		"185.228.168.168",	/* 16: CleanBrowsing Family */
 		"1.1.1.2",			/* 17: Cloudflare Malware */
-		"1.1.1.3"			/* 18: Cloudflare Malware + Adult */
-		"94.140.14.14"		/* 19: Adguard Default */
+		"1.1.1.3",			/* 18: Cloudflare Malware + Adult */
+		"94.140.14.14",		/* 19: Adguard Default */
 		"94.140.14.15"		/* 20: Adguard Family */
         };
 
