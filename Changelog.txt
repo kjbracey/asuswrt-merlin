@@ -4,6 +4,19 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_46D5j9527  (22-November-2020) ARM SDK, MIPS,ARM KRACK
+- CHANGED: openvpn: httpd: webui: (backport) implement stub/stub-v2 support
+- CHANGED: openvpn: httpd: webui: (backport) implement tls-crypt-v2 support
+- CHANGED: make: update for lz4 support
+- CHANGED: lz4: add 1.9.2
+- CHANGED: webui: openvpn: (backport) limit max data-ciphers length to 127 chars per OpenVPN doc
+- CHANGED: openvpn: (backport) try to use CHACHA20-POLY1305 if supported by the remote end
+* CHANGED: openvpn: asus-merlin customizations 2.5.x
+* CHANGED: openvpn: update to 2.5.0
+* CHANGED: openvpn: new cipher option naming
+* CHANGED: wsdd: move start to watchdog to wait for internet up (needed for soap xml)
+
+
 374.43_45EDj9527  (6-December-2020) ARM SDK, MIPS,ARM KRACK
 * NEW: ntp: nvram option to attempt ntp sync without internet access (pass 2)
 
