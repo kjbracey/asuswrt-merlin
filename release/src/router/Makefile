@@ -506,9 +506,9 @@ obj-y += openssl-1.1 # include for all builds
 obj-y += haveged
 obj-y += udp-broadcast-relay-redux
 ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
-obj-y += libnfnetlink
-obj-y += libmnl
-obj-y += ipset_arm
+obj-y += libnfnetlink-1.0.1
+obj-y += libmnl-1.0.4
+obj-y += ipset-7
 else
 obj-y += ipset
 endif
@@ -3636,6 +3636,80 @@ ipset_arm-clean:
 	-@$(MAKE) -C ipset_arm clean
 	-@$(MAKE) -C ipset_arm modules_clean
 	-@rm -rf ipset_arm/Makefile ipset_arm/stamp-h1
+
+libnfnetlink-1.0.1: libnfnetlink-1.0.1/Makefile
+	$(MAKE) -C libnfnetlink-1.0.1
+
+libnfnetlink-1.0.1/Makefile:
+	$(MAKE) libnfnetlink-1.0.1-configure
+
+libnfnetlink-1.0.1-configure:
+	( cd libnfnetlink-1.0.1 && autoreconf -i -f ; \
+		$(CONFIGURE) \
+		--prefix=/usr \
+		--bindir=/usr/sbin \
+		--libdir=/usr/lib \
+	)
+
+libnfnetlink-1.0.1-install:
+	install -D libnfnetlink-1.0.1/src/.libs/libnfnetlink.so $(INSTALLDIR)/libnfnetlink-1.0.1/usr/lib/libnfnetlink.so.0
+	$(STRIP) $(INSTALLDIR)/libnfnetlink-1.0.1/usr/lib/libnfnetlink.so.0
+
+libnfnetlink-1.0.1-clean:
+	[ ! -f libnfnetlink-1.0.1/Makefile ] || $(MAKE) -C libnfnetlink-1.0.1 distclean
+	@rm -f libnfnetlink-1.0.1/Makefile
+
+libmnl-1.0.4: libmnl-1.0.4/Makefile
+	$(MAKE) -C $@ && $(MAKE) $@-stage
+
+libmnl-1.0.4/Makefile:
+	(cd libmnl-1.0.4 && autoreconf -i -f)
+	$(MAKE) libmnl-1.0.4-configure
+
+libmnl-1.0.4-configure:
+	( cd libmnl-1.0.4 ; \
+		autoreconf -i -f && \
+		$(CONFIGURE) \
+		--prefix=/usr \
+		--bindir=/usr/sbin \
+		--libdir=/usr/lib \
+	)
+
+libmnl-1.0.4-install:
+	install -D libmnl-1.0.4/src/.libs/libmnl.so $(INSTALLDIR)/libmnl-1.0.4/usr/lib/libmnl.so.0
+	$(STRIP) $(INSTALLDIR)/libmnl-1.0.4/usr/lib/libmnl.so.0
+
+libmnl-1.0.4-clean:
+	[ ! -f libmnl-1.0.4/Makefile ] || $(MAKE) -C libmnl-1.0.4 distclean
+	@rm -f libmnl-1.0.4/Makefile
+
+ipset-7/configure:
+	cd ipset-7 && ./autogen.sh
+
+ipset-7/Makefile: ipset-7/configure
+	cd ipset-7 && \
+	libmnl_CFLAGS="-I$(STAGEDIR)/usr/include" \
+	libmnl_LIBS="-L$(STAGEDIR)/usr/lib -lmnl" \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	LDFLAGS="-Wl,--gc-sections" \
+	$(CONFIGURE) --prefix=/usr --disable-rpath \
+		--with-kmod=no --with-kbuild=$(LINUXDIR)
+
+ipset-7: libmnl-1.0.4 ipset-7/Makefile
+	$(MAKE) -C $@ && $(MAKE) $@-stage
+
+ipset-7-install:
+	install -D ipset-7/src/ipset $(INSTALLDIR)/ipset-7/usr/sbin/ipset
+	install -D ipset-7/lib/.libs/libipset.so.13.1.0 $(INSTALLDIR)/ipset-7/usr/lib/libipset.so.13.1.0
+	cd $(INSTALLDIR)/ipset-7/usr/lib/ && \
+		ln -sf libipset.so.13.1.0 libipset.so.13 && \
+		ln -sf libipset.so.13.1.0 libipset.so
+	$(STRIP) $(INSTALLDIR)/ipset-7/usr/sbin/ipset
+	$(STRIP) $(INSTALLDIR)/ipset-7/usr/lib/*.so*
+
+ipset-7-clean:
+	[ ! -f ipset-7/Makefile ] || $(MAKE) -C ipset-7 distclean
+	@rm -f ipset-7/Makefile
 
 ncurses/Makefile:
 	cd ncurses && CFLAGS="$(EXTRACFLAGS) -Os -I$(STAGEDIR)/usr/include -ffunction-sections -fdata-sections -fPIC" \
