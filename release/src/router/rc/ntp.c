@@ -16,14 +16,14 @@
  *
  * Copyright 2004, ASUSTeK Inc.
  * All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS OFFERED "AS IS", AND ASUS GRANTS NO WARRANTIES OF ANY
  * KIND, EXPRESS OR IMPLIED, BY STATUTE, COMMUNICATION OR OTHERWISE. BROADCOM
  * SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
  * FOR A SPECIFIC PURPOSE OR NONINFRINGEMENT CONCERNING THIS SOFTWARE.
  *
  */
- 
+
 #include <stdio.h>
 #include <signal.h>
 #include <time.h>
@@ -210,7 +210,7 @@ int ntp_main(int argc, char *argv[])
 		else if (sig_cur == SIGTSTP)
 			;
 		else if (nvram_get_int("sw_mode") == SW_MODE_ROUTER &&
-			!nvram_match("link_internet", "1"))
+			!nvram_match("link_internet", "1") && !nvram_get_int("ntp_force"))
 		{
 			alarm(SECONDS_TO_WAIT);
 		}

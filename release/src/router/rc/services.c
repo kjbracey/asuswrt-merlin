@@ -1020,6 +1020,10 @@ void start_dnsmasq(int force)
 		}
 	}
 
+	/* Force ntpc start with no WAN */
+	if (!pids("ntp") && nvram_get_int("ntp_force"))
+		refresh_ntpc();
+
 /* TODO: remove it for here !!!*/
 //	int unit;
 //	char prefix[8], nvram_name[16], wan_proto[16];
