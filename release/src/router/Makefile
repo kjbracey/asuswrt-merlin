@@ -3585,58 +3585,6 @@ ipset-install:
 	$(STRIP) $(INSTALLDIR)/ipset/usr/lib/*.so
 	$(STRIP) $(INSTALLDIR)/ipset/usr/sbin/ipset
 
-libmnl/stamp-h1:
-	cd $(TOP)/libmnl && CC=$(CC) STRIP=$(STRIP) \
-	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
-	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
-	$(CONFIGURE) --prefix=/usr
-	touch libmnl/stamp-h1
-
-libmnl: libmnl/stamp-h1
-	$(MAKE) -C libmnl
-	$(MAKE) -C libmnl DESTDIR=$(TOP)/libmnl/staged install
-
-libmnl-install: libmnl
-	install -d $(INSTALLDIR)/libmnl/usr/lib/
-	install libmnl/src/.libs/libmnl.so.0.1.0 $(INSTALLDIR)/libmnl/usr/lib/libmnl.so.0.1.0
-	$(STRIP) $(INSTALLDIR)/libmnl/usr/lib/libmnl.so.0.1.0
-	cd $(INSTALLDIR)/libmnl/usr/lib/ && \
-		ln -sf libmnl.so.0.1.0 libmnl.so.0 && \
-		ln -sf libmnl.so.0.1.0 libmnl.so
-
-libmnl-clean:
-	-@$(MAKE) -C libmnl clean
-	-@rm -rf libmnl/staged
-
-ipset_arm/stamp-h1: libmnl
-	cd $(TOP)/ipset_arm && CC=$(CC) STRIP=$(STRIP) \
-	autoreconf -i -f && \
-	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
-	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
-	libmnl_CFLAGS="-I$(TOP)/libmnl/staged/usr/include" \
-	libmnl_LIBS="-L$(TOP)/libmnl/staged/usr/lib -lmnl" \
-	$(CONFIGURE) --prefix=/usr --with-kmod=yes --with-kbuild=$(LINUXDIR)
-	touch ipset_arm/stamp-h1
-
-ipset_arm: ipset_arm/stamp-h1
-	$(MAKE) -C ipset_arm
-	$(MAKE) -C ipset_arm modules
-
-ipset_arm-install: ipset_arm
-	install -D ipset_arm/src/ipset $(INSTALLDIR)/ipset_arm/usr/sbin/ipset
-	install -d $(INSTALLDIR)/ipset_arm/usr/lib/
-	install ipset_arm/lib/.libs/libipset.so.3.6.0 $(INSTALLDIR)/ipset_arm/usr/lib/libipset.so.3.6.0
-	$(STRIP) $(INSTALLDIR)/ipset_arm/usr/lib/libipset.so.3.6.0
-	$(STRIP) $(INSTALLDIR)/ipset_arm/usr/sbin/ipset
-	cd $(INSTALLDIR)/ipset_arm/usr/lib/ && \
-		ln -sf libipset.so.3.6.0 libipset.so.3 && \
-		ln -sf libipset.so.3.6.0 libipset.so
-
-ipset_arm-clean:
-	-@$(MAKE) -C ipset_arm clean
-	-@$(MAKE) -C ipset_arm modules_clean
-	-@rm -rf ipset_arm/Makefile ipset_arm/stamp-h1
-
 libnfnetlink-1.0.1: libnfnetlink-1.0.1/Makefile
 	$(MAKE) -C libnfnetlink-1.0.1
 
