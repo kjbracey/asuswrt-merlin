@@ -4,6 +4,18 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_46D7j9527  (29-November-2020) ARM SDK, MIPS,ARM KRACK
+* CHANGED: make: ipset7 remove unrecognized option disable-rpath
+* CHANGED: make: remove old libmnl and ipset_arm recipes
+
+
+374.43_46D6j9527  (29-November-2020) ARM SDK, MIPS,ARM KRACK
+- CHANGED: make: update for ipset-7
+- CHANGED: ipset7: add 7.6
+- CHANGED: libnfnetlink: add 1.0.1
+- CHANGED: libmnl: add 1.0.4
+
+
 374.43_46D5j9527  (22-November-2020) ARM SDK, MIPS,ARM KRACK
 - CHANGED: openvpn: httpd: webui: (backport) implement stub/stub-v2 support
 - CHANGED: openvpn: httpd: webui: (backport) implement tls-crypt-v2 support
