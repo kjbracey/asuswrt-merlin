@@ -4,6 +4,10 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_45EDj9527  (6-December-2020) ARM SDK, MIPS,ARM KRACK
+* NEW: ntp: nvram option to attempt ntp sync without internet access (pass 2)
+
+
 374.43_45ECj9527  (18-November-2020) ARM SDK, MIPS,ARM KRACK
 - CHANGED: init: set unique machine-id during init
 - CHANGED: doc: update fork options file

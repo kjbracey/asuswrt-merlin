@@ -552,6 +552,18 @@ NextDNS support
                                   A NextDNS id must be provided in order to enable analytics.
                                   If a provider other than NextDNS is selected/also selected/ analytics are automatically disabled.
 ---------------------------------------------------------------------------------------------------------------
+NTP sync without internet access
+
+        Can be set in gui:      No
+        Enable via NVRAM:       nvram set ntp_force=x
+                                  (where x = 0, require internet - default, x = 1, force attempted sync)
+
+
+        Routers Supported:      All
+        Released:               Update-45ED
+        Reboot Required:        No
+        Notes:                  Allows syncing to local NTP server when WAN/internet is not connected
+---------------------------------------------------------------------------------------------------------------
 
 
 Disabling the special options:
