@@ -3,6 +3,8 @@ name,ip4address,ip6address,tls_port,tls_name,tls_digest,tls_pubkey,dnssec,nologs
 "Cloudflare Secondary",1.0.0.1,2606:4700:4700::1001,853,"cloudflare-dns.com",,,yes,yes,yes
 "Quad 9 Secure Primary",9.9.9.9,2620:fe::fe,853,"dns.quad9.net",,,yes,yes,yes
 "Quad 9 Secure Secondary",149.112.112.112,2620:fe::9,853,"dns.quad9.net",,,yes,yes,yes
+"Quad 9 EDNS Secure Primary",9.9.9.11,2620:fe::11,853,"dns.quad9.net",,,yes,yes,yes
+"Quad 9 EDNS Secure Secondary",149.112.112.11,2620:fe::fe:11,853,"dns.quad9.net",,,yes,yes,yes
 "Quad 9 Insecure Primary",9.9.9.10,2620:fe::10,853,"dns.quad9.net",,,yes,yes,yes
 "Quad 9 Insecure Secondary",149.112.112.10,2620:fe::fe:10,853,"dns.quad9.net",,,yes,yes,yes
 "AdGuard DNS Primary",176.103.130.130,2a00:5a60::ad1:0ff,853,"dns.adguard.com",,,yes,yes,yes
