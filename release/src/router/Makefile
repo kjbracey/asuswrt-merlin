@@ -3640,7 +3640,7 @@ ipset-7/Makefile: ipset-7/configure
 	libmnl_LIBS="-L$(STAGEDIR)/usr/lib -lmnl" \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-Wl,--gc-sections" \
-	$(CONFIGURE) --prefix=/usr --disable-rpath \
+	$(CONFIGURE) --prefix=/usr \
 		--with-kmod=no --with-kbuild=$(LINUXDIR)
 
 ipset-7: libmnl-1.0.4 ipset-7/Makefile
