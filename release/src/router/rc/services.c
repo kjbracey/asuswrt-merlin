@@ -3942,10 +3942,7 @@ int start_lltd(void)
 			eval("lld2d.rtac66r", "br0");
 			break;
 		default:
-			if(is_ac66u_v2_series())
-				eval("lld2d.rtac66r", "br0");
-			else
-				eval("lld2d", "br0");
+			eval("lld2d", "br0");
 			break;
 		}
 	}
@@ -7050,7 +7047,7 @@ void setup_leds()
 		}
 
 #ifdef RTCONFIG_TURBO
-		if (!is_ac66u_v2_series())
+		if (!is_ac66u_v2_series() && !is_ac68u_v3_series())
 			led_control(LED_TURBO, LED_ON);
 #endif
 		led_control(LED_SWITCH, LED_ON);
