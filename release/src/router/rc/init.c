@@ -174,6 +174,9 @@ wps_restore_defaults(void)
 	nvram_set("wps_device_name", get_productid());
 	nvram_set("wps_modelnum", get_productid());
 
+	if (is_ac68u_v3_series() && (nvram_safe_get("odmpid") == "")) //make sure V3 odmpid set
+		nvram_set("odmpid", get_productid());
+
 #ifdef RTCONFIG_RGMII_BRCM5301X
 	strcpy(macstr, nvram_safe_get("lan_hwaddr"));
 #else
