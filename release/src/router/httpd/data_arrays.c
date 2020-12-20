@@ -196,7 +196,7 @@ int ej_resolver_dump_array(int eid, webs_t wp, int argc, char_t **argv) {
 
 	ret += websWrite(wp, "var resolverarray = [\n");
 
-	sprintf(fcsv, "%s", nvram_safe_get("dnscrypt_csv"));
+	snprintf(fcsv, sizeof(fcsv), "%s", nvram_safe_get("dnscrypt_csv"));
 	fp = fopen(fcsv, "r");
 	if (fp) {
 		ret += resolver_dump(fp, wp);
@@ -258,7 +258,7 @@ int ej_stubby_dump_array(int eid, webs_t wp, int argc, char_t **argv) {
 
 	ret += websWrite(wp, "var stubbyarray = [\n");
 
-	sprintf(fcsv, "%s", nvram_safe_get("stubby_csv"));
+	snprintf(fcsv, sizeof(fcsv), "%s", nvram_safe_get("stubby_csv"));
 	fp = fopen(fcsv, "r");
 	if (fp) {
 		ret += stubby_dump(fp, wp);
@@ -415,7 +415,7 @@ int ej_get_addons_array(int eid, webs_t wp, int argc, char_t **argv) {
 
 	// look for addon title files
 	for(i=1;i<=num;i++) {
-		sprintf(filename, "/tmp/var/wwwext/user%d.title", i);
+		snprintf(filename, sizeof(filename), "/tmp/var/wwwext/user%d.title", i);
 		if (f_exists(filename)) {
 			fp = fopen(filename, "r");
 			if (fp) {

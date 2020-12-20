@@ -1327,7 +1327,7 @@ void http_get_access_ip(void) {
 	if (nv) {
 		while ((b = strsep(&nvp, "<")) != NULL) {
 			if (strlen(b)==0) continue;
-			sprintf(tmp_access_ip, "%s", b);
+			snprintf(tmp_access_ip, sizeof(tmp_access_ip), "%s", b);
 			inet_aton(tmp_access_ip, &tmp_access_addr);
 
 			if (p >= ARRAY_SIZE(access_ip)) {
@@ -1365,7 +1365,7 @@ void http_login(unsigned int ip, char *url) {
 
 	login_timestamp = uptime();
 	memset(login_timestampstr, 0, 32);
-	sprintf(login_timestampstr, "%lu", login_timestamp);
+	snprintf(login_timestampstr, sizeof(login_timestampstr), "%lu", login_timestamp);
 	nvram_set("login_timestamp", login_timestampstr);
 
 	if(ip != login_ip || http_port != login_port) {
@@ -1380,10 +1380,10 @@ void http_login(unsigned int ip, char *url) {
 		nvram_set("login_ip_str", login_ip_str);
 
 		memset(login_ipstr, 0, 32);
-		sprintf(login_ipstr, "%u", login_ip);
+		snprintf(login_ipstr, sizeof(login_ipstr), "%u", login_ip);
 		nvram_set("login_ip", login_ipstr);
 
-		sprintf(login_port_str, "%u", http_port);
+		snprintf(login_port_str, sizeof(login_port_str), "%u", http_port);
 		nvram_set("login_port", login_port_str);
 	}
 
@@ -1397,7 +1397,7 @@ int http_client_ip_check(void) {
 
 	if(nvram_match("http_client", "1")) {
 		//always allow router
-		sprintf(tmp_access_ip, "%s", nvram_get("lan_ipaddr"));
+		snprintf(tmp_access_ip, sizeof(tmp_access_ip), "%s", nvram_get("lan_ipaddr"));
 		inet_aton(tmp_access_ip, &tmp_access_addr);
 		if(login_ip_tmp==(unsigned int)tmp_access_addr.s_addr)
 			return 1;
@@ -2038,7 +2038,7 @@ QTN_RESET:
 		login_hst[0] = login_ip;
 		login_timestamp = uptime();
 		memset(login_timestampstr, 0, 32);
-		sprintf(login_timestampstr, "%lu", login_timestamp);
+		snprintf(login_timestampstr, sizeof(login_timestampstr), "%lu", login_timestamp);
 		nvram_set("login_timestamp", login_timestampstr);
 	} else {
 	//websSetVer();
@@ -2078,7 +2078,7 @@ QTN_RESET:
 //	if (http_port==SERVER_PORT)
 	if (http_port==nvram_get_int("http_lanport"))
 		strcpy(pidfile, "/var/run/httpd.pid");
-	else sprintf(pidfile, "/var/run/httpd-%d.pid", http_port);
+	else snprintf(pidfile, sizeof(pidfile), "/var/run/httpd-%d.pid", http_port);
 
 	if (!(pid_fp = fopen(pidfile, "w"))) {
 		perror(pidfile);
