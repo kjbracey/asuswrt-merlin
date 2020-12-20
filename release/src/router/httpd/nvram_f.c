@@ -118,13 +118,13 @@ char *nvram_get_list_x(const char *sid, const char *name, int index)
  * @return	0 on success and errno on failure
  */
 int nvram_add_lists_x(const char *sid, const char *name, const char *value, int count)
-{    	
+{
     char name1[32], name2[32];
-  
-    strcpy(name1, name);
-  
+
+    strlcpy(name1, name, sizeof(name1));
+
   if (name[0]!='\0')
-    {	
+    {
 	sprintf(name2, "%s%d", name1, count);
     	nvram_set(name2, value);
     }	
@@ -143,11 +143,11 @@ int nvram_del_lists_x(const char *sid, const char *name, int *delMap)
 //    FILE *fp;
     char names[32], oname[32], nname[32], *oval, *nval;
     int oi, ni, di;
-    
-    strcpy(names, name);
-    
+
+    strlcpy(names, name, sizeof(names));
+
     if (names[0]!='\0')
-    {	
+    {
 	oi=0;
 	ni=0;
 	di=0;

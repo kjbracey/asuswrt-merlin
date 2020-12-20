@@ -1148,7 +1148,7 @@ handle_request(void)
 			if(!(mime_exception&MIME_EXCEPTION_NOAUTH_ALL)) {
 				file = "Nologin.asp";
 				memset(url, 0, sizeof(url));
-				strcpy(url, file);
+				strncpy(url, file, sizeof(url));
 			}
 		}
 	}

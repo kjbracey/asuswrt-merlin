@@ -1045,7 +1045,7 @@ ej_dump(int eid, webs_t wp, int argc, char_t **argv)
 
 	ret = 0;
 
-	strcpy(path, get_logfile_path());
+	strlcpy(path, get_logfile_path(), sizeof(path));
 	if (strcmp(file, "syslog.log")==0)
 	{
 		sprintf(filename, "%s/%s-1", path, file);
@@ -3011,14 +3011,14 @@ static int login_state_hook(int eid, webs_t wp, int argc, char_t **argv){
 
 	now_ip_addr.s_addr = ip;
 	memset(ip_str, 0, 16);
-	strcpy(ip_str, inet_ntoa(now_ip_addr));
+	strlcpy(ip_str, inet_ntoa(now_ip_addr), sizeof(ip_str));
 //	time(&now);
 	now = uptime();
 
 	login_ip = (unsigned int)atoll(nvram_safe_get("login_ip"));
 	login_ip_addr.s_addr = login_ip;
 	memset(login_ip_str, 0, 16);
-	strcpy(login_ip_str, inet_ntoa(login_ip_addr));
+	strlcpy(login_ip_str, inet_ntoa(login_ip_addr), sizeof(login_ip_str));
 //	login_timestamp = (unsigned long)atol(nvram_safe_get("login_timestamp"));
 	login_timestamp = strtoul(nvram_safe_get("login_timestamp"), NULL, 10);
 	login_port = (unsigned int)atol(nvram_safe_get("login_port"));
@@ -3527,7 +3527,7 @@ static char *get_stok(char *str, char *dest, char delimiter)
 
 		p++;
 	} else
-		strcpy(dest, str);
+		strncpy(dest, str, BUFSIZE);
 
 	return p;
 }
@@ -5044,7 +5044,7 @@ int ej_shown_language_css(int eid, webs_t wp, int argc, char **argv){
 	}
 
 	memset(lang, 0, 4);
-	strcpy(lang, nvram_safe_get("preferred_lang"));
+	strlcpy(lang, nvram_safe_get("preferred_lang"), sizeof(lang));
 	websWrite(wp, "<li><dl><a href=\"#\"><dt id=\"selected_lang\"></dt></a>\\n");
 	while (1) {
 		memset(buffer, 0, sizeof(buffer));
@@ -5544,17 +5544,17 @@ do_auth(char *userid, char *passwd, char *realm)
 
 	if (strcmp(ProductID,"")==0)
 	{
-		strcpy(ProductID, get_productid());
+		strncpy(ProductID, get_productid(), sizeof(ProductID));
 	}
 	if (strcmp(UserID,"")==0 || reget_passwd == 1)
 	{
-	   	strcpy(UserID, nvram_safe_get("http_username"));
+		strncpy(UserID, nvram_safe_get("http_username"), sizeof(UserID));
 	}
 // 2008.08 magic {
 	if (strcmp(UserPass, "") == 0 || reget_passwd == 1)
 	{
 // 2008.08 magic }
-		strcpy(UserPass, nvram_safe_get("http_passwd"));
+		strncpy(UserPass, nvram_safe_get("http_passwd"), sizeof(UserPass));
 	}
 
 	reget_passwd = 0;
@@ -8096,8 +8096,8 @@ int ej_initial_account(int eid, webs_t wp, int argc, char **argv){
 	char buf1[64], buf2[64];
 	memset(buf1, 0, 64);
 	memset(buf2, 0, 64);
-	strcpy(buf1, nvram_safe_get("http_username"));
-	strcpy(buf2, nvram_safe_get("http_passwd"));
+	strncpy(buf1, nvram_safe_get("http_username"), sizeof(buf1));
+	strncpy(buf2, nvram_safe_get("http_passwd"), sizeof(buf2));
 
 	if(add_account(buf1, buf2) < 0)
 #endif
@@ -8672,16 +8672,16 @@ int ej_cloud_status(int eid, webs_t wp, int argc, char **argv){
 			case 2:
 				memset(buf, 0, PATH_MAX);
 				char_to_ascii(buf, line);
-				strcpy(mounted_path, buf);
+				strlcpy(mounted_path, buf, sizeof(mounted_path));
 				break;
 			case 3:
 				// memset(buf, 0, PATH_MAX);
 				// char_to_ascii(buf, line);
-				// strcpy(target_obj, buf);
-				strcpy(target_obj, line); // support Chinese
+				// strlcpy(target_obj, buf, sizeof(target_obj));
+				strlcpy(target_obj, line, sizeof(target_obj)); // support Chinese
 				break;
 			case 4:
-				strcpy(error_msg, line);
+				strlcpy(error_msg, line, sizeof(error_msg));
 				break;
 		}
 
@@ -8747,28 +8747,28 @@ int ej_UI_cloud_status(int eid, webs_t wp, int argc, char **argv){
 			memset(buf, 0, PATH_MAX);
 			substr(dest, line, 11, PATH_MAX-11);
 			char_to_ascii(buf, dest);
-			strcpy(mounted_path, buf);
+			strlcpy(mounted_path, buf, sizeof(mounted_path));
 		}
 		else if(strstr(line, "FILENAME") != NULL){
 			substr(dest, line, 9, PATH_MAX-9);
-			strcpy(target_obj, dest); // support Chinese
+			strlcpy(target_obj, dest, sizeof(target_obj)); // support Chinese
 			break;
 		}
 		else if(strstr(line, "ERR_MSG") != NULL){
 			substr(dest, line, 8, PATH_MAX-8);
-			strcpy(error_msg, dest);
+			strlcpy(error_msg, dest, sizeof(error_msg));
 		}
 		else if(strstr(line, "TOTAL_SPACE") != NULL){
 			substr(dest, line, 12, PATH_MAX-12);
-			strcpy(full_capa, dest);
+			strlcpy(full_capa, dest, sizeof(full_capa));
 		}
 		else if(strstr(line, "USED_SPACE") != NULL){
 			substr(dest, line, 11, PATH_MAX-11);
-			strcpy(used_capa, dest);
+			strlcpy(used_capa, dest, sizeof(used_capa));
 		}
 		else if(strstr(line, "CAPTCHA_URL") != NULL){
 			substr(dest, line, 12, PATH_MAX-12);
-			strcpy(captcha_url, dest);
+			strlcpy(captcha_url, dest, sizeof(captcha_url));
 		}
 
 		memset(line, 0, PATH_MAX);
@@ -8830,29 +8830,29 @@ int ej_UI_rs_status(int eid, webs_t wp, int argc, char **argv){
 		}
 		else if(strstr(line, "RULENUM") != NULL){
 			substr(dest, line, 8, PATH_MAX-8);
-			strcpy(rulenum, dest);
+			strlcpy(rulenum, dest, sizeof(rulenum));
 		}
 		else if(strstr(line, "MOUNT_PATH") != NULL){
 			memset(buf, 0, PATH_MAX);
 			substr(dest, line, 11, PATH_MAX-11);
 			char_to_ascii(buf, dest);
-			strcpy(mounted_path, buf);
+			strlcpy(mounted_path, buf, sizeof(mounted_path));
 		}
 		else if(strstr(line, "FILENAME") != NULL){
 			substr(dest, line, 9, PATH_MAX-9);
-			strcpy(target_obj, dest); // support Chinese
+			strlcpy(target_obj, dest, sizeof(target_obj)); // support Chinese
 		}
 		else if(strstr(line, "ERR_MSG") != NULL){
 			substr(dest, line, 8, PATH_MAX-8);
-			strcpy(error_msg, dest);
+			strlcpy(error_msg, dest, sizeof(error_msg));
 		}
 		else if(strstr(line, "TOTAL_SPACE") != NULL){
 			substr(dest, line, 12, PATH_MAX-12);
-			strcpy(full_capa, dest);
+			strlcpy(full_capa, dest, sizeof(full_capa));
 		}
 		else if(strstr(line, "USED_SPACE") != NULL){
 			substr(dest, line, 11, PATH_MAX-11);
-			strcpy(used_capa, dest);
+			strlcpy(used_capa, dest, sizeof(used_capa));
 		}
 
 		memset(line, 0, PATH_MAX);
@@ -9006,15 +9006,15 @@ dbg("%u, %u, %u.\n", new_lan_ip_num, new_dhcp_start_num, new_dhcp_end_num);
 	memset(&addr, 0, sizeof(addr));
 	addr.s_addr = htonl(new_lan_ip_num);
 	memset(new_lan_ip_str, 0, 16);
-	strcpy(new_lan_ip_str, inet_ntoa(addr));
+	strlcpy(new_lan_ip_str, inet_ntoa(addr), sizeof(new_lan_ip_str));
 	memset(&addr, 0, sizeof(addr));
 	addr.s_addr = htonl(new_dhcp_start_num);
 	memset(new_dhcp_start_str, 0, 16);
-	strcpy(new_dhcp_start_str, inet_ntoa(addr));
+	strlcpy(new_dhcp_start_str, inet_ntoa(addr), sizeof(new_dhcp_start_str));
 	memset(&addr, 0, sizeof(addr));
 	addr.s_addr = htonl(new_dhcp_end_num);
 	memset(new_dhcp_end_str, 0, 16);
-	strcpy(new_dhcp_end_str, inet_ntoa(addr));
+	strlcpy(new_dhcp_end_str, inet_ntoa(addr), sizeof(new_dhcp_end_str));
 dbg("%s, %s, %s.\n", new_lan_ip_str, new_dhcp_start_str, new_dhcp_end_str);
 
 	nvram_set(strcat_r(prefix_lan, "ipaddr", tmp_lan), new_lan_ip_str);
@@ -9305,7 +9305,7 @@ loopagain:
 				}
 
 				if(strlen(ifname_desc2)) {
-					strcpy(ifname_desc, ifname_desc2);
+					strlcpy(ifname_desc, ifname_desc2, sizeof(ifname_desc));
 					rx = rx2;
 					tx = tx2;
 					strcpy(ifname_desc2, "");

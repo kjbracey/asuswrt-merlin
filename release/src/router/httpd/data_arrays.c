@@ -96,7 +96,7 @@ int ej_tcclass_dump_array(int eid, webs_t wp, int argc, char_t **argv) {
 			strncpy(wan_ifname, tmp, sizeof(wan_ifname));
 		else
 
-			strcpy(wan_ifname, "eth0");     // Default fallback
+			strncpy(wan_ifname, "eth0", sizeof(wan_ifname));     // Default fallback
 #endif
 		wan_ifname = (nvram_get("qos_iface") ? : get_wan_ifname(wan_primary_ifunit())); // judge WAN interface
 

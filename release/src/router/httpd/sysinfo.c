@@ -416,12 +416,12 @@ unsigned int get_wifi_clients(int radio, int querytype)
 		return 0;
 
 	if (querytype == SI_WL_QUERY_AUTHE) {
-		strcpy((char*)clientlist, "authe_sta_list");
+		strncpy((char*)clientlist, "authe_sta_list", maclist_size);
 		if (wl_ioctl(name, WLC_GET_VAR, clientlist, maclist_size))
 			goto exit;
 
 	} else if (querytype == SI_WL_QUERY_AUTHO) {
-		strcpy((char*)clientlist, "autho_sta_list");
+		strncpy((char*)clientlist, "autho_sta_list", maclist_size);
 		if (wl_ioctl(name, WLC_GET_VAR, clientlist, maclist_size))
 			goto exit;
 
