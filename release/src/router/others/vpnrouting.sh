@@ -188,18 +188,29 @@ then
 	fi
 fi	# End route down
 
-
-
 if [ $script_type == 'route-up' ]
 then
 	init_table
 
-# Delete existing VPN routes that were pushed by server on table main
-	NET_LIST=$(ip route show|awk '$2=="via" && $3==ENVIRON["route_vpn_gateway"] && $4=="dev" && $5==ENVIRON["dev"] {print $1}')
+# Delete pseudo default VPN routes that were pushed by server on table main
+    NET_LIST=$(ip route show|awk '($1 == "0.0.0.0/1" || $1 == "128.0.0.0/1") && $2=="via" && $3==ENVIRON["route_vpn_gateway"] && $4=="dev" && $5==ENVIRON["dev"] {print $1}')
 	for NET in $NET_LIST
 	do
 		ip route del $NET dev $dev
 		logger -t "openvpn-routing" "Removing route for $NET to $dev from table main"
+	done
+
+# Process other VPN routes that were pushed by server on table main, allow local routing
+	NET_LIST=$(ip route show|awk '$2=="via" && $3==ENVIRON["route_vpn_gateway"] && $4=="dev" && $5==ENVIRON["dev"] {print $1}')
+	for NET in $NET_LIST
+	do
+		if $(echo $NET | grep -q -E '^(192\.168|10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.)')
+		then
+			logger -t "openvpn-routing" "Retained route for $NET to $dev in table main"
+		else
+			ip route del $NET dev $dev
+			logger -t "openvpn-routing" "Removing route for $NET to $dev from table main"
+		fi
 	done
 
 # Update policy rules
