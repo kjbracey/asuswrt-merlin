@@ -385,6 +385,11 @@ void start_vpnclient(int clientNum)
 
 	fprintf(fp, "status-version 2\n");
 	fprintf(fp, "status status 10\n"); //update status file every 10 sec
+
+	// IPv6 currently not supported
+	fprintf(fp, "pull-filter ignore \"ifconfig-ipv6\"\n");
+	fprintf(fp, "pull-filter ignore \"route-ipv6\"\n");
+
 	fprintf(fp, "\n# Custom Configuration\n");
 	sprintf(&buffer[0], "vpn_client%d_custom", clientNum);
 	p = buf = strdup(nvram_safe_get(&buffer[0]));
