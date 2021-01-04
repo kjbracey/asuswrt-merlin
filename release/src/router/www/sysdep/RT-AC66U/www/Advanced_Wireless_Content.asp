@@ -608,7 +608,7 @@ function check_acs_band1_support(obj){
 			  	<tr>
 					<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(0, 7);"><#WLANConfig11b_x_PSKKey_itemname#></a></th>
 					<td>
-						<input id="wl_wpa_psk" name="wl_wpa_psk" maxlength="64" class="input_32_table" type="password" readonly autocapitalization="off" onBlur="switchType(this, false);" onFocus="switchType(this, true); $(this).removeAttribute('readonly');" value="<% nvram_get("wl_wpa_psk"); %>">
+						<input id="wl_wpa_psk" name="wl_wpa_psk" maxlength="64" class="input_32_table" autocorrect="off" autocapitalize="off" autocomplete="new-password" type="password" readonly onBlur="switchType(this, false);" onFocus="switchType(this, true); $(this).removeAttribute('readonly');" value="<% nvram_get("wl_wpa_psk"); %>">
 					</td>
 			  	</tr>
 			  		  

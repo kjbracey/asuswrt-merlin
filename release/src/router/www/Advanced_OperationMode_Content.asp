@@ -484,7 +484,7 @@ function cancel_SSID_Block(){
 				<span onmouseout="return nd();" onclick="openHint(0, 23);" style="cursor:help;"><#Network_key#><img align="right" style="cursor:pointer;margin-top:-14px\9;" src="/images/New_ui/helpicon.png"></span>		
 			</th>
 			<td class="QISformtd">
-				<input id="wl0_wpa_psk" name="wl0_wpa_psk" type="password" readonly autocapitalization="off" onBlur="switchType(this,false);" onFocus="switchType(this,true); $(this).removeAttribute('readonly');" value="" onkeyup="Sync_2ghz(2);" style="height:25px;" class="input_32_table" maxlength="65" disabled="disabled">
+				<input id="wl0_wpa_psk" name="wl0_wpa_psk" autocorrect="off" autocapitalize="off" autocomplete="new-password" type="password" readonly onBlur="switchType(this,false);" onFocus="switchType(this,true); $(this).removeAttribute('readonly');" value="" onkeyup="Sync_2ghz(2);" style="height:25px;" class="input_32_table" maxlength="65" disabled="disabled">
 			</td>
 		</tr>
 		<tr id="wl_unit_field_1">
@@ -506,7 +506,7 @@ function cancel_SSID_Block(){
 				<span onmouseout="return nd();" onclick="openHint(0, 23);" style="cursor:help;"><#Network_key#><img align="right" style="cursor:pointer;margin-top:-14px\9;" src="/images/New_ui/helpicon.png"></span>
 			</th>
 			<td class="QISformtd">
-				<input id="wl1_wpa_psk" name="wl1_wpa_psk" type="password" readonly autocapitalization="off" onBlur="switchType(this,false);" onFocus="switchType(this,true); $(this).removeAttribute('readonly');" value="" onkeyup="Sync_2ghz(5);" style="height:25px;" class="input_32_table" maxlength="65" disabled="disabled">
+				<input id="wl1_wpa_psk" name="wl1_wpa_psk" autocorrect="off" autocapitalize="off" autocomplete="new-password" type="password" readonly onBlur="switchType(this,false);" onFocus="switchType(this,true); $(this).removeAttribute('readonly');" value="" onkeyup="Sync_2ghz(5);" style="height:25px;" class="input_32_table" maxlength="65" disabled="disabled">
 			</td>
 		</tr>
 		<tr>
