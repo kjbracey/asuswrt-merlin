@@ -1280,7 +1280,7 @@ void
 setup_timezone(void)
 {
 #ifndef RC_BUILDTIME
-#define RC_BUILDTIME	1293840000	// Jan 1 00:00:00 GMT 2011
+#define RC_BUILDTIME	1577836800	// Jan 1 00:00:00 GMT 2020
 #endif
 	time_t now;
 	struct tm gm, local;
