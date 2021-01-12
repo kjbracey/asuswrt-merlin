@@ -44,6 +44,8 @@ var clients_info = getclients();
 var dnsfilter_rule_list = '<% nvram_get("dnsfilter_rulelist"); %>'.replace(/&#60/g, "<");
 var dnsfilter_rule_list_row = dnsfilter_rule_list.split('<');
 
+var wan_dns = '<% nvram_get("wan0_dns"); %>'
+var wan_dns_list = wan_dns.split(' ');
 
 function initial(){
 	show_menu();
@@ -128,11 +130,11 @@ function gen_modeselect(name, value, onchange){
 	code +='<select class="input_option" name="'+name+'" value="'+value+'" onchange="'+onchange+'">';
 	code +='<option value="0"'+(value == 0 ? "selected" : "")+'>No Filtering</option>';
 	code +='<option value="11"'+(value == 11 ? "selected" : "")+'>Router</option>';
+//	code +='<option value="2"'+(value == 2 ? "selected" : "")+'>Norton Safe</option>';
+	code +='<option value="3"'+(value == 3 ? "selected" : "")+'>WAN DNS 1</option>';
+	code +='<option value="4"'+(value == 4 ? "selected" : "")+'>WAN DNS 2</option>';
 	code +='<option value="1"'+(value == 1 ? "selected" : "")+'>OpenDNS Home</option>';
 	code +='<option value="7"'+(value == 7 ? "selected" : "")+'>OpenDNS Family</option>';
-//	code +='<option value="2"'+(value == 2 ? "selected" : "")+'>Norton Safe</option>';
-//	code +='<option value="3"'+(value == 3 ? "selected" : "")+'>Norton Family</option>';
-//	code +='<option value="4"'+(value == 4 ? "selected" : "")+'>Norton Children</option>';
 	code +='<option value="19"'+(value == 19 ? "selected" : "")+'>Adguard Default</option>';
 	code +='<option value="20"'+(value == 20 ? "selected" : "")+'>Adguard Family</option>';
 	code +='<option value="5"'+(value == 5 ? "selected" : "")+'>Yandex Safe</option>';
@@ -431,11 +433,11 @@ function changeRow_main(r){
 						<select name="dnsfilter_mode" class="input_option">
 							<option value="0" <% nvram_match("dnsfilter_mode", "0", "selected"); %>>No filtering</option>
 							<option value="11" <% nvram_match("dnsfilter_mode", "11", "selected"); %>>Router</option>
+<!--							<option value="2" <% nvram_match("dnsfilter_mode", "2", "selected"); %>>Norton Safe</option> -->
+							<option value="3" <% nvram_match("dnsfilter_mode", "3", "selected"); %>>WAN DNS 1</option> -->
+							<option value="4" <% nvram_match("dnsfilter_mode", "4", "selected"); %>>WAN DNS 2</option> -->
 							<option value="1" <% nvram_match("dnsfilter_mode", "1", "selected"); %>>OpenDNS Home</option>
 							<option value="7" <% nvram_match("dnsfilter_mode", "7", "selected"); %>>OpenDNS Family</option>
-<!--							<option value="2" <% nvram_match("dnsfilter_mode", "2", "selected"); %>>Norton Safe</option> -->
-<!--							<option value="3" <% nvram_match("dnsfilter_mode", "3", "selected"); %>>Norton Family</option> -->
-<!--							<option value="4" <% nvram_match("dnsfilter_mode", "4", "selected"); %>>Norton Children</option> -->
 							<option value="19" <% nvram_match("dnsfilter_mode", "19", "selected"); %>>Adguard Default</option>
 							<option value="20" <% nvram_match("dnsfilter_mode", "20", "selected"); %>>Adguard Family</option>
 							<option value="5" <% nvram_match("dnsfilter_mode", "5", "selected"); %>>Yandex Safe</option>

@@ -7122,8 +7122,8 @@ const char *dns_filter(int mode)
 		"",					/* 0: Unfiltered (handled separately below) */
 		"208.67.222.222",	/* 1: OpenDNS */
 		"",					/* 2: Norton Connect Safe A (Security) */
-		"",					/* 3: Norton Connect Safe B (Security + Adult) */
-		"",					/* 4: Norton Connect Safe C (Sec. + Adult + Violence */
+		"",					/* 3: WAN DNS 1 */
+		"",					/* 4: WAN DNS 2 */
 		"77.88.8.88",		/* 5: Secure Mode safe.dns.yandex.ru */
 		"77.88.8.7",		/* 6: Family Mode family.dns.yandex.ru */
 		"208.67.222.123",	/* 7: OpenDNS Family Shield */
@@ -7141,15 +7141,32 @@ const char *dns_filter(int mode)
 		"94.140.14.14",		/* 19: Adguard Default */
 		"94.140.14.15"		/* 20: Adguard Family */
         };
+	int i;
+	char wan_dns[1024];
+	char *wan_dnsx[10];
 
 	size = sizeof(server)/sizeof(char*);
 	if (mode < 0 || mode > ((int)size-1)) mode = 0;
 
+	strncpy(wan_dns, nvram_safe_get("wan0_dns"), sizeof(wan_dns));
+	if(strlen(wan_dns) > 0){
+		for (wan_dnsx[i=0] = strtok(wan_dns, " "); wan_dnsx[i] != NULL; wan_dnsx[++i] = strtok(NULL, " "));
+	}
+	else
+	{
+		wan_dnsx[0] = nvram_safe_get("wan0_dns1_x");
+		wan_dnsx[1] = nvram_safe_get("wan0_dns2_x");
+	}
+				
 	// Unfiltered - don't return anything, the calling function should take care of handling it
         // (currently, dnsfilter_settings() will simply not enforce anything, as if dnsfilter was disabled)
 	if (mode == 0)
 		return "";
 	// Custom IP, will fallback to router IP if it's not defined
+	else if (mode == 3)
+		dnsptr = wan_dnsx[0];
+	else if (mode == 4)
+		dnsptr = wan_dnsx[1];
 	else if (mode == 8)
 		dnsptr = nvram_safe_get("dnsfilter_custom1");
 	else if (mode == 9)
