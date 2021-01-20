@@ -1974,8 +1974,10 @@ int update_resolvconf(void)
 	/* Add DNS from VPN clients, others if non-exclusive */
 #ifdef RTCONFIG_OPENVPN
 	dnsstrict = get_dnslevel();
-	if (nvram_get_int("vpn_reverse_strict") == 0)	// standard dns configs
-		write_vpn_resolv(fp);
+	if (nvram_get_int("vpn_reverse_strict") == 0) {	// standard dns configs
+		if (dnsstrict > 0 && dnsstrict < 4)
+			write_vpn_resolv(fp);
+	}
 	// If dns not set to exclusive/dnscrypt/stubby
 	if (dnsstrict < 3) {
 #endif
@@ -2038,8 +2040,10 @@ int update_resolvconf(void)
 	}
 #endif
 #ifdef RTCONFIG_OPENVPN
-	if (nvram_get_int("vpn_reverse_strict") == 1)	// reverse strict
-		write_vpn_resolv(fp);
+	if (nvram_get_int("vpn_reverse_strict") == 1) {	// reverse strict
+		if (dnsstrict > 0 && dnsstrict < 4)
+			write_vpn_resolv(fp);
+	}
 #endif
 
 	fclose(fp);
