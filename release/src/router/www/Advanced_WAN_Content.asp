@@ -400,11 +400,11 @@ function applyRule(){
 		if(!document.form.dnscrypt_proxy[0].checked && (dnscrypt_proxy_orig == 1)) {
 			if(vpn_client1_enabled == 1) {
 				if(document.form.vpn_client1_adns.value == 4)
-					document.form.vpn_client1_adns.value = 3;
+					document.form.vpn_client1_adns.value = 2;
 			}
 			if(vpn_client2_enabled == 1) {
 				if(document.form.vpn_client2_adns.value == 4)
-					document.form.vpn_client2_adns.value = 3;
+					document.form.vpn_client2_adns.value = 2;
 			}
 		}
 
@@ -426,11 +426,11 @@ function applyRule(){
 		if(!document.form.stubby_proxy[0].checked && (stubby_proxy_orig == 1)) {
 			if(vpn_client1_enabled == 1) {
 				if(document.form.vpn_client1_adns.value == 4)
-					document.form.vpn_client1_adns.value = 3;
+					document.form.vpn_client1_adns.value = 2;
 			}
 			if(vpn_client2_enabled == 1) {
 				if(document.form.vpn_client2_adns.value == 4)
-					document.form.vpn_client2_adns.value = 3;
+					document.form.vpn_client2_adns.value = 2;
 			}
 		}
 
