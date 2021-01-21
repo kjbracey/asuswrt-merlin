@@ -59,7 +59,7 @@ void test_main (void)
 
       if (!(ecc->p.bit_size == 255 || ecc->p.bit_size == 448))
 	continue;
-
+  
       size = ecc_size (ecc);
       clen = 1 + ecc->p.bit_size / 8;
 

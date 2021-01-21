@@ -58,3 +58,4 @@ cmac_des3_digest (struct cmac_des3_ctx *ctx,
 {
   CMAC64_DIGEST (ctx, des3_encrypt, length, digest);
 }
+
