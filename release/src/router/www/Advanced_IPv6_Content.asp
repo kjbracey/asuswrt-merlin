@@ -33,6 +33,8 @@ var machine_name = '<% get_machine_name(); %>';
 var machine_arm = (machine_name.search("arm") == -1) ? false : true;
 var ipv6_dhcp_start_orig = '<% nvram_get("ipv6_dhcp_start"); %>';
 var ipv6_dhcp_end_orig = '<% nvram_get("ipv6_dhcp_end"); %>';
+var dnssec_enable = '<% nvram_get("dnssec_enable"); %>';
+var stubby_enable = '<% nvram_get("stubby_proxy"); %>';
 
 var $j = jQuery.noConflict();
 
@@ -467,6 +469,22 @@ function showInputfield(v){
 	}		
 
 	hide_enable_mtu(document.form.ipv6_radvd.value);
+
+	$("dns_warn").innerHTML = "";
+	showhide("dns_warn", false);
+	if (stubby_enable == '1') { // warn if stubby enabled, disable dns options
+		inputCtrl(document.form.ipv6_dnsenable[0], 0);
+		inputCtrl(document.form.ipv6_dnsenable[1], 0);
+		inputCtrl(document.form.ipv6_dns1, 0);
+		inputCtrl(document.form.ipv6_dns2, 0);
+		inputCtrl(document.form.ipv6_dns3, 0);
+		$("dns_warn").innerHTML += " - DoT enabled";
+		showhide("dns_warn", true);
+	}
+	if (dnssec_enable == '1') { // warn if dnssec enabled
+		$("dns_warn").innerHTML += " - DNSSEC enabled";
+		showhide("dns_warn", true);
+	}
 	
 	if(v != ipv6_proto_orig){
 			update_info(0);
@@ -1255,7 +1273,7 @@ function showInfo(){
 			<table id="ipv6_dns_setting" style="margin-top:8px;" width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3"  class="FormTable">
 				  <thead>
 				  <tr>
-						<td colspan="2"><#IPv6_DNS_Setting#></td>
+						<td colspan="2"><#IPv6_DNS_Setting#><span id="dns_warn" style="background-color:transparent;"> -Placehoder- </span></td>
 				  </tr>
 				  </thead>		
 					<tr style="display:none;">
