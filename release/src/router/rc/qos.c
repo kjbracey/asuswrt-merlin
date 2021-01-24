@@ -1100,7 +1100,7 @@ int start_tqos(void)
 			sprintf(qsched, "codel");
 			break;
 		case 2:
-			sprintf(qsched, "fq_codel quantum %u noecn", mtu);
+			sprintf(qsched, "fq_codel quantum %u limit 1000 noecn", mtu);
 			break;
 		default:
 			/* qsched = "sfq perturb 10"; */
