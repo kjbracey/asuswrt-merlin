@@ -70,9 +70,8 @@ endif
 # Postconf helper script
 	install -m 0755 helper.sh $(INSTALLDIR)/usr/sbin
 
-# amtm script + legacy Entware installer link
+# amtm script
 	install -m 0700 amtm $(INSTALLDIR)/usr/sbin
-	ln -sf /usr/sbin/amtm $(INSTALLDIR)/usr/sbin/entware-setup.sh
 
 # Conntrack connection counts script
 	install -m 0755 conntrkcnt.sh $(INSTALLDIR)/usr/sbin
