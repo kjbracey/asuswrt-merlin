@@ -1020,10 +1020,6 @@ void start_dnsmasq(int force)
 		}
 	}
 
-	/* Force ntpc start with no WAN */
-	if (!pids("ntp") && nvram_get_int("ntp_force"))
-		refresh_ntpc();
-
 /* TODO: remove it for here !!!*/
 //	int unit;
 //	char prefix[8], nvram_name[16], wan_proto[16];
@@ -3577,6 +3573,10 @@ start_httpd(void)
 	}
 	else
 		clear_invoke_later(INVOKELATER_HTTPD);
+
+	/* Force ntpc start with no WAN, but wait for LAN */
+	if (!pids("ntp") && nvram_get_int("ntp_force"))
+		refresh_ntpc();
 
 #ifdef DEBUG_RCTEST // Left for UI debug
 	httpd_dir = nvram_safe_get("httpd_dir");
