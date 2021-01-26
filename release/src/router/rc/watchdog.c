@@ -1585,7 +1585,7 @@ void ntpd_check()
 static int wsddflag = 0;
 void wsdd_check()
 {
-	if (nvram_match("link_internet", "1") && !g_reboot) {
+	if (is_lan_connected() && !g_reboot) {
 		if (!pids("wsdd2")){
 			wsddflag = 0;
 			logmessage("watchdog", "restart wsdd");
