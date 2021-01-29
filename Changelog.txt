@@ -4,6 +4,30 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_46E9j9527  (1 February-2020) ARM SDK, MIPS,ARM KRACK
+  Rollup of 47D builds without RT-AC68U V3 support
+* NEW: dnsfilter: add WAN DNS 1/2 to filter selection list
+* CHANGED: dnsmasq: update to 2.84 final (dnspooq)
+* CHANGED: nettle: update to 3.7
+* CHANGED: others: (backport) remove legacy entware-setup.sh symlink
+* CHANGED: rc: (backport) limit fq_codel queues to 1000 packets instead of the default 10240
+* CHANGED: httpd: (backport) cache require.min.js and jquery-ui.js browser-side
+* CHANGED: openvpn: (backport) enable multihome for UDP servers
+* CHANGED: wsdd2: (backport) identify as ASUSWRT WSD rather than NETGEAR WSD
+* CHANGED: services: move forced ntpc start from dnsmasq to http/httpd
+* CHANGED: wsdd2: start on lan connected instead of internet up
+* CHANGED: dns: fallback to VPN strict instead of exclusive when disabling DoT with VPN DoT set
+* CHANGED: webui: add stubby/dnssec enabled warning to ipv6 dns settings
+* CHANGED: rc: update default system time (RC_BUILDTIME) to 01 Jan 2020
+* CHANGED: httpd: convert apps.c to linux line endings
+* CHANGED: webui: update html attributes for wireless psk
+* CHANGED: httpd: buffer overflow protection strncpy/strlcpy (p2)
+* CHANGED: httpd: buffer overflow protection snprintf (p2)
+* FIXED: openvpn: do not add openvpn dns server when accept dns disable
+* FIXED: webui: fix enumeration of selected stubby servers
+* FIXED: webui: fix tools/wireless clients stats when radio is off
+
+
 374.43_46E8j9527  (23-December-2020) ARM SDK, MIPS,ARM KRACK
 * CHANGED: openssl: update CA bundle to 2020 December 9th version
 * CHANGED: openssl11: update to 1.1.1i
