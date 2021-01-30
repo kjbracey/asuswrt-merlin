@@ -225,129 +225,135 @@ static int check_date_range(unsigned long curtime, u32 date_start, u32 date_end)
     && serial_compare_32(curtime, date_end) == SERIAL_LT;
 }
 
-/* Return bytes of canonicalised rdata, when the return value is zero, the remaining
-   data, pointed to by *p, should be used raw. */
-static int get_rdata(struct dns_header *header, size_t plen, unsigned char *end, char *buff, int bufflen,
-		     unsigned char **p, u16 **desc)
+/* Return bytes of canonicalised rrdata one by one.
+   Init state->ip with the RR, and state->end with the end of same.
+   Init state->op to NULL.
+   Init state->desc to RR descriptor.
+   Init state->buff with a MAXDNAME * 2 buffer.
+   
+   After each call which returns 1, state->op points to the next byte of data.
+   On returning 0, the end has been reached.
+*/
+struct rdata_state {
+  u16 *desc;
+  size_t c;
+  unsigned char *end, *ip, *op;
+  char *buff;
+};
+
+static int get_rdata(struct dns_header *header, size_t plen, struct rdata_state *state)
 {
-  int d = **desc;
-
-  /* No more data needs mangling */
-  if (d == (u16)-1)
+  int d;
+  
+  if (state->op && state->c != 1)
     {
-      /* If there's more data than we have space for, just return what fits,
-	 we'll get called again for more chunks */
-      if (end - *p > bufflen)
-	{
-	  memcpy(buff, *p, bufflen);
-	  *p += bufflen;
-	  return bufflen;
-	}
-
-      return 0;
+      state->op++;
+      state->c--;
+      return 1;
     }
 
-  (*desc)++;
-
-  if (d == 0 && extract_name(header, plen, p, buff, 1, 0))
-    /* domain-name, canonicalise */
-    return to_wire(buff);
-  else
+  while (1)
     {
-      /* plain data preceding a domain-name, don't run off the end of the data */
-      if ((end - *p) < d)
-	d = end - *p;
-
-      if (d != 0)
+      d = *(state->desc);
+      
+      if (d == (u16)-1)
 	{
-	  memcpy(buff, *p, d);
-	  *p += d;
+	  /* all the bytes to the end. */
+	  if ((state->c = state->end - state->ip) != 0)
+	    {
+	      state->op = state->ip;
+	      state->ip = state->end;;
+	    }
+	  else
+	    return 0;
 	}
-
-      return d;
+      else
+	{
+	  state->desc++;
+	  
+	  if (d == (u16)0)
+	    {
+	      /* domain-name, canonicalise */
+	      int len;
+	      
+	      if (!extract_name(header, plen, &state->ip, state->buff, 1, 0) ||
+		  (len = to_wire(state->buff)) == 0)
+		continue;
+	      
+	      state->c = len;
+	      state->op = (unsigned char *)state->buff;
+	    }
+	  else
+	    {
+	      /* plain data preceding a domain-name, don't run off the end of the data */
+	      if ((state->end - state->ip) < d)
+		d = state->end - state->ip;
+	      
+	      if (d == 0)
+		continue;
+		  
+	      state->op = state->ip;
+	      state->c = d;
+	      state->ip += d;
+	    }
+	}
+      
+      return 1;
     }
 }
 
-/* Bubble sort the RRset into the canonical order.
-   Note that the byte-streams from two RRs may get unsynced: consider
-   RRs which have two domain-names at the start and then other data.
-   The domain-names may have different lengths in each RR, but sort equal
+/* Bubble sort the RRset into the canonical order. */
 
-   ------------
-   |abcde|fghi|
-   ------------
-   |abcd|efghi|
-   ------------
-
-   leaving the following bytes as deciding the order. Hence the nasty left1 and left2 variables.
-*/
-
-static int sort_rrset(struct dns_header *header, size_t plen, u16 *rr_desc, int rrsetidx,
+static int sort_rrset(struct dns_header *header, size_t plen, u16 *rr_desc, int rrsetidx, 
 		      unsigned char **rrset, char *buff1, char *buff2)
 {
-  int swap, quit, i, j;
-
+  int swap, i, j;
+  
   do
     {
       for (swap = 0, i = 0; i < rrsetidx-1; i++)
 	{
-	  int rdlen1, rdlen2, left1, left2, len1, len2, len, rc;
-	  u16 *dp1, *dp2;
-	  unsigned char *end1, *end2;
+	  int rdlen1, rdlen2;
+	  struct rdata_state state1, state2;
+	  
 	  /* Note that these have been determined to be OK previously,
 	     so we don't need to check for NULL return here. */
-	  unsigned char *p1 = skip_name(rrset[i], header, plen, 10);
-	  unsigned char *p2 = skip_name(rrset[i+1], header, plen, 10);
+	  state1.ip = skip_name(rrset[i], header, plen, 10);
+	  state2.ip = skip_name(rrset[i+1], header, plen, 10);
+	  state1.op = state2.op = NULL;
+	  state1.buff = buff1;
+	  state2.buff = buff2;
+	  state1.desc = state2.desc = rr_desc;
+	  
+	  state1.ip += 8; /* skip class, type, ttl */
+	  GETSHORT(rdlen1, state1.ip);
+	  if (!CHECK_LEN(header, state1.ip, plen, rdlen1))
+	    return rrsetidx; /* short packet */
+	  state1.end = state1.ip + rdlen1;
+	  
+	  state2.ip += 8; /* skip class, type, ttl */
+	  GETSHORT(rdlen2, state2.ip);
+	  if (!CHECK_LEN(header, state2.ip, plen, rdlen2))
+	    return rrsetidx; /* short packet */
+	  state2.end = state2.ip + rdlen2; 
 
-	  p1 += 8; /* skip class, type, ttl */
-	  GETSHORT(rdlen1, p1);
-	  end1 = p1 + rdlen1;
-
-	  p2 += 8; /* skip class, type, ttl */
-	  GETSHORT(rdlen2, p2);
-	  end2 = p2 + rdlen2;
-
-	  dp1 = dp2 = rr_desc;
-
-	  for (quit = 0, left1 = 0, left2 = 0, len1 = 0, len2 = 0; !quit;)
+	  /* If the RR has no names in it then canonicalisation
+	     is the identity function and we can compare
+	     the RRs directly. If not we compare the 
+	     canonicalised RRs one byte at a time. */
+	  if (*rr_desc == (u16)-1)	  
 	    {
-	      if (left1 != 0)
-		memmove(buff1, buff1 + len1 - left1, left1);
-
-	      if ((len1 = get_rdata(header, plen, end1, buff1 + left1, (MAXDNAME * 2) - left1, &p1, &dp1)) == 0)
-		{
-		  quit = 1;
-		  len1 = end1 - p1;
-		  memcpy(buff1 + left1, p1, len1);
-		}
-	      len1 += left1;
-
-	      if (left2 != 0)
-		memmove(buff2, buff2 + len2 - left2, left2);
-
-	      if ((len2 = get_rdata(header, plen, end2, buff2 + left2, (MAXDNAME *2) - left2, &p2, &dp2)) == 0)
-		{
-		  quit = 1;
-		  len2 = end2 - p2;
-		  memcpy(buff2 + left2, p2, len2);
-		}
-	      len2 += left2;
-
-	      if (len1 > len2)
-		left1 = len1 - len2, left2 = 0, len = len2;
-	      else
-		left2 = len2 - len1, left1 = 0, len = len1;
-
-	      rc = (len == 0) ? 0 : memcmp(buff1, buff2, len);
-
-	      if (rc > 0 || (rc == 0 && quit && len1 > len2))
+	      int rdmin = rdlen1 > rdlen2 ? rdlen2 : rdlen1;
+	      int cmp = memcmp(state1.ip, state2.ip, rdmin);
+	      
+	      if (cmp > 0 || (cmp == 0 && rdlen1 > rdmin))
 		{
 		  unsigned char *tmp = rrset[i+1];
 		  rrset[i+1] = rrset[i];
 		  rrset[i] = tmp;
-		  swap = quit = 1;
+		  swap = 1;
 		}
-	      else if (rc == 0 && quit && len1 == len2)
+	      else if (cmp == 0 && (rdlen1 == rdlen2))
 		{
 		  /* Two RRs are equal, remove one copy. RFC 4034, para 6.3 */
 		  for (j = i+1; j < rrsetidx-1; j++)
@@ -355,9 +361,39 @@ static int sort_rrset(struct dns_header *header, size_t plen, u16 *rr_desc, int 
 		  rrsetidx--;
 		  i--;
 		}
-	      else if (rc < 0)
-		quit = 1;
 	    }
+	  else
+	    /* Comparing canonicalised RRs, byte-at-a-time. */
+	    while (1)
+	      {
+		int ok1, ok2;
+		
+		ok1 = get_rdata(header, plen, &state1);
+		ok2 = get_rdata(header, plen, &state2);
+		
+		if (!ok1 && !ok2)
+		  {
+		    /* Two RRs are equal, remove one copy. RFC 4034, para 6.3 */
+		    for (j = i+1; j < rrsetidx-1; j++)
+		      rrset[j] = rrset[j+1];
+		    rrsetidx--;
+		    i--;
+		    break;
+		  }
+		else if (ok1 && (!ok2 || *state1.op > *state2.op)) 
+		  {
+		    unsigned char *tmp = rrset[i+1];
+		    rrset[i+1] = rrset[i];
+		    rrset[i] = tmp;
+		    swap = 1;
+		    break;
+		  }
+		else if (ok2 && (!ok1 || *state2.op > *state1.op))
+		  break;
+		
+		/* arrive here when bytes are equal, go round the loop again
+		   and compare the next ones. */
+	      }
 	}
     } while (swap);
 
@@ -555,87 +591,125 @@ static int validate_rrset(time_t now, struct dns_header *header, size_t plen, in
 	   /* 4035 5.3.3 rules on TTLs */
 	   if (orig_ttl < ttl)
 	     ttl = orig_ttl;
-
+	   
 	   if (time_check && difftime(sig_expiration, curtime) < ttl)
 	     ttl = difftime(sig_expiration, curtime);
 
 	   *ttl_out = ttl;
 	 }
-
+       
       sig = p;
       sig_len = rdlen - (p - psav);
-
+              
       nsigttl = htonl(orig_ttl);
-
+      
       hash->update(ctx, 18, psav);
       wire_len = to_wire(keyname);
       hash->update(ctx, (unsigned int)wire_len, (unsigned char*)keyname);
       from_wire(keyname);
 
+#define RRBUFLEN 128 /* Most RRs are smaller than this. */
+      
       for (i = 0; i < rrsetidx; ++i)
 	{
-	  int seg;
-	  unsigned char *end, *cp;
-	  u16 len, *dp;
-
+	  int j;
+	  struct rdata_state state;
+	  u16 len;
+	  unsigned char rrbuf[RRBUFLEN];
+	  
 	  p = rrset[i];
-
-	  if (!extract_name(header, plen, &p, name, 1, 10))
+	  
+	  if (!extract_name(header, plen, &p, name, 1, 10)) 
 	    return STAT_BOGUS;
 
 	  name_start = name;
-
+	  
 	  /* if more labels than in RRsig name, hash *.<no labels in rrsig labels field>  4035 5.3.2 */
 	  if (labels < name_labels)
 	    {
-	      int k;
-	      for (k = name_labels - labels; k != 0; k--)
+	      for (j = name_labels - labels; j != 0; j--)
 		{
 		  while (*name_start != '.' && *name_start != 0)
 		    name_start++;
-		  if (k != 1 && *name_start == '.')
+		  if (j != 1 && *name_start == '.')
 		    name_start++;
 		}
-
+	      
 	      if (wildcard_out)
 		*wildcard_out = name_start+1;
 
 	      name_start--;
 	      *name_start = '*';
 	    }
-
+	  
 	  wire_len = to_wire(name_start);
 	  hash->update(ctx, (unsigned int)wire_len, (unsigned char *)name_start);
 	  hash->update(ctx, 4, p); /* class and type */
 	  hash->update(ctx, 4, (unsigned char *)&nsigttl);
 
-	  p += 8; /* skip class, type, ttl */
+	  p += 8; /* skip type, class, ttl */
 	  GETSHORT(rdlen, p);
 	  if (!CHECK_LEN(header, p, plen, rdlen))
-	    return STAT_BOGUS;
+	    return STAT_BOGUS; 
 
-	  end = p + rdlen;
-
-	  /* canonicalise rdata and calculate length of same, use name buffer as workspace.
-	     Note that name buffer is twice MAXDNAME long in DNSSEC mode. */
-	  cp = p;
-	  dp = rr_desc;
-	  for (len = 0; (seg = get_rdata(header, plen, end, name, MAXDNAME * 2, &cp, &dp)) != 0; len += seg);
-	  len += end - cp;
-	  len = htons(len);
-	  hash->update(ctx, 2, (unsigned char *)&len);
-
-	  /* Now canonicalise again and digest. */
-	  cp = p;
-	  dp = rr_desc;
-	  while ((seg = get_rdata(header, plen, end, name, MAXDNAME * 2, &cp, &dp)))
-	    hash->update(ctx, seg, (unsigned char *)name);
-	  if (cp != end)
-	    hash->update(ctx, end - cp, cp);
+	  /* Optimisation for RR types which need no cannonicalisation.
+	     This includes DNSKEY DS NSEC and NSEC3, which are also long, so
+	     it saves lots of calls to get_rdata, and avoids the pessimal
+	     segmented insertion, even with a small rrbuf[].
+	     
+	     If canonicalisation is not needed, a simple insertion into the hash works.
+	  */
+	  if (*rr_desc == (u16)-1)
+	    {
+	      len = htons(rdlen);
+	      hash->update(ctx, 2, (unsigned char *)&len);
+	      hash->update(ctx, rdlen, p);
+	    }
+	  else
+	    {
+	      /* canonicalise rdata and calculate length of same, use 
+		 name buffer as workspace for get_rdata. */
+	      state.ip = p;
+	      state.op = NULL;
+	      state.desc = rr_desc;
+	      state.buff = name;
+	      state.end = p + rdlen;
+	      
+	      for (j = 0; get_rdata(header, plen, &state); j++)
+		if (j < RRBUFLEN)
+		  rrbuf[j] = *state.op;
+	      
+	      len = htons((u16)j);
+	      hash->update(ctx, 2, (unsigned char *)&len); 
+	      
+	      /* If the RR is shorter than RRBUFLEN (most of them, in practice)
+		 then we can just digest it now. If it exceeds RRBUFLEN we have to
+		 go back to the start and do it in chunks. */
+	      if (j >= RRBUFLEN)
+		{
+		  state.ip = p;
+		  state.op = NULL;
+		  state.desc = rr_desc;
+		  
+		  for (j = 0; get_rdata(header, plen, &state); j++)
+		    {
+		      rrbuf[j] = *state.op;
+		      
+		      if (j == RRBUFLEN - 1)
+			{
+			  hash->update(ctx, RRBUFLEN, rrbuf);
+			  j = -1;
+			}
+		    }
+		}
+	      
+	      if (j != 0)
+		hash->update(ctx, j, rrbuf);
+	    }
 	}
-
+     
       hash->digest(ctx, hash->digest_size, digest);
-
+      
       /* namebuff used for workspace above, restore to leave unchanged on exit */
       p = (unsigned char*)(rrset[0]);
       extract_name(header, plen, &p, name, 1, 0);
@@ -1015,7 +1089,7 @@ int dnssec_validate_ds(time_t now, struct dns_header *header, size_t plen, char 
       log_query(F_NOEXTRA | F_UPSTREAM, name, NULL, nons ? "no DS/cut" : "no DS");
     }
 
-  insecure_count = 0;      
+  insecure_count = 0;
   return STAT_OK;
 }
 
@@ -2064,37 +2138,6 @@ size_t dnssec_generate_query(struct dns_header *header, unsigned char *end, char
     PUTSHORT(edns_pktsz, p);
 
   return ret;
-}
-
-unsigned char* hash_questions(struct dns_header *header, size_t plen, char *name)
-{
-  int q;
-  unsigned int len;
-  unsigned char *p = (unsigned char *)(header+1);
-  const struct nettle_hash *hash;
-  void *ctx;
-  unsigned char *digest;
-
-  if (!(hash = hash_find("sha1")) || !hash_init(hash, &ctx, &digest))
-    return NULL;
-
-  for (q = ntohs(header->qdcount); q != 0; q--)
-    {
-      if (!extract_name(header, plen, &p, name, 1, 4))
-	break; /* bad packet */
-
-      len = to_wire(name);
-      hash->update(ctx, len, (unsigned char *)name);
-      /* CRC the class and type as well */
-      hash->update(ctx, 4, p);
-
-      p += 4;
-      if (!CHECK_LEN(header, p, plen, 0))
-	break; /* bad packet */
-    }
-
-  hash->digest(ctx, hash->digest_size, digest);
-  return digest;
 }
 
 #endif /* HAVE_DNSSEC */
