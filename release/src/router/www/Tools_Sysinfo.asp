@@ -65,8 +65,14 @@ function initial(){
 	var conn_wifi_5g_assoc = parseInt('<% sysinfo("conn.wifi.5.assoc"); %>') + parseInt('<% sysinfo("conn.wifi.51.assoc"); %>') + parseInt('<% sysinfo("conn.wifi.52.assoc"); %>') + parseInt('<% sysinfo("conn.wifi.53.assoc"); %>');
 	var conn_wifi_5g_autho = parseInt('<% sysinfo("conn.wifi.5.autho"); %>') + parseInt('<% sysinfo("conn.wifi.51.autho"); %>') + parseInt('<% sysinfo("conn.wifi.52.autho"); %>') + parseInt('<% sysinfo("conn.wifi.53.autho"); %>');
 	var conn_wifi_5g_authe = parseInt('<% sysinfo("conn.wifi.5.authe"); %>') + parseInt('<% sysinfo("conn.wifi.51.authe"); %>') + parseInt('<% sysinfo("conn.wifi.52.authe"); %>') + parseInt('<% sysinfo("conn.wifi.53.authe"); %>');
-	$("wifi2_clients_dt").innerHTML = "Associated:&nbsp;" + conn_wifi_2g_assoc + "&nbsp;&nbsp;-&nbsp;&nbsp;Authorized:&nbsp;" + conn_wifi_2g_autho + "&nbsp;&nbsp;-&nbsp;&nbsp;Authenticated:&nbsp;" + conn_wifi_2g_authe;
-	$("wifi5_clients_dt").innerHTML = "Associated:&nbsp;" + conn_wifi_5g_assoc + "&nbsp;&nbsp;-&nbsp;&nbsp;Authorized:&nbsp;" + conn_wifi_5g_autho + "&nbsp;&nbsp;-&nbsp;&nbsp;Authenticated:&nbsp;" + conn_wifi_5g_authe;
+	if (conn_wifi_2g_assoc >= 0)
+		$("wifi2_clients_dt").innerHTML = "Associated:&nbsp;" + conn_wifi_2g_assoc + "&nbsp;&nbsp;-&nbsp;&nbsp;Authorized:&nbsp;" + conn_wifi_2g_autho + "&nbsp;&nbsp;-&nbsp;&nbsp;Authenticated:&nbsp;" + conn_wifi_2g_authe;
+	else
+		$("wifi2_clients_dt").innerHTML = "<i>Radio is off</i>";
+	if (conn_wifi_5g_assoc >= 0)
+		$("wifi5_clients_dt").innerHTML = "Associated:&nbsp;" + conn_wifi_5g_assoc + "&nbsp;&nbsp;-&nbsp;&nbsp;Authorized:&nbsp;" + conn_wifi_5g_autho + "&nbsp;&nbsp;-&nbsp;&nbsp;Authenticated:&nbsp;" + conn_wifi_5g_authe;
+	else
+		$("wifi5_clients_dt").innerHTML = "<i>Radio is off</i>";
 
 if ((extendno == "") || (extendno == "0"))
 		$("fwver").innerHTML = firmver + "." + buildno;

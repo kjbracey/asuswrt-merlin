@@ -256,9 +256,9 @@ int ej_show_sysinfo(int eid, webs_t wp, int argc, char_t ** argv)
 			} else {
 				count = 0;
 			}
-			if (count == -1)
-				strcpy(result,"<i>off</i>");
-			else
+//			if (count == -1)
+//				strcpy(result,"<i>off</i>");
+//			else
 				sprintf(result,"%d",count);
 
 		} else if(strcmp(type,"driver_version") == 0 ) {
