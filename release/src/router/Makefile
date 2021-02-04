@@ -255,7 +255,12 @@ obj-y += libdisk
 
 obj-y += e2fsprogs
 obj-$(RTCONFIG_EXFAT) += exfat-utils
+
+ifeq ($(RTCONFIG_BCMARM),y)
+obj-$(RTCONFIG_NFS) += nfs-utils-arm
+else
 obj-$(RTCONFIG_NFS) += nfs-utils
+endif
 obj-$(RTCONFIG_NFS) += portmap
 
 ifneq ($(RTCONFIG_TFAT),y)
@@ -3567,6 +3572,29 @@ nfs-utils-install:
 	install -D nfs-utils/utils/statd/statd $(INSTALLDIR)/nfs-utils/usr/sbin/statd
 	install -D nfs-utils/support/lib/libnfs.so $(INSTALLDIR)/nfs-utils/usr/lib/libnfs.so
 	$(STRIP) $(INSTALLDIR)/nfs-utils/usr/sbin/* $(INSTALLDIR)/nfs-utils/usr/lib/libnfs.so
+
+nfs-utils-arm/stamp-h1:
+	cd nfs-utils-arm && ./autogen.sh && \
+	CPPFLAGS="$(EXTRACFLAGS) -Os" knfsd_cv_bsd_signals=no \
+	CC_FOR_BUILD=$(CC) $(CONFIGURE) --enable-nfsv3 --disable-nfsv4 --disable-nfsv41 \
+	--disable-ipv6 --disable-tirpc --disable-nfsdcltrack \
+	--disable-uuid --disable-gss --disable-mount --without-tcp-wrappers
+	@touch $@
+
+nfs-utils-arm: nfs-utils-arm/stamp-h1
+	$(MAKE) -C $@ $(PARALLEL_BUILD)
+
+nfs-utils-arm-clean:
+	-@$(MAKE) -C nfs-utils-arm distclean
+	@rm -f nfs-utils-arm/stamp-h1
+
+nfs-utils-arm-install:
+	install -D nfs-utils-arm/utils/nfsd/nfsd $(INSTALLDIR)/nfs-utils-arm/usr/sbin/nfsd
+	install -D nfs-utils-arm/utils/mountd/mountd $(INSTALLDIR)/nfs-utils-arm/usr/sbin/mountd
+	install -D nfs-utils-arm/utils/exportfs/exportfs $(INSTALLDIR)/nfs-utils-arm/usr/sbin/exportfs
+	install -D nfs-utils-arm/utils/showmount/showmount $(INSTALLDIR)/nfs-utils-arm/usr/sbin/showmount
+	install -D nfs-utils-arm/utils/statd/statd $(INSTALLDIR)/nfs-utils-arm/usr/sbin/statd
+	$(STRIP) $(INSTALLDIR)/nfs-utils-arm/usr/sbin/*
 
 portmap: portmap/Makefile
 	$(MAKE) -C $@  EXTRACFLAGS="$(EXTRACFLAGS) -Os" NO_TCP_WRAPPER=y RPCUSER=nobody

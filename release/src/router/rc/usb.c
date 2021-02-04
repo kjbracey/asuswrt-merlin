@@ -3972,6 +3972,7 @@ void start_nfsd(void)
 	/* create directories/files */
 	mkdir_if_none("/var/lib");
 	mkdir_if_none("/var/lib/nfs");
+	mkdir_if_none("/var/lib/nfs/sm");
 #ifdef LINUX26
 	mkdir_if_none("/var/lib/nfs/v4recovery");
 	mount("nfsd", "/proc/fs/nfsd", "nfsd", MS_MGC_VAL, NULL);
@@ -4024,11 +4025,16 @@ void start_nfsd(void)
 	eval("/usr/sbin/statd");
 
 	if (nvram_match("nfsd_enable_v2", "1")) {
+#ifdef RTCONFIG_BCMARM
+		eval("/usr/sbin/nfsd", "-V 2", (threads ? options : "2"));
+		eval("/usr/sbin/mountd", "-V 2");
+#else
 		eval("/usr/sbin/nfsd", (threads ? options : "2"));
 		eval("/usr/sbin/mountd");
+#endif
 	} else {
 		eval("/usr/sbin/nfsd", "-N 2", (threads ? options : "2"));
-		eval("/usr/sbin/mountd", "-N 2");
+		eval("/usr/sbin/mountd");  // always enable V1/V2 mountd for Win10 NFS discovery
 	}
 
 	sleep(1);
