@@ -3960,6 +3960,7 @@ void start_nfsd(void)
 	FILE 		*fp;
         char *nv, *nvp, *b, *c;
 	char *dir, *access, *options;
+	char numthreads[4];
 	int threads;
 
 	if (nvram_match("nfsd_enable", "0")) return;
@@ -4013,8 +4014,7 @@ void start_nfsd(void)
 
 	// Get number of threads to start
 	threads = nvram_get_int("nfsd_threads");
-	if (threads)
-		sprintf(options, "%d", threads);
+	snprintf(numthreads, sizeof(numthreads), "%d", (threads ? : 2)); //default to 2 threads
 
 	append_custom_config("exports", fp);
 	fclose(fp);
@@ -4026,15 +4026,15 @@ void start_nfsd(void)
 
 	if (nvram_match("nfsd_enable_v2", "1")) {
 #ifdef RTCONFIG_BCMARM
-		eval("/usr/sbin/nfsd", "-V 2", (threads ? options : "2"));
-		eval("/usr/sbin/mountd", "-V 2");
+		eval("/usr/sbin/nfsd", "-V", "2", numthreads);
+		eval("/usr/sbin/mountd", "-V", "2", "-t", numthreads);
 #else
-		eval("/usr/sbin/nfsd", (threads ? options : "2"));
-		eval("/usr/sbin/mountd");
+		eval("/usr/sbin/nfsd", numthreads);
+		eval("/usr/sbin/mountd", "-t", numthreads);
 #endif
 	} else {
-		eval("/usr/sbin/nfsd", "-N 2", (threads ? options : "2"));
-		eval("/usr/sbin/mountd");  // always enable V1/V2 mountd for Win10 NFS discovery
+		eval("/usr/sbin/nfsd", "-N", "2", numthreads);
+		eval("/usr/sbin/mountd", "-t", numthreads);  // always enable V1/V2 mountd for Win10 NFS discovery
 	}
 
 	sleep(1);
