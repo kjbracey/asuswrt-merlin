@@ -1,6 +1,10 @@
 name,ip4address,ip6address,tls_port,tls_name,tls_digest,tls_pubkey,dnssec,nologs,verified
 "Cloudflare Primary",1.1.1.1,2606:4700:4700::1111,853,"cloudflare-dns.com",,,yes,yes,yes
 "Cloudflare Secondary",1.0.0.1,2606:4700:4700::1001,853,"cloudflare-dns.com",,,yes,yes,yes
+"Cloudflare Security Primary",1.1.1.2,2606:4700:4700::1112,853,"security.cloudflare-dns.com",,,yes,yes,yes
+"Cloudflare Security Secondary",1.0.0.2,2606:4700:4700::1002,853,"security.cloudflare-dns.com",,,yes,yes,yes
+"Cloudflare Family Primary",1.1.1.3,2606:4700:4700::1113,853,"family.cloudflare-dns.com",,,yes,yes,yes
+"Cloudflare Family Secondary",1.0.0.3,2606:4700:4700::1003,853,"family.cloudflare-dns.com",,,yes,yes,yes
 "Quad 9 Secure Primary",9.9.9.9,2620:fe::fe,853,"dns.quad9.net",,,yes,yes,yes
 "Quad 9 Secure Secondary",149.112.112.112,2620:fe::9,853,"dns.quad9.net",,,yes,yes,yes
 "Quad 9 EDNS Secure Primary",9.9.9.11,2620:fe::11,853,"dns.quad9.net",,,yes,yes,yes
