@@ -1427,10 +1427,10 @@ void ddns_check(void)
 	if(nvram_match("ddns_enable_x", "1") &&
 	  (nvram_match("wan0_state_t", "2") && nvram_match("wan0_auxstate_t", "0")) )
 	{
-		if (pids("ez-ipupdate")) //ez-ipupdate is running!
+		if (pids("ez-ipupdate") || nvram_match("ntp_sync", "0")) //ez-ipupdate is running or time not set!
 			return;
 
-		if (nvram_match("ddns_regular_check", "1")&& !nvram_match("ddns_server_x", "WWW.ASUS.COM")) {
+		if (nvram_match("ddns_regular_check", "1") && !nvram_match("ddns_server_x", "WWW.ASUS.COM")) {
 			int period = nvram_get_int("ddns_regular_period");
 //			if (period < 30) period = 60;
 			if (ddns_check_count >= (period*2)) {

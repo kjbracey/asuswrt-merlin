@@ -2427,18 +2427,18 @@ wan_up(char *wan_ifname)	// oleg patch, replace
 	//add_iQosRules(wan_ifname);
 	start_iQos();
 
-	if (!pids("miniupnpd") && nvram_get_int("ntp_sync"))
-		start_upnp();
-
-	stop_ddns();
-	start_ddns();
-
 	if(strcmp(wan_proto, "static")){
 		/* Sync time */
 		refresh_ntpc();
 		stop_ntpd();
 		start_ntpd();
 	}
+
+	if (!pids("miniupnpd") && nvram_get_int("ntp_sync"))
+		start_upnp();
+
+	stop_ddns();
+	start_ddns();
 
 #ifdef RTCONFIG_VPNC
 	if((nvram_match("vpnc_proto", "pptp") || nvram_match("vpnc_proto", "l2tp")) && nvram_match("vpnc_auto_conn", "1"))

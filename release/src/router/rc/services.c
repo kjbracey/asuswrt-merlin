@@ -3015,6 +3015,7 @@ start_ddns(void)
 	char usrstr[64];
 	int wild = nvram_get_int("ddns_wildcard_x");
 	int unit, asus_ddns = 0;
+	int i;
 	char tmp[32], prefix[] = "wanXXXXXXXXXX_";
 	time_t now;
 	pid_t pid;
@@ -3025,6 +3026,11 @@ start_ddns(void)
 	}
 	if (nvram_invmatch("ddns_enable_x", "1"))
 		return -1;
+
+	i = 60;  // wait max 60s for valid time
+	while (time(0) < 1609459200 && i--) {	//another way to check ntp_ready, system time < 01-Jan-2021
+		sleep(1);
+	}
 
 	unit = wan_primary_ifunit();
 	snprintf(prefix, sizeof(prefix), "wan%d_", unit);
