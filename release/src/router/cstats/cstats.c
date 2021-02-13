@@ -648,7 +648,7 @@ static void calc(void) {
 					}
 				}
 
-				if (now > 1325376000) {	/* Skip this if the time&date is not set yet */
+				if (now > 1609459200) {	/* Skip this if the time&date is not set yet */
 #ifdef DEBUG_CSTATS
 					_dprintf("%s: calling bump %s ptr->dailyp=%d\n", __FUNCTION__, ptr->ipaddr, ptr->dailyp);
 #endif
