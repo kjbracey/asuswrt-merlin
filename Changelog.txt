@@ -4,6 +4,20 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_47DAj9527  (13 February-2020) ARM SDK, MIPS,ARM KRACK, KROOK
+* CHANGED: init: make sure RT68U V3 odmpid set
+* CHANGED: rc: shared: add mainline support for AC68U V3
+* CHANGED: wl_arm: update wireless prebuilts for AC68U V3 support
+* CHANGED: nfs: usb: add thread support to mountd
+* CHANGED: nfs: arm: use updated nfs-utils; always enable mountd V2 support
+* CHANGED: nfs-utils: arm: add release 1.3.5-rc6
+* CHANGED: portmap: update to 6.0-20140623 snapshot
+* CHANGED: stubby: update stubby-resolvers.csv
+* CHANGED: nano: update to 5.5
+* CHANGED: rc: start ntp client/wait for valid time  before starting ddns
+* FIXED: rc: cstats: update time checks based on new default system time
+
+
 374.43_46E9j9527  (1 February-2020) ARM SDK, MIPS,ARM KRACK
   Rollup of 47D builds without RT-AC68U V3 support
 * NEW: dnsfilter: add WAN DNS 1/2 to filter selection list
