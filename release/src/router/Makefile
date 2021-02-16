@@ -510,6 +510,7 @@ endef
 obj-y += openssl-1.1 # include for all builds
 obj-y += haveged
 obj-y += udp-broadcast-relay-redux
+obj-y += socat
 ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
 obj-y += libnfnetlink-1.0.1
 obj-y += libmnl-1.0.4
@@ -1486,6 +1487,26 @@ haveged-install:
 haveged-clean:
 	-@$(MAKE) -C haveged clean
 	@rm -rf haveged/stamp-h1 haveged/src/.deps haveged/Makefile
+
+socat/stamp-h1:
+	cd $(TOP)/socat && CC=$(CC) AR=$(AR) STRIP=$(CROSS_COMPILE)strip \
+	autoreconf -i -f && \
+	CFLAGS="-Wall -Os -D_GNU_SOURCE $(EXTRACFLAGS) -fPIC -ffunction-sections -fdata-sections -I$(STAGEDIR)/usr/include -I$(TOP)/openssl-1.1/include/openssl" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L$(TOP)/openssl-1.1 -lssl -lcrypto -L$(STAGEDIR)/usr/lib -ldl" \
+	$(CONFIGURE) --prefix=/usr \
+	--disable-socks4 --disable-socks4a --disable-termios --disable-abstract-unixsocket --disable-libwrap
+	touch socat/stamp-h1
+
+socat: socat/stamp-h1
+	$(MAKE) -C socat progs
+
+socat-install:
+	install -D socat/socat $(INSTALLDIR)/socat/usr/sbin/socat
+	$(STRIP) $(INSTALLDIR)/socat/usr/sbin/socat
+
+socat-clean:
+	-@$(MAKE) -C socat distclean docclean
+	@rm -rf socat/stamp-h1 socat/Makefile
 
 nettle/stamp-h1:
 	@cd nettle && autoreconf -fi && \
