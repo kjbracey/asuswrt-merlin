@@ -4,6 +4,21 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_47EBj9527  (1-March-2020) ARM SDK, MIPS,ARM KRACK, KROOK
+* NEW: others: add acme.sh (letsencrypt) cli install
+* CHANGED: openssl11: update to 1.1.1j
+* CHANGED: openssl11: asuswrt-merlin customization for 1.1.x
+* CHANGED: make: update openssl11 and openvpn build recipes
+* CHANGED: build: updates for socat cross compile
+* CHANGED: socat: add release 1.7.4.1
+* CHANGED: rc: cstats: eliminate waits based on time(now) tests
+* CHANGED: make: update version info displayed by motd
+* CHANGED: haveged: update to 1.9.2
+* CHANGED: haveged: misc upstream commits
+* CHANGED: others: just log result of renew-acme.sh without pipe to syslog
+* CHANGED: webui: add empty field markers in wireless log
+
+
 374.43_47DAj9527  (13 February-2020) ARM SDK, MIPS,ARM KRACK, KROOK
 * CHANGED: init: make sure RT68U V3 odmpid set
 * CHANGED: rc: shared: add mainline support for AC68U V3
