@@ -44,6 +44,11 @@ ifeq ($(RTCONFIG_DNSMASQ),y)
 	install -m 0755 updatehosts.sh $(INSTALLDIR)/usr/sbin
 endif
 
+# acme.sh command line utility/cert renew
+	install -m 0755 install-acme.sh $(INSTALLDIR)/usr/sbin
+	install -m 0755 renew-acme.sh $(INSTALLDIR)/usr/sbin
+	install -m 0755 dns_asusapi.sh $(INSTALLDIR)/usr/sbin
+
 # Utility to prune logs
 	install -m 0755 check-log $(INSTALLDIR)/usr/sbin
 
