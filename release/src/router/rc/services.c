@@ -3028,7 +3028,7 @@ start_ddns(void)
 		return -1;
 
 	i = 60;  // wait max 60s for valid time
-	while (time(0) < 1609459200 && i--) {	//another way to check ntp_ready, system time < 01-Jan-2021
+	while (!nvram_get_int("ntp_sync") && i--) {
 		sleep(1);
 	}
 
