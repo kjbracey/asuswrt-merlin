@@ -63,7 +63,7 @@ endif
 
 export BRANCH := $(shell git branch)
 
-#ifneq ($(BRANCH),) 
+#ifneq ($(BRANCH),)
 #include ./router/extendno.conf
 #else
 #export EXTENDNO := $(shell git log --pretty=oneline asuswrt_$(KERNEL_VER).$(FS_VER).$(SERIALNO)..HEAD | wc -l)-g$(shell git log --pretty=format:'%h' -n 1)
@@ -170,7 +170,8 @@ endif
 	@echo '#define RT_BUILD_NAME "$(BUILD_NAME)"' >> router/shared/version.h
 	@echo '#define RT_BUILD_INFO "$(BUILD_TIME) $(BUILD_USER)@$(BUILD_INFO)"' >> router/shared/version.h
 	@echo '#endif' >> router/shared/version.h
-	@echo '$(BUILD_NAME)_$(KERNEL_VER).$(FS_VER) $(BUILD_TIME)' > router/shared/version
+#	@echo '$(BUILD_NAME)_$(KERNEL_VER).$(FS_VER) $(BUILD_TIME)' > router/shared/version
+	@echo '$(BUILD_NAME) $(subst j9527,,$(EXTENDNO)) $(BUILD_TIME)' > router/shared/version
 	@echo 'EXTENDNO=$(EXTENDNO)$(BUILDREV)' > router/extendno.conf
 
 rt_ver_ntools:
@@ -321,7 +322,7 @@ else
 endif
 	@rm -f image/linux-lzma.trx
 endif
-	
+
 #	md5sum image/$(IMGNAME).trx > image/$(IMGNAME).md5
 
 ifeq ($(DSL_TCLINUX),y)
@@ -365,7 +366,7 @@ cleanimage:
 	@rm -f fpkg.log
 	@rm -fr image/*
 	@rm -f router/.config
-	@touch router/.config 
+	@touch router/.config
 	@-mkdir image
 
 cleantools:

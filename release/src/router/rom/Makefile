@@ -22,7 +22,7 @@ endif
 all:
 	@echo "" >rom/etc/motd
 	@echo "" >>rom/etc/motd
-	@echo "ASUSWRT-Merlin `cat ../shared/version`" >>rom/etc/motd
+	@echo "ASUSWRT-Merlin LTS `cat ../shared/version`" >>rom/etc/motd
 
 clean:
 	rm -f rom/etc/motd
