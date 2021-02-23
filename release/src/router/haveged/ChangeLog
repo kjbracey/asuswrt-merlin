@@ -1,3 +1,8 @@
+v1.9.2 (Nov 16, 2017)
+ * Add cross compile fixes contributed by Robert Schwebel
+ * Limit watermark max to less than pool size to avoid 100% cpu condition
+ * Add service.suse init script contributed by Tomáš Chvátal
+ 
 v1.9.1 (Feb 11, 2014)
  * Documentation and sample file touch-up for v1.9.
  

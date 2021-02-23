@@ -3,15 +3,16 @@
 ## Minimum Autoconf version
 
 AC_PREREQ([2.59])
-AC_INIT([haveged],[1.9.1])
+AC_INIT([haveged],[1.9.2])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects no-dependencies])
 AC_CONFIG_SRCDIR([src/haveged.c])
 AC_CHECK_TYPES([uint32_t, uint8_t])
 HA_LDFLAGS=""
 
 ##libtool_start##
+LT_INIT
 AC_PROG_LIBTOOL
 AM_ENABLE_SHARED
 AM_DISABLE_STATIC
@@ -174,6 +175,8 @@ case "$host" in
 
  *)
     if test "x$enable_clock_gettime" = "xx"; then
+      enable_clock_gettime="yes"
+    elif test "x$enable_clock_gettime" = "xyes"; then
       enable_clock_gettime="yes"
     else
       AC_MSG_ERROR([no timer source for host :"$host".])

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in.
 
-EXTRA_DIST = service.fedora service.forking service.redhat sysv.lsb sysv.redhat
+EXTRA_DIST = service.fedora service.forking service.redhat service.suse sysv.lsb sysv.redhat
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -35,10 +35,11 @@ install-exec-hook:
 
 install-data-hook:
 if ENABLE_SYSTEMD_LOOKUP
-	install -p -m644 haveged.service `pkg-config --variable=systemdsystemunitdir systemd`/haveged.service;
+	install -p -D -m644 haveged.service $(DESTDIR)`pkg-config --variable=systemdsystemunitdir systemd`/haveged.service;
 else
-	install -p -m644 haveged.service ($unit_dir)/haveged.service;
+	install -p -D -m644 haveged.service $(DESTDIR)$(unit_dir)/haveged.service;
 endif
-	systemctl enable haveged.service;
+## Defer systemd call to for cross-compile case
+##	systemctl enable haveged.service;
 
 endif

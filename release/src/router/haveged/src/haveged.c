@@ -462,6 +462,8 @@ static void set_watermark( /* RETURN: nothing   */
 {
    FILE *wm_fh;
 
+   if (level > (poolSize - 32))
+      level = poolSize - 32;
    wm_fh = fopen(params->watermark, "w");
    if (wm_fh) {
       fprintf(wm_fh, "%d\n", level);

@@ -1,3 +1,9 @@
+v1.9.2 (Nov 16, 1017)
+   
+   This release cleans up issues that have accumulated since the last release. I retired
+   several years ago, and haveged is no longer under active development. This release only
+   attempts to collect and document the downstream reports I have received. 
+
 v1.9   (Feb 10, 2014)
 
    A Fedora bugzilla request was received to harden the haveged build. Since haveged has
