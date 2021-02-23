@@ -109,7 +109,7 @@ typedef enum {
 } CPUID_REGNAMES;
 
 #define CPUID_CONFIG(a)   cpuid_config(a)
-#define CPUID_VENDOR(r)   *((H_UINT *)s) = regs[r];s+= sizeof(H_UINT) 
+#define CPUID_VENDOR(r)   *((H_UINT *)s) = regs[r];s+= sizeof(H_UINT)
 /**
  * Local CPUID prototypes
  */
@@ -170,7 +170,7 @@ void havege_tune(          /* RETURN: none               */
 {
    char *bp = anchor->buildOpts;
    int i;
- 
+
    /**
     * Capture build options
     */
@@ -187,7 +187,7 @@ void havege_tune(          /* RETURN: none               */
    *bp++ = BUILD_CPUID;
 #endif
 #if NUMBER_CORES>1
-   *bp++ = BUILD_THREAD;
+   *bp++ = BUILD_THREADS;
 #endif
 #ifdef ONLINE_TESTS_ENABLE
    *bp++ = BUILD_OLT;
@@ -264,7 +264,7 @@ static int cfg_bitCount(      /* RETURN : None  */
   TOPO_MAP *m)                /* IN: bitmap     */
 {
    int n, ct=0;
-   
+
    for(n=-1;(n=cfg_bitNext(m,n))!=-1;ct++) ;
    return ct;
 }
@@ -280,7 +280,7 @@ static void cfg_bitDecode(    /* RETURN: None         */
 {
    H_UINT      i=0;
    const char  *s;
-   
+
    size -= 1;
    while(value!= 0  && *reps != 0) {
       s = *reps++;
@@ -302,7 +302,7 @@ static void cfg_bitDisplay(   /* RETURN : None  */
    TOPO_MAP *m)               /* IN: bitmap     */
 {
    int n;
- 
+
    for(n=m->msw;n>=0 && n < (int)MAX_BIT_IDX;n--)
       printf(" %08x", m->bits[n]);
 }
@@ -315,7 +315,7 @@ static int cfg_bitIntersect(  /* RETURN: None   */
   TOPO_MAP *t)                /* IN: bit to set */
 {
    H_UINT i;
- 
+
    for (i=0;i < MAX_BIT_IDX;i++)
       if (0!=(m->bits[i] & t->bits[i]))
          return 1;
@@ -329,7 +329,7 @@ static void cfg_bitMerge(  /* RETURN: None      */
   TOPO_MAP *t)             /* IN: bits to set   */
 {
    int i;
-   
+
    for (i=0;i<(int)MAX_BIT_IDX;i++) {
       m->bits[i] |= t->bits[i];
       if (0 != m->bits[i] && i > m->msw)
@@ -344,7 +344,7 @@ static int cfg_bitNext (   /* RETURN: index of next bit or -1  */
   int n)                   /* IN: prev bit  use -1 for first   */
 {
    int bit, word;
- 
+
    bit  = (n+1) % BITS_PER_H_UINT;
    for(word = (n+1) / BITS_PER_H_UINT;word <= m->msw && word < (int)MAX_BIT_IDX;word++) {
       for(;bit<(int)BITS_PER_H_UINT; bit++)
@@ -362,7 +362,7 @@ static void cfg_bitSet(    /* RETURN: None   */
   int n)                   /* IN: bit to set */
 {
    int word;
- 
+
    word = n / BITS_PER_H_UINT;
    if (word < (int)MAX_BIT_IDX) {
       if (word > m->msw)
@@ -382,7 +382,7 @@ static void cfg_cacheAdd(  /* RETURN: None            */
   H_UINT kb)               /* IN: cache size in kb    */
 {
    int i;
- 
+
    TUNE_DEBUG("cacheAdd(%x, %d,%d,%d,%c)\n", src, cpu, level, kb, type);
    if (3 < level || 0 ==kb) return;
    for(i = 0;i < anchor->ctCache;i++)
@@ -410,7 +410,7 @@ static void cfg_cpuAdd(    /* RETURN: None            */
   CPU_INST *inst)          /* IN: instance            */
 {
    int i=0;
-   
+
    TUNE_DEBUG("cpuAdd(%x)\n", src);
    if (NULL==inst) {
       cfg_bitSet(&anchor->cpus[i].cpuMap, 0);
@@ -473,7 +473,7 @@ static void cpuid_config(  /* RETURN: none            */
    CPU_INST    wsp;
    H_UINT      regs[4];
    char        *s;
- 
+
    if (HASCPUID(regs)) {
       memset(&wsp, 0, sizeof(CPU_INST));
       wsp.flags |= SRC_CPUID_PRESENT;
@@ -536,7 +536,7 @@ static void cpuid_configIntel(
    CPU_INST *w)            /* IN-OUT: Workspace          */
 {
    H_UINT  regs[4];
- 
+
    if (w->maxFn >=0x0b) {
       regs[ECX] = 0;
       cpuid(0x0b,0,regs);
@@ -587,7 +587,7 @@ static void cpuid_configIntel2(
      0x00, 0,  0     /* sentinel                                           */
      };
    H_UINT   i, j, n, m;
- 
+
    cpuid(0x02,0,regs);
    n = regs[EAX]&0xff;
    while(n--) {
@@ -619,7 +619,7 @@ static void cpuid_configIntel4(
 {
    H_UINT  level, type;
    H_UINT  i, j, lineSz, nParts, nWays, sz;
- 
+
    for(i=0;i<MAX_CACHES;i++) {
       cpuid(0x04,i,regs);
       if (0==i) {
@@ -661,7 +661,7 @@ static void vfs_config(
    CPU_INST  inst;
    H_UINT    args[2];
    int       n;
- 
+
    args[0] = args[1] = 0;
    snprintf(path, FILENAME_MAX, "%s/self/status", anchor->procfs);
    if (-1 != vfs_configFile(anchor, path, vfs_configStatus))
@@ -695,7 +695,7 @@ static int vfs_configCpuDir(
   char *input,             /* filename                */
   H_UINT *pArg)            /* parameter               */
 {
-   
+
    (void)pArg;
    if (strlen(input)> 3) {
       char  term[32];
@@ -724,7 +724,7 @@ static int vfs_configCpuInfo(
          if (!strcmp("processor",key))
             cfg_bitSet(&anchor->pCpuInfo, atoi(value));
          }
-      } 
+      }
    return 0;
 }
 /**
@@ -738,7 +738,7 @@ static int vfs_configDir(
 {
    DIR              *d;
    int              rv=-1;
- 
+
    if (NULL != (d = opendir(path))) {
       struct dirent    *ent;
 
@@ -760,7 +760,7 @@ static int vfs_configFile(
 {
    FILE *f;
    int rv=-1;
-   
+
    if (NULL != (f = fopen(path, "rb"))) {
       char buf[VFS_LINESIZE];
 
@@ -795,6 +795,8 @@ static int vfs_configInfoCache(
          ctype = vfs_configFile(pAnchor, path, vfs_configType);
          strcpy(path+plen, "size");
          size  = vfs_configFile(pAnchor, path, vfs_configInt);
+		 if (size == -1)
+			 size = ctype == 'I' ? GENERIC_ICACHE : GENERIC_DCACHE;
          cfg_cacheAdd(pAnchor, SRC_VFS_INDEX,  pArgs[1], level, ctype, size);
          }
      }
@@ -861,7 +863,7 @@ static void vfs_parseList( /* RETURN: None               */
 {
    char *term, c;
    int  bounds[2], n;
- 
+
    cfg_bitClear(map);
    for(term = strtok(input, ",");term != NULL;term = strtok(NULL, ",")) {
       n = bounds[0] = bounds[1] = 0;
@@ -889,7 +891,7 @@ static void vfs_parseMask( /* RETURN: None               */
 {
    char *term, c;
    int  m, n;
- 
+
    cfg_bitClear(map);
    for(term = strtok(input, ",");term != NULL;term = strtok(NULL, ",")) {
       m = 0;

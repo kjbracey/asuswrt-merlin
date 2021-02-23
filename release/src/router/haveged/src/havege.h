@@ -55,7 +55,7 @@ typedef void (*pMsg)(const char *format, ...);
 typedef int (*pRawIn)(volatile H_UINT *pData, H_UINT szData);
 /**
  * options for H_PARAMS below. Lower byte transferred from verbose settings
- * upper byte set by diagnositic run options 
+ * upper byte set by diagnositic run options
  */
 #define H_VERBOSE         0x001           /* deprecated from ver 1.7       */
 #define H_DEBUG_INFO      0x001           /* Show config info, retries     */
@@ -71,7 +71,7 @@ typedef int (*pRawIn)(volatile H_UINT *pData, H_UINT szData);
 /**
  * Initialization parameters. Use non-zero values to override default values.
  * Notes:
- * 
+ *
  * 1) Correspondence between provided value and value of H_PTR members are:
  *    ioSz <==> i_readSz, collectSize <==> i_collectSz, nCores <==> n_cores,
  *    options <==> havege_opts
@@ -179,7 +179,7 @@ typedef enum {
  * P is a run time override, items V* come from linux virtual file system,
  * other items trace various cpuid sources. Tuning is skipped if both cache
  * sizes have 'P' sources.
- * 
+ *
  * Notes:
  *
  *    1) Build: package version of source
@@ -237,7 +237,16 @@ typedef enum {
  * Possible error values: H_NOERR, H_NOTESTSPEC, H_NOBUF, H_NOTESTMEM,
  *                        H_NOINIT
  */
+
 H_PTR       havege_create(H_PARAMS *params);
+
+/**
+ * haveger_create() remembers parent pid and uses it to identify deallocating thread.
+ * daemonize() forks parent and effectively loses parent thread.
+ * havege_reparent(void) allows recovering new parent pid before havege_run() is started.
+ */
+void        havege_reparent(H_PTR hptr);
+
 /**
  * Frees all allocated anchor resources. If the multi-core option is used, this
  * method should be called from a signal handler to prevent zombie processes.
@@ -254,7 +263,7 @@ void        havege_destroy(H_PTR hptr);
  * memory-mapped between collectors.
  *
  * Returns the number of H_UINT read.
- * 
+ *
  * Possible error values: H_NOERR, H_NOTESRUN, H_NOPOST, H_NODONE,
  *                        H_NORQST, H_NOCOMP, H_EXIT
  */
@@ -288,7 +297,7 @@ int         havege_status_dump(H_PTR hptr, H_SD_TOPIC topic, char *buf, size_t l
  * returns the definition of HAVEGE_PREP_VERSION used to build the library. Calling
  * with HAVEGE_PREP_VERSION as the version checks if this headers definition is
  * compatible with that of the library, returning NULL if the input is incompatible
- * with the library. 
+ * with the library.
  */
 const char *havege_version(const char *version);
 

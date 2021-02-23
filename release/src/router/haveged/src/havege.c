@@ -178,6 +178,19 @@ H_PTR havege_create(             /* RETURN: app state    */
    havege_ndsetup(h);
    return h;
 }
+
+void havege_reparent(
+  H_PTR hptr)
+{
+#if NUMBER_CORES>1
+   H_THREAD *t = (H_THREAD *)hptr->threads;
+   if (0 == t)
+      return; /* single-threaded */
+
+   t->main = getpid();
+#endif
+}
+
 /**
  * Destructor. In a multi-collector build, this method should be called from a signal handler
  * to avoid creating processes.
@@ -223,7 +236,7 @@ int havege_rng(            /* RETURN: number words read     */
 {
 #if NUMBER_CORES>1
    H_THREAD    *t = (H_THREAD *) h->threads;
-   
+
    t->count = sz;
    t->out   = buffer;
    if (0!=sem_post(&t->flags[t->last]))
@@ -300,7 +313,7 @@ int  havege_status_dump(   /* RETURN: output length   */
 {
    struct   h_status status;
    int      n = 0;
-   
+
    if (buf != 0) {
       *buf = 0;
       len -= 1;
@@ -329,7 +342,7 @@ int  havege_status_dump(   /* RETURN: output length   */
          case H_SD_TOPIC_TEST:
             {
                H_UINT   m;
-               
+
                if (strlen(status.tot_tests)>0) {
                   n += snprintf(buf+n, len-n, "tot tests(%s): ", status.tot_tests);
                   if ((m = status.n_tests[ H_OLT_TOT_A_P] + status.n_tests[ H_OLT_TOT_A_F])>0)
@@ -354,7 +367,7 @@ int  havege_status_dump(   /* RETURN: output length   */
                double factor  = 1024.0 * 1024.0 * 1024.0 * 1024.0;
                double sz = ((double)hptr->n_fills * hptr->i_collectSz) * sizeof(H_UINT);
                int i;
-               
+
                for (i=0;0 != units[i];i++) {
                   if (sz >= factor)
                      break;
@@ -376,7 +389,7 @@ int  havege_status_dump(   /* RETURN: output length   */
  * returns the definition of HAVEGE_PREP_VERSION used to build the library. Calling
  * with HAVEGE_PREP_VERSION as the version checks if this headers definition is
  * compatible with that of the library, returning NULL if the input is incompatible
- * with the library. 
+ * with the library.
  */
 const char *havege_version(const char *version)
 {
@@ -390,7 +403,7 @@ const char *havege_version(const char *version)
    if (version) {
       H_UINT l_interface=0, l_revision=0, l_age=0;
       H_UINT p, p_interface, p_revision, p_patch;
-      
+
 #ifdef HAVEGE_LIB_VERSION
       sscanf(HAVEGE_LIB_VERSION, "%d:%d:%d", &l_interface, &l_revision, &l_age);
 #endif
@@ -423,7 +436,7 @@ static int havege_exit(    /* RETURN: NZ if child  */
    H_THREAD *t = (H_THREAD *)h_ptr->threads;
    pid_t  p;
    H_UINT i;
-   
+
    if (0 == t)
       return 0;            /* Must be main thread */
    t->fatal = H_EXIT;
@@ -453,7 +466,7 @@ static void havege_ipc(    /* RETURN: None            */
 {
    void     *m;
    H_THREAD *t;
-   H_UINT   m_sz; 
+   H_UINT   m_sz;
    int      i;
 
    if (n > NUMBER_CORES) {
@@ -486,7 +499,7 @@ static void havege_ipc(    /* RETURN: None            */
  * If task fails after start, H_THREAD::fatal will be set to the reason and a completion
  * will be posted to prevent the main thread from hanging waiting for a response.
  */
-static int havege_rngChild(/* RETURN: none         */   
+static int havege_rngChild(/* RETURN: none         */
   H_PTR h_ptr,             /* IN: app state        */
   H_UINT cNumber)          /* IN: collector index  */
 {
@@ -512,7 +525,7 @@ static int havege_rngChild(/* RETURN: none         */
                thds->last = cNumber;
                r = h_ctxt->havege_szFill - h_ctxt->havege_nptr;
                if (thds->count < r)
-                  r = thds->count; 
+                  r = thds->count;
                for(i=0;i<r;i++)
                   thds->out[i] = havege_ndread(h_ctxt);
                thds->fatal = h_ctxt->havege_err;
@@ -560,7 +573,7 @@ static void havege_unipc(  /* RETURN: none         */
 #ifdef ONLINE_TESTS_ENABLE
 /**
  * Interpret options string as settings. The option string consists of terms
- * like "[t|c][a[1-8][w]|b[w]]". 
+ * like "[t|c][a[1-8][w]|b[w]]".
  */
 static int testsConfigure( /* RETURN: non-zero on error  */
    H_UINT *tot,            /* OUT: tot test options      */
@@ -627,7 +640,7 @@ static void testsStatus(    /* RETURN: test config     */
    procInst    *p;
    char        *dst = tot;
    H_UINT      i, j, k, m;
-   
+
    *dst = *tot = 0;
    p = tps->totTests;
    for(i=0;i<2;i++,p = tps->runTests, dst = prod) {
@@ -665,7 +678,7 @@ static void testReport(
    H_PTR       h_ptr = (H_PTR)(h_ctxt->havege_app);
    onlineTests *context = (onlineTests *) h_ctxt->havege_tests;
    char        *result;
-   
+
    switch(state) {
       case TEST_DONE:   result = "success";           break;
       case TEST_RETRY:  result = "retry";             break;
@@ -695,7 +708,7 @@ static void testReportA(       /* RETURN: nothing               */
 
    H_UINT ran[6],sum[6];
    H_UINT ct, i, j, k;
-         
+
    for (i=0;i<6;i++)
       ran[i] = sum[i] = 0;
    for(i=0;i<p->testRun;i++){

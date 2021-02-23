@@ -379,7 +379,8 @@ static int get_poolsize(   /* RETURN: number of bits  */
    void)                   /* IN: nothing             */
 {
    FILE *poolsize_fh,*osrel_fh;
-   unsigned int max_bits,major,minor;
+   unsigned int major,minor;
+   int max_bits;
 
    poolsize_fh = fopen(params->poolsize, "rb");
    if (poolsize_fh) {
@@ -412,8 +413,10 @@ static void run_daemon(    /* RETURN: nothing   */
       anchor_info(h);
       return;
       }
-   if (params->foreground==0)
+   if (params->foreground==0) {
      daemonize();
+     havege_reparent(handle);
+   }
    else printf ("%s starting up\n", params->daemon);
    if (0 != havege_run(h))
       error_exit("Couldn't initialize HAVEGE rng %d", h->error);
@@ -480,7 +483,7 @@ static void anchor_info(H_PTR h)
    char       buf[120];
    H_SD_TOPIC topics[4] = {H_SD_TOPIC_BUILD, H_SD_TOPIC_TUNE, H_SD_TOPIC_TEST, H_SD_TOPIC_SUM};
    int        i;
-   
+
    for(i=0;i<4;i++)
       if (havege_status_dump(h, topics[i], buf, sizeof(buf))>0)
          print_msg("%s\n", buf);
@@ -530,7 +533,7 @@ static int get_runsize(    /* RETURN: the size        */
    int         p2 = 0;
    int         p10 = APP_BUFF_SIZE * sizeof(H_UINT);
    long long   ct;
-   
+
 
    f = strtod(bp, &suffix);
    if (f < 0 || strlen(suffix)>1)
@@ -590,7 +593,7 @@ static char *ppSize(       /* RETURN: the formated size  */
    char   units[] = {'T', 'G', 'M', 'K', 0};
    double factor  = 1024.0 * 1024.0 * 1024.0 * 1024.0;
    int i;
-   
+
    for (i=0;0 != units[i];i++) {
       if (sz >= factor)
          break;
@@ -607,7 +610,7 @@ static void print_msg(     /* RETURN: nothing   */
    ...)                    /* IN: args          */
 {
    char buffer[128];
-   
+
    va_list ap;
    va_start(ap, format);
    snprintf(buffer, sizeof(buffer), "%s: %s", params->daemon, format);
@@ -645,7 +648,7 @@ static void run_app(       /* RETURN: nothing         */
 #ifdef RAW_IN_ENABLE
    {
       char *format, *in="",*out,*sz,*src="";
-      
+
       if (params->run_level==DIAG_RUN_INJECT)
          in = "tics";
       else if (params->run_level==DIAG_RUN_TEST)
@@ -660,7 +663,7 @@ static void run_app(       /* RETURN: nothing         */
       else sz = "unlimited";
       out = (fout==stdout)? "stdout" : params->sample_out;
       fprintf(stderr, format, in, src, sz, out);
-   }  
+   }
 #else
    if (limits)
       fprintf(stderr, "Writing %s output to %s\n",
@@ -725,7 +728,7 @@ static void usage(               /* OUT: nothing            */
    const char **cmds)            /* IN: associated text     */
 {
   int i, j;
-  
+
   (void)loc;
   fprintf(stderr, "\nUsage: %s [options]\n\n", params->daemon);
 #ifndef NO_DAEMON
