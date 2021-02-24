@@ -1194,14 +1194,16 @@ cyassl-clean:
 cyassl-install:
 	@true
 
-ifeq ($(RTCONFIG_OPENVPN),y)
-OPENSSL_CIPHERS:=enable-rc5 no-rc4 no-ssl3
-else
 #OPENSSL_CIPHERS:=no-dh no-idea no-rc2 no-rc5 no-aes no-aes192 no-cast no-des no-modes no-tls1 no-tlsext
-OPENSSL_CIPHERS:=no-rc4
+#      no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd \
+#      no-seed no-capieng no-cms no-gms no-gmp no-rfc3779 \
+#      no-ec no-ecdh no-ecdsa no-err no-hw no-jpake no-threads \
+#      no-zlib no-engine no-engines no-sse2 no-perlasm \
+#      no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
+OPENSSL_CIPHERS := no-ssl2 no-gost no-heartbeats no-err no-unit-test
+ifeq ($(RTCONFIG_OPENVPN),y)
+OPENSSL_CIPHERS += enable-rc5
 endif
-
-#OPENSSL_CIPHERS:=enable-aes enable-tls1 enable-tlsext
 
 openssl/Makefile:
 	cd openssl && \
@@ -1247,13 +1249,15 @@ openssl-1.1/Makefile:
 	cd $(TOP)/openssl-1.1 && \
 	./Configure $(HOSTCONFIG) --prefix=/usr --openssldir=/etc/ssl --cross-compile-prefix=' ' --api=1.0.0 \
 	-O2 -ffunction-sections -fdata-sections -Wl,--gc-sections \
-	shared no-err no-async $(if $(RTCONFIG_BCMARM),,no-threads) $(OPENSSL_CIPHERS) \
-	no-aria no-sm2 no-sm3 no-sm4
-	-@$(MAKE) -C openssl-1.1 depend clean
+	shared no-err no-async $(if $(RTCONFIG_BCMARM),,no-threads) \
+	$(OPENSSL_CIPHERS) no-aria no-sm2 no-sm3 no-sm4 \
+	-DOPENSSL_PREFER_CHACHA_OVER_GCM
+	-@$(MAKE) -C openssl-1.1 depend
+	-@$(MAKE) -C openssl-1.1 clean
 	@touch $@
 
 openssl-1.1: openssl-1.1/Makefile
-	$(MAKE) -C openssl-1.1 $(PARALLEL_BUILD)
+	$(MAKE) -C openssl-1.1 $(PARALLEL_BUILD) && $(MAKE) $@-stage
 
 openssl-1.1-clean:
 	[ ! -f openssl-1.1/Makefile ] || $(MAKE) -C openssl-1.1 clean
@@ -1274,7 +1278,7 @@ openssl-1.1-install:
 	fi
 
 openssl-1.1-stage:
-	 $(MAKE) -C openssl-1.1 install_sw INSTALL_PREFIX=$(STAGEDIR)
+	 $(MAKE) -C openssl-1.1 install_sw DESTDIR=$(STAGEDIR)
 
 mssl: openssl-1.1
 
@@ -2932,7 +2936,7 @@ openvpn/Makefile:
 	cd openvpn && ./autogen.sh && \
 	OPENSSL_CFLAGS="-I$(TOP)/openssl-1.1/include" \
 	OPENSSL_LIBS="-L$(TOP)/openssl-1.1 -lssl -lcrypto" \
-	CFLAGS="-O3 -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -I$(TOP)/openssl-1.1/include/openssl $(if $(RTCONFIG_BCMARM),,-std=gnu99)" \
+	CFLAGS="-O3 -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -I$(TOP)/openssl-1.1/include/openssl $(if $(RTCONFIG_BCMARM),,-std=gnu99) -DASUSWRT" \
 	CPPFLAGS="-I$(TOP)/lzo/include -I$(TOP)/openssl-1.1/include -I$(TOP)/openpam/include -I$(TOP)/shared -I$(SRCBASE)/include" \
 	LIBPAM_CFLAGS="-I$(TOP)/openpam/include" \
 	LIBPAM_LIBS="-L$(TOP)/openpam/lib/libpam/.libs -lpam" \
@@ -2943,7 +2947,7 @@ openvpn/Makefile:
 	LDFLAGS="$(EXTRALDFLAGS) -L$(TOP)/nvram$(BCMEX) -lnvram -L$(TOP)/shared -lshared $(if $(RTCONFIG_HTTPS),-L$(TOP)/openssl-1.1 -lssl -lcrypto) -L$(TOP)/zlib -lz -lpthread -ldl -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	IPROUTE="/usr/sbin/ip" IFCONFIG="/sbin/ifconfig" ROUTE="/sbin/route" \
 	$(CONFIGURE) --prefix=/usr --bindir=/usr/sbin --libdir=/usr/lib  --enable-iproute2 \
-	--disable-debug --enable-management \
+	--disable-debug --enable-management --disable-small --disable-selinux \
 	$(if $(RTCONFIG_BCMARM),--enable-plugin-auth-pam) \
 	ac_cv_lib_resolv_gethostbyname=no
 	touch $@
