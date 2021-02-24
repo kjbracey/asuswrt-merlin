@@ -4,7 +4,7 @@
  *
  * Copyright 2004, Broadcom Corporation
  * All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
  * KIND, EXPRESS OR IMPLIED, BY STATUTE, COMMUNICATION OR OTHERWISE. BROADCOM
  * SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
@@ -216,10 +216,10 @@ dump_rateset(int eid, webs_t wp, int argc, char_t **argv, uint8 *rates, uint cou
  *
  * In its simplest form, it is a 20MHz channel number, with the implied band
  * of 2.4GHz if channel number <= 14, and 5GHz otherwise.
- * 
+ *
  * To allow for backward compatibility with scripts, the old form for
  * 40MHz channels is also allowed: <channel><ctl-sideband>
- *     
+ *
  * <channel>:
  *      primary channel of 40MHz, channel <= 14 is 2GHz, otherwise 5GHz
  * <ctl-sideband>:
@@ -469,7 +469,7 @@ wf_chspec_ntoa(chanspec_t chspec, char *buf)
 		/* ctl sideband string if needed for 2g 40MHz */
 		if (CHSPEC_IS40(chspec) && CHSPEC_IS2G(chspec)) {
 			sb = CHSPEC_SB_UPPER(chspec) ? "u" : "l";
-		} 
+		}
 
 		snprintf(buf, CHANSPEC_STR_LEN, "%s%d/%s%s", band, ctl_chan, bw, sb);
 #else
@@ -980,7 +980,7 @@ wl_dump_wps(webs_t wp, uint8* cp, uint len)
 	uint32 parse_len = len;
 	uint8 *proprietary_ie;
 	int retval = 0;
- 
+
 	while ((proprietary_ie = wlu_parse_tlvs(parse, parse_len, DOT11_MNG_WPA_ID))) {
 		if (bcm_is_wps_ie(proprietary_ie, &parse, &parse_len)) {
 			/* Print WPS status */
@@ -1609,7 +1609,7 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 					}
 
 					if (found || !leaselist) {
-						ret += websWrite(wp, "%-16s", (found ? ipentry : ""));
+						ret += websWrite(wp, "%-16s", (found ? ipentry : "-"));
 					}
 				}
 
@@ -1630,10 +1630,10 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 
 					if (found == 0) {
 						// Not in arplist nor in leaselist
-						ret += websWrite(wp, "%-16s%-16s ", "", "");
+						ret += websWrite(wp, "%-16s%-16s ", "-", "-");
 					} else if (found == 1) {
 						// Only in arplist (static IP)
-						ret += websWrite(wp, "%-16s ", "");
+						ret += websWrite(wp, "%-16s ", "-");
 					} else if (found == 2) {
 						// Only in leaselist (dynamic IP that has not communicated with router for a while)
 						ret += websWrite(wp, "%-16s%-16s ", ipentry, hostnameentry);
@@ -2430,7 +2430,7 @@ ej_nat_table(int eid, webs_t wp, int argc, char_t **argv)
 						else
 						sprintf(line, "%s %-11d", line, ntohs(nat_list[i].match.dst.ports[0]));
 					}
-					else 
+					else
 					{
 						sprintf(tstr, "%d:%d", ntohs(nat_list[i].match.dst.ports[0]),
 						ntohs(nat_list[i].match.dst.ports[1]));
@@ -2986,7 +2986,7 @@ ej_SiteSurvey(int eid, webs_t wp, int argc, char_t **argv)
 
 				ie = (struct bss_ie_hdr *) ((unsigned char *) info + sizeof(*info));
 				for (left = info->ie_length; left > 0; // look for RSN IE first
-					left -= (ie->len + 2), ie = (struct bss_ie_hdr *) ((unsigned char *) ie + 2 + ie->len)) 
+					left -= (ie->len + 2), ie = (struct bss_ie_hdr *) ((unsigned char *) ie + 2 + ie->len))
 				{
 					if (ie->elem_id != DOT11_MNG_RSN_ID)
 						continue;
@@ -3000,7 +3000,7 @@ ej_SiteSurvey(int eid, webs_t wp, int argc, char_t **argv)
 
 				ie = (struct bss_ie_hdr *) ((unsigned char *) info + sizeof(*info));
 				for (left = info->ie_length; left > 0; // then look for WPA IE
-					left -= (ie->len + 2), ie = (struct bss_ie_hdr *) ((unsigned char *) ie + 2 + ie->len)) 
+					left -= (ie->len + 2), ie = (struct bss_ie_hdr *) ((unsigned char *) ie + 2 + ie->len))
 				{
 					if (ie->elem_id != DOT11_MNG_WPA_ID)
 						continue;

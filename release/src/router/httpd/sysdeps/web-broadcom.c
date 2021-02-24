@@ -4,7 +4,7 @@
  *
  * Copyright 2004, Broadcom Corporation
  * All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
  * KIND, EXPRESS OR IMPLIED, BY STATUTE, COMMUNICATION OR OTHERWISE. BROADCOM
  * SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
@@ -864,7 +864,7 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 		ret += wl_status(eid, wp, argc, argv, unit);
 	}
 
-	if (val) 
+	if (val)
 	{
 		ret += websWrite(wp, "%s radio is disabled\n",
 			nvram_match(strcat_r(prefix, "nband", tmp), "1") ? "5 GHz" : "2.4 GHz");
@@ -947,7 +947,7 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 	ret += websWrite(wp, "\n");
  	ret += websWrite(wp, "Stations  (flags: P=Powersave Mode, S=Short GI, T=STBC, A=Associated, U=Authenticated)\n");
 	ret += websWrite(wp, "-------------------------------------------------------------------------------------------\n");
- 	
+
 	if (leaselist) {
 		ret += websWrite(wp, "%-18s%-16s%-17s%-8s%-15s%-12s%-5s\n",
 				"MAC", "IP Address", "Name", "  RSSI", "  Rx/Tx Rate", "Connected", "Flags");
@@ -1104,7 +1104,7 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 						}
 					}
 
-					ret += websWrite(wp, "%-16s", (found ? ipentry : ""));
+					ret += websWrite(wp, "%-16s", (found ? ipentry : "-"));
 				}
 
 #ifdef RTCONFIG_DNSMASQ
@@ -1122,7 +1122,7 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 						}
 					}
 
-					ret += websWrite(wp, "%-16s ", (found ? hostnameentry : ""));
+					ret += websWrite(wp, "%-16s ", (found ? hostnameentry : "-"));
 				}
 #endif
 
@@ -1797,7 +1797,7 @@ ej_nat_table(int eid, webs_t wp, int argc, char_t **argv)
 						else
 						sprintf(line, "%s %-11d", line, ntohs(nat_list[i].match.dst.ports[0]));
 					}
-					else 
+					else
 					{
 						sprintf(tstr, "%d:%d", ntohs(nat_list[i].match.dst.ports[0]),
 						ntohs(nat_list[i].match.dst.ports[1]));
@@ -2348,7 +2348,7 @@ ej_SiteSurvey(int eid, webs_t wp, int argc, char_t **argv)
 
 				ie = (struct bss_ie_hdr *) ((unsigned char *) info + sizeof(*info));
 				for (left = info->ie_length; left > 0; // look for RSN IE first
-					left -= (ie->len + 2), ie = (struct bss_ie_hdr *) ((unsigned char *) ie + 2 + ie->len)) 
+					left -= (ie->len + 2), ie = (struct bss_ie_hdr *) ((unsigned char *) ie + 2 + ie->len))
 				{
 					if (ie->elem_id != DOT11_MNG_RSN_ID)
 						continue;
@@ -2362,7 +2362,7 @@ ej_SiteSurvey(int eid, webs_t wp, int argc, char_t **argv)
 
 				ie = (struct bss_ie_hdr *) ((unsigned char *) info + sizeof(*info));
 				for (left = info->ie_length; left > 0; // then look for WPA IE
-					left -= (ie->len + 2), ie = (struct bss_ie_hdr *) ((unsigned char *) ie + 2 + ie->len)) 
+					left -= (ie->len + 2), ie = (struct bss_ie_hdr *) ((unsigned char *) ie + 2 + ie->len))
 				{
 					if (ie->elem_id != DOT11_MNG_WPA_ID)
 						continue;
