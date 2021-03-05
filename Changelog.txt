@@ -4,7 +4,13 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
-374.43_47EBj9527  (1-March-2020) ARM SDK, MIPS,ARM KRACK, KROOK
+374.43_48E1j9527  (4-March-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: Revert "wl_arm: update wireless prebuilts for AC68U V3 support"
+* CHANGED: Revert "rc: shared: add mainline support for AC68U V3"
+* CHANGED: Revert "init: make sure RT68U V3 odmpid set"
+
+
+374.43_47EBj9527  (1-March-2021) ARM SDK, MIPS,ARM KRACK, KROOK
 * NEW: others: add acme.sh (letsencrypt) cli install
 * CHANGED: openssl11: update to 1.1.1j
 * CHANGED: openssl11: asuswrt-merlin customization for 1.1.x
@@ -19,7 +25,7 @@ Changelog
 * CHANGED: webui: add empty field markers in wireless log
 
 
-374.43_47DAj9527  (13 February-2020) ARM SDK, MIPS,ARM KRACK, KROOK
+374.43_47DAj9527  (13 February-2021) ARM SDK, MIPS,ARM KRACK, KROOK
 * CHANGED: init: make sure RT68U V3 odmpid set
 * CHANGED: rc: shared: add mainline support for AC68U V3
 * CHANGED: wl_arm: update wireless prebuilts for AC68U V3 support
@@ -33,7 +39,7 @@ Changelog
 * FIXED: rc: cstats: update time checks based on new default system time
 
 
-374.43_46E9j9527  (1 February-2020) ARM SDK, MIPS,ARM KRACK
+374.43_46E9j9527  (1 February-2021) ARM SDK, MIPS,ARM KRACK
   Rollup of 47D builds without RT-AC68U V3 support
 * NEW: dnsfilter: add WAN DNS 1/2 to filter selection list
 * CHANGED: dnsmasq: update to 2.84 final (dnspooq)
