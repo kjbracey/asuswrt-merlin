@@ -59,36 +59,6 @@ typedef struct remote_ioctl {
 #endif
 } rem_ioctl_t;
 #define REMOTE_SIZE	sizeof(rem_ioctl_t)
-
-typedef struct {
-	uint32 num;
-	chanspec_t list[1];
-} chanspec_list_t;
-
-#define DFS_SCAN_S_IDLE				-1
-#define DFS_SCAN_S_RADAR_FREE			0
-#define DFS_SCAN_S_RADAR_FOUND			1
-#define DFS_SCAN_S_INPROGESS			2
-#define DFS_SCAN_S_SCAN_ABORTED			3
-#define DFS_SCAN_S_SCAN_MODESW_INPROGRESS	4
-
-/* DFS Forced param */
-typedef struct wl_dfs_forced_params {
-	chanspec_t chspec;
-	uint16 version;
-	chanspec_list_t chspec_list;
-} wl_dfs_forced_t;
-
-#define DFS_PREFCHANLIST_VER 0x01
-#define WL_CHSPEC_LIST_FIXED_SIZE	OFFSETOF(chanspec_list_t, list)
-/* size of dfs forced param size given n channels are in the list */
-#define WL_DFS_FORCED_PARAMS_SIZE(n) \
-	(sizeof(wl_dfs_forced_t) + (((n) < 1) ? (0) : (((n) - 1)* sizeof(chanspec_t))))
-#define WL_DFS_FORCED_PARAMS_FIXED_SIZE \
-	(WL_CHSPEC_LIST_FIXED_SIZE + OFFSETOF(wl_dfs_forced_t, chspec_list))
-#define WL_DFS_FORCED_PARAMS_MAX_SIZE \
-	WL_DFS_FORCED_PARAMS_FIXED_SIZE + (WL_NUMCHANSPECS * sizeof(chanspec_t))
-
 #ifdef EFI
 #define BCMWL_IOCTL_GUID \
 	{0xB4910A35, 0x88C5, 0x4328, { 0x90, 0x08, 0x9F, 0xB2, 0x00, 0x00, 0x0, 0x0 } }
@@ -1235,9 +1205,7 @@ typedef struct {
 						          */
 	int8			rx_lastpkt_rssi[WL_STA_ANT_MAX]; /* Per antenna RSSI of last
 						                  * received data frame
-								  */
-	uint32			wnm_cap;		/* wnm capabilities */
-	uint8			rrm_cap[DOT11_RRM_CAP_LEN]; /* RRM capability */
+						                  */
 } sta_info_t;
 
 #define WL_OLD_STAINFO_SIZE	OFFSETOF(sta_info_t, tx_tot_pkts)
@@ -1245,8 +1213,6 @@ typedef struct {
 #define WL_STA_VER		4
 
 #define WL_STA_AID(a)		((a) &~ 0xc000)
-
-#define STAMON_MODULE_VER	1
 
 /* Flags for sta_info_t indicating properties of STA */
 #define WL_STA_BRCM		0x00000001	/* Running a Broadcom driver */
@@ -1350,21 +1316,10 @@ typedef struct channel_info {
 } channel_info_t;
 
 /* For ioctls that take a list of MAC addresses */
-typedef struct maclist {
+struct maclist {
 	uint count;			/* number of MAC addresses */
 	struct ether_addr ea[1];	/* variable length array of MAC addresses */
-} maclist_t;
-
-typedef struct stamon_data {
-	struct ether_addr  ea;
-	int rssi;
-} stamon_data_t;
-
-typedef struct stamon_info {
-	int version;
-	uint count;
-	stamon_data_t sta_data[1];
-} stamon_info_t;
+};
 
 #ifndef LINUX_POSTMOGRIFY_REMOVAL
 /* get pkt count struct passed through ioctl */
@@ -1869,9 +1824,8 @@ typedef struct wlc_iov_trx_s {
 #define WLC_SET_TXBF_RATESET			319
 #define WLC_SCAN_CQ				320
 #define WLC_GET_RSSI_QDB			321 /* qdB portion of the RSSI */
-#define WLC_DUMP_RATESET			322
-#define WLC_SET_WSEC_PORTOPEN			323
-#define WLC_LAST				324
+#define WLC_DUMP_RATESET                       322
+#define WLC_LAST				323
 
 #ifndef EPICTRL_COOKIE
 #define EPICTRL_COOKIE		0xABADCEDE
@@ -2521,19 +2475,13 @@ typedef struct wl_txchain_pwr_offsets {
  */
 #define SPECT_MNGMT_LOOSE_11H_D		4		/* operation defined above */
 
-#define WL_CHAN_VALID_HW		(1 << 0)	/* valid with current HW */
-#define WL_CHAN_VALID_SW		(1 << 1)	/* valid with current country setting */
-#define WL_CHAN_BAND_5G			(1 << 2)	/* 5GHz-band channel */
-#define WL_CHAN_RADAR			(1 << 3)	/* radar sensitive  channel */
-#define WL_CHAN_INACTIVE		(1 << 4)	/* temporarily inactive due to radar */
-#define WL_CHAN_PASSIVE			(1 << 5)	/* channel is in passive mode */
-#define WL_CHAN_RESTRICTED		(1 << 6)	/* restricted use channel */
-#define WL_CHAN_RADAR_EU_WEATHER	(1 << 7)	/* EU Radar weather channel. Implies an
-							 * EU Radar channel.
-							 */
-
-/* following definition is for precommit; will be removed once wl, acsd switch to the new def */
-#define WL_CHAN_WEATHER_RADAR		WL_CHAN_RADAR_EU_WEATHER
+#define WL_CHAN_VALID_HW	(1 << 0)	/* valid with current HW */
+#define WL_CHAN_VALID_SW	(1 << 1)	/* valid with current country setting */
+#define WL_CHAN_BAND_5G		(1 << 2)	/* 5GHz-band channel */
+#define WL_CHAN_RADAR		(1 << 3)	/* radar sensitive  channel */
+#define WL_CHAN_INACTIVE	(1 << 4)	/* temporarily inactive due to radar */
+#define WL_CHAN_PASSIVE		(1 << 5)	/* channel is in passive mode */
+#define WL_CHAN_RESTRICTED	(1 << 6)	/* restricted use channel */
 
 /* BTC mode used by "btc_mode" iovar */
 #define	WL_BTC_DISABLE		0	/* disable BT coexistence */
@@ -6152,8 +6100,7 @@ typedef enum wl_stamon_cfg_cmd_type {
 	STAMON_CFG_CMD_DEL = 0,
 	STAMON_CFG_CMD_ADD = 1,
 	STAMON_CFG_CMD_ENB = 2,
-	STAMON_CFG_CMD_DSB = 3,
-	STAMON_CFG_CMD_GET_STATS =4
+	STAMON_CFG_CMD_DSB = 3
 } wl_stamon_cfg_cmd_type_t;
 
 typedef struct wlc_stamon_sta_config {
@@ -6198,11 +6145,5 @@ typedef struct cma_meminfo {
 }
 cma_meminfo_t;
 #endif /* BCM_SECURE_DMA */
-
-/* WET host ip and mac parameter configuration */
-typedef struct wet_host {
-	uint8 buf[6]; /* ip or mac*/
-	uint8 bssidx;
-} wet_host_t;
 
 #endif /* _wlioctl_h_ */
