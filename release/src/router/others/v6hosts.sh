@@ -105,6 +105,9 @@ echo "$V6NEIGH" | while IFS= read -r V6IFACE ; do
 	fi
 
 	ping -6 -q -c 2 -W 5 $V6ADDR > /tmp/ping
+	if [ $? != 0 ]; then
+		UPDATE_HOSTS=0;
+	fi
 
 	ip -6 neigh | grep -qi "$V6ADDR .* lladdr $2"
 	if [ $? == 0 ]; then
