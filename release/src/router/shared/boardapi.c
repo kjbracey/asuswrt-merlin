@@ -49,10 +49,10 @@ int wan_port = 0xff;
 int fan_gpio = 0xff;
 int have_fan_gpio = 0xff;
 #ifdef RTCONFIG_WIRELESS_SWITCH
-int btn_wifi_sw = 0xff;
+int btn_wifi_sw = 0xff; 
 #endif
 #ifdef RTCONFIG_WIFI_TOG_BTN
-int btn_wltog_gpio = 0xff;
+int btn_wltog_gpio = 0xff; 
 #endif
 #ifdef RTCONFIG_TURBO
 int btn_turbo_gpio = 0xff;
@@ -82,7 +82,7 @@ int init_gpio(void)
 		, "btn_swmode1_gpio", "btn_swmode2_gpio", "btn_swmode3_gpio"
 #endif
 		, "btn_turbo_gpio", "btn_led_gpio" };
-	char *led_list[] = { "led_turbo_gpio", "led_pwr_gpio", "led_usb_gpio", "led_wps_gpio", "fan_gpio", "have_fan_gpio", "led_lan_gpio", "led_wan_gpio", "led_usb3_gpio", "led_2g_gpio", "led_5g_gpio"
+	char *led_list[] = { "led_turbo_gpio", "led_pwr_gpio", "led_usb_gpio", "led_wps_gpio", "fan_gpio", "have_fan_gpio", "led_lan_gpio", "led_wan_gpio", "led_usb3_gpio", "led_2g_gpio", "led_5g_gpio" 
 #ifdef RTCONFIG_LAN4WAN_LED
 		, "led_lan1_gpio", "led_lan2_gpio", "led_lan3_gpio", "led_lan4_gpio"
 #endif  /* LAN4WAN_LED */
@@ -147,14 +147,12 @@ int set_pwr_usb(int boolOn){
 	switch(get_model()) {
 		case MODEL_RTAC68U:
 			if ((nvram_get_int("HW_ver") != 170) &&
-			    (nvram_get_int("HW_ver") != 180) &&
 			    (nvram_get_double("HW_ver") != 1.10) &&
 			    (nvram_get_double("HW_ver") != 1.85) &&
 			    (nvram_get_double("HW_ver") != 1.90) &&
 			    (nvram_get_double("HW_ver") != 1.95) &&
 			    (nvram_get_double("HW_ver") != 2.10) &&
 			    (nvram_get_double("HW_ver") != 2.20) &&
-				(nvram_get_double("HW_ver") != 3.00) &&
 			    !is_ac66u_v2_series() &&
 			    !nvram_match("cpurev", "c0"))
 				return 0;
@@ -289,7 +287,7 @@ int button_pressed(int which)
 			break;
 	}
 
-	if((use_gpio&0xff)!=0x0ff)
+	if((use_gpio&0xff)!=0x0ff) 
 	{
 		gpio_value = get_gpio(use_gpio&0xff);
 
@@ -297,7 +295,7 @@ int button_pressed(int which)
 
 		if((use_gpio&GPIO_ACTIVE_LOW)==0) // active high case
 			return gpio_value==0 ? 0 : 1;
-		else
+		else 
 			return gpio_value==0 ? 1 : 0;
 	}
 	else return 0;
@@ -328,7 +326,7 @@ int led_control(int which, int mode)
 		case LED_USB3:
 			use_gpio = led_usb3_gpio;
 			break;
-		case LED_WPS:
+		case LED_WPS:	
 			use_gpio = led_wps_gpio;
 			break;
 		case LED_2G:
@@ -455,7 +453,7 @@ int led_control(int which, int mode)
 			case HAVE_FAN_ON:
 				set_gpio((use_gpio&0xff), enable);
 				break;
-			case LED_OFF:
+			case LED_OFF:	
 			case FAN_OFF:
 			case HAVE_FAN_OFF:
 				set_gpio((use_gpio&0xff), disable);
@@ -560,8 +558,8 @@ int lanport_status(void)
 	return 0;
 #else
 	return rtkswitch_lanPorts_phyStatus();
-#endif
-
+#endif	
+	
 #else
 	char word[100], *next;
 	int mask;

@@ -296,7 +296,7 @@ misc_ioctrl(void)
 	char buf[16];
 
 #ifdef RTAC68U
-	if (!is_ac66u_v2_series() && !is_ac68u_v3_series())
+	if (!is_ac66u_v2_series())
 		return;
 #endif
 
@@ -2645,34 +2645,35 @@ int init_nvram(void)
 #else
 		nvram_set_int("pwr_usb_gpio", 9);
 #endif
-
-		if (!is_ac66u_v2_series() && !is_ac68u_v3_series()) {
+		if (!is_ac66u_v2_series())
 			nvram_set_int("led_usb_gpio", 0|GPIO_ACTIVE_LOW);
+		if (!is_ac66u_v2_series())
 			nvram_set_int("led_pwr_gpio", 3|GPIO_ACTIVE_LOW);
-			nvram_set_int("led_wps_gpio", 3|GPIO_ACTIVE_LOW);
-		} else {
+		else
 			nvram_set_int("led_pwr_gpio", 0|GPIO_ACTIVE_LOW);
+		if (!is_ac66u_v2_series())
+			nvram_set_int("led_wps_gpio", 3|GPIO_ACTIVE_LOW);
+		else
 			nvram_set_int("led_wps_gpio", 0|GPIO_ACTIVE_LOW);
-		}
 		nvram_set_int("btn_wps_gpio", 7|GPIO_ACTIVE_LOW);
 		nvram_set_int("btn_rst_gpio", 11|GPIO_ACTIVE_LOW);
-		if (!is_ac66u_v2_series()) {
+		if (!is_ac66u_v2_series())
 			nvram_set_int("led_5g_gpio", 6|GPIO_ACTIVE_LOW);	// 4360's fake led 5g
+		if (!is_ac66u_v2_series())
 			nvram_set_int("led_usb3_gpio", 14|GPIO_ACTIVE_LOW);
-		}
 #ifdef RTCONFIG_WIFI_TOG_BTN
 		if (!is_ac66u_v2_series())
 			nvram_set_int("btn_wltog_gpio", 15|GPIO_ACTIVE_LOW);
 #endif
 #ifdef RTCONFIG_TURBO
-		if (!is_ac66u_v2_series() && !is_ac68u_v3_series())
+		if (!is_ac66u_v2_series())
 			nvram_set_int("led_turbo_gpio", 4|GPIO_ACTIVE_LOW);
 #endif
 #ifdef RTCONFIG_LED_BTN
-		if (!is_ac66u_v2_series() && !is_ac68u_v3_series())
+		if (!is_ac66u_v2_series())
 			nvram_set_int("btn_led_gpio", 5);	// active high
 #endif
-		if (is_ac66u_v2_series() || is_ac68u_v3_series())
+		if (is_ac66u_v2_series())
 			nvram_set_int("led_wan_gpio", 5);
 
 #ifdef RTCONFIG_XHCIMODE

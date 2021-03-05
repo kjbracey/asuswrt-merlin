@@ -279,7 +279,7 @@ void enable_wan_led()
 		switch (get_model()) {
 #ifdef RTAC68U
 			case MODEL_RTAC68U:
-				if (!is_ac66u_v2_series() && !is_ac68u_v3_series())
+				if (!is_ac66u_v2_series())
 					break;
 #endif
 			case MODEL_RTAC87U:
@@ -329,7 +329,7 @@ static void wan_led_control(int sig) {
 #if defined(RTAC68U) ||  defined(RTAC87U) || defined(DSL_AC68U)
 	if(nvram_match("AllLED", "1")
 #ifdef RTAC68U
-		&& (is_ac66u_v2_series() || is_ac68u_v3_series())
+		&& is_ac66u_v2_series()
 #endif
 	) {
 #if defined(RTAC68U) || defined(RTAC87U)
@@ -2420,7 +2420,7 @@ int wanduck_main(int argc, char *argv[]){
 #endif
 						if(
 #ifdef RTAC68U
-							(is_ac66u_v2_series()  || is_ac68u_v3_series())
+							is_ac66u_v2_series()
 #else
 							1
 #endif // RTAC68U
@@ -2495,7 +2495,7 @@ int wanduck_main(int argc, char *argv[]){
 						led_control(LED_WAN, LED_OFF);
 				if(nvram_match("AllLED", "1")
 #ifdef RTAC68U
-					&& (is_ac66u_v2_series() || is_ac68u_v3_series())
+					&& is_ac66u_v2_series()
 #endif
 				){
 						led_control(LED_WAN, LED_OFF);
@@ -2550,7 +2550,7 @@ int wanduck_main(int argc, char *argv[]){
 		if (strcmp(dualwan_wans, "wan none")) {
 			if(nvram_match("AllLED", "1")
 #ifdef RTAC68U
-				&& (is_ac66u_v2_series()  || is_ac68u_v3_series())
+				&& is_ac66u_v2_series()
 #endif
 			){
 				link_status = 0;
