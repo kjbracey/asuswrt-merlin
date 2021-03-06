@@ -4,6 +4,13 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_48E2j9527  (7-March-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: openvpn: update to 2.5.1
+* CHANGED: others: do not refresh autov6 address for hosts not responding to ping
+* CHANGED: others: add ip2cidr function to helper.sh
+* CHANGED: firewall: move udp ctf bypass (fw_pt_stun) to mangle/prerouting chain
+
+
 374.43_48E1j9527  (4-March-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: Revert "wl_arm: update wireless prebuilts for AC68U V3 support"
 * CHANGED: Revert "rc: shared: add mainline support for AC68U V3"
