@@ -79,3 +79,54 @@ am_settings_set() {
 	sed -i "\\~^$1 ~d" $_am_settings_path
 	echo "$@" >> $_am_settings_path
 }
+
+# This function will convert ip address and netmask to cidr notation
+# Example:  NETADDR=$(ip2cidr $(nvram get lan_ipaddr) $(nvram get lan_netmask))
+ip2cidr() {
+  awk '
+  BEGIN {
+    len = ARGC - 1;
+    if (len != 2) {
+      print "ip2cidr {ip} {netmask}";
+      exit 1;
+    }
+    ipaddr = ARGV[1];
+    netmask = ARGV[2];
+
+    ipaddr_num = ip2num(ipaddr);
+    netmask_num = ip2num(netmask);
+    netaddr = num2ip(and(ipaddr_num, netmask_num));
+    numhosts = xor(0xffffffff, netmask_num);
+    hostbits = 0;
+    while (numhosts > 0) {
+      hostbits++;
+      numhosts = int(numhosts / 2);
+    }
+    maskbits = 32 - hostbits;
+
+    printf("%s/%d\n", netaddr, maskbits);
+  }
+  function ip2num( ip,
+                   num, len, array, i ) {
+    num = 0;
+    len = split(ip, array, ".");
+    for (i = 1; i <= 4; i++) {
+      num *= 256;
+      if (i <= len) {
+        num += array[i];
+      }
+    }
+    return num;
+  }
+  function num2ip( n,
+                   ip, m ) {
+    ip = "";
+    for (i = 1; i <= 4; i++) {
+      m = n % 256;
+      n = int(n / 256);
+      ip = (ip == "") ? m : m "." ip;
+    }
+    return ip;
+  }
+  ' $@
+}
