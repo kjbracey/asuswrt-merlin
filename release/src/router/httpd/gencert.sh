@@ -5,12 +5,7 @@ source /usr/sbin/helper.sh
 PID=$$
 SECS=1262278080
 
-if [ -f /usr/sbin/openssl11 ]
-then
-	OPENSSL=/usr/sbin/openssl11
-else
-	OPENSSL=/usr/sbin/openssl
-fi
+OPENSSL=/usr/sbin/openssl
 
 if [ $(nvram get ntp_sync) = "1" ]
 then

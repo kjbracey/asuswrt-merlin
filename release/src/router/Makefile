@@ -1231,9 +1231,9 @@ openssl-install:
 	[ ! -f openssl/Makefile ] || $(STRIP) $(INSTALLDIR)/openssl/usr/lib/libcrypto.so.1.0.0
 #	[ ! -f openssl/Makefile ] || cd $(INSTALLDIR)/openssl/usr/lib && rm -f libcrypto.so && ln -sf libcrypto.so.1.0.0 libcrypto.so
 
-	[ ! -f openssl/Makefile ] || install -D openssl/apps/openssl $(INSTALLDIR)/openssl/usr/sbin/openssl
-	[ ! -f openssl/Makefile ] || $(STRIP) $(INSTALLDIR)/openssl/usr/sbin/openssl
-	[ ! -f openssl/Makefile ] || chmod 0500 $(INSTALLDIR)/openssl/usr/sbin/openssl
+#	[ ! -f openssl/Makefile ] || install -D openssl/apps/openssl $(INSTALLDIR)/openssl/usr/sbin/openssl
+#	[ ! -f openssl/Makefile ] || $(STRIP) $(INSTALLDIR)/openssl/usr/sbin/openssl
+#	[ ! -f openssl/Makefile ] || chmod 0500 $(INSTALLDIR)/openssl/usr/sbin/openssl
 
 ifeq ($(RTCONFIG_WEBDAV),y)
 	[ ! -f openssl/Makefile ] || install -D openssl/libssl.so.1.0.0 $(INSTALLDIR)/openssl/usr/lib/libssl.so.1.0.0
@@ -1268,13 +1268,13 @@ openssl-1.1-install:
 	if [ -f openssl-1.1/Makefile ] ; then \
 		install -D openssl-1.1/libcrypto.so.1.1 $(INSTALLDIR)/openssl-1.1/usr/lib/libcrypto.so.1.1 ; \
 		install -D openssl-1.1/libssl.so.1.1 $(INSTALLDIR)/openssl-1.1/usr/lib/libssl.so.1.1 ; \
-		install -D openssl-1.1/apps/openssl $(INSTALLDIR)/openssl/usr/sbin/openssl11 ; \
+		install -D openssl-1.1/apps/openssl $(INSTALLDIR)/openssl-1.1/usr/sbin/openssl ; \
 		$(STRIP) $(INSTALLDIR)/openssl-1.1/usr/lib/libcrypto.so.1.1 ; \
 		$(STRIP) $(INSTALLDIR)/openssl-1.1/usr/lib/libssl.so.1.1 ; \
-		$(STRIP) $(INSTALLDIR)/openssl/usr/sbin/openssl11 ; \
+		$(STRIP) $(INSTALLDIR)/openssl/usr/sbin/openssl ; \
 		cd $(INSTALLDIR)/openssl-1.1/usr/lib && rm -f libcrypto.so && ln -sf libcrypto.so.1.1 libcrypto.so ; \
 		cd $(INSTALLDIR)/openssl-1.1/usr/lib && rm -f libssl.so && ln -sf libssl.so.1.1 libssl.so ; \
-		chmod 0500 $(INSTALLDIR)/openssl/usr/sbin/openssl11 ; \
+		chmod 0500 $(INSTALLDIR)/openssl-1.1/usr/sbin/openssl ; \
 	fi
 
 openssl-1.1-stage:
