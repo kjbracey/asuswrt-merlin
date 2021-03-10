@@ -612,6 +612,8 @@ void stop_vpnclient(int clientNum)
 		nvram_set(&buffer[0], "0");
 		sprintf(&buffer[0], "vpn_clientx_enabled");
 		nvram_set_int(&buffer[0], (nvram_get_int(&buffer[0])-1));
+        sprintf(&buffer[0], "vpn_client%d_off", clientNum);
+		nvram_set(&buffer[0], "1");
 	}
 
 	// NVRAM setting for device type could have changed, just try to remove both
