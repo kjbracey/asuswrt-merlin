@@ -71,6 +71,7 @@ endif
 # Get external ip via stun
 	install -m 0755 getextip.sh $(INSTALLDIR)/usr/sbin
 	ln -sf getextip.sh $(INSTALLDIR)/usr/sbin/gettunnelip.sh
+	ln -sf getextip.sh $(INSTALLDIR)/usr/sbin/getrealip.sh
 
 # Postconf helper script
 	install -m 0755 helper.sh $(INSTALLDIR)/usr/sbin
