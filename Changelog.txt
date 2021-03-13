@@ -4,6 +4,13 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_48D3j9527  (10-March-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: make: openssl: make openssl11 the cli default
+* CHANGED: others: link getrealip to getextip for Merlin compatibility
+* CHANGED: others: make getextip.sh pppoe aware
+* CHANGED: openvpn: set vpn_client off state on stop_vpnclient
+
+
 374.43_48E2j9527  (7-March-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: openvpn: update to 2.5.1
 * CHANGED: others: do not refresh autov6 address for hosts not responding to ping
