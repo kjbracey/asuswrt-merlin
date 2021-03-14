@@ -21,18 +21,29 @@
 wan_route_x = '<% nvram_get("wan_route_x"); %>';
 wan_nat_x = '<% nvram_get("wan_nat_x"); %>';
 wan_proto = '<% nvram_get("wan_proto"); %>';
+wan_addr = '<% nvram_get("ext_ipaddr"); %>';
 server1pid = '<% sysinfo("pid.vpnserver1"); %>';
 server1stt = '<% nvram_get("vpn_server1_state"); %>';
 server1err = '<% nvram_get("vpn_server1_errno"); %>';
+server1prt = '<% nvram_get("vpn_server1_port"); %>';
+server1pro = '<% nvram_get("vpn_server1_proto"); %>';
 server2pid = '<% sysinfo("pid.vpnserver2"); %>';
 server2stt = '<% nvram_get("vpn_server2_state"); %>';
 server2err = '<% nvram_get("vpn_server2_errno"); %>';
+server2prt = '<% nvram_get("vpn_server2_port"); %>';
+server2pro = '<% nvram_get("vpn_server2_proto"); %>';
 client1pid = '<% sysinfo("pid.vpnclient1"); %>';
 client1stt = '<% nvram_get("vpn_client1_state"); %>';
 client1err = '<% nvram_get("vpn_client1_errno"); %>';
+client1rip = '<% nvram_get("vpn_client1_rip"); %>';
+client1prt = '<% nvram_get("vpn_client1_port"); %>';
+client1pro = '<% nvram_get("vpn_client1_proto"); %>';
 client2pid = '<% sysinfo("pid.vpnclient2"); %>';
 client2stt = '<% nvram_get("vpn_client2_state"); %>';
 client2err = '<% nvram_get("vpn_client2_errno"); %>';
+client2rip = '<% nvram_get("vpn_client2_rip"); %>';
+client2prt = '<% nvram_get("vpn_client2_port"); %>';
+client2pro = '<% nvram_get("vpn_client2_proto"); %>';
 pptpdpid = '<% sysinfo("pid.pptpd"); %>';
 client1blk = '<% nvram_get("vpn_client1_block"); %>';
 client2blk = '<% nvram_get("vpn_client2_block"); %>';
@@ -54,7 +65,7 @@ function initial(){
 	if (openvpnd_support){
 		if (server1pid > 0) {
 			if (server1stt == 2)
-				$("server1_Block_Running").innerHTML = state_r;
+				$("server1_Block_Running").innerHTML = state_r + " - " + wan_addr + " " + server1pro.toUpperCase() + ":" + server1prt;
 			else if (server1stt == -1)
 				$("server1_Block_Running").innerHTML = state_e;
 			else
@@ -64,7 +75,7 @@ function initial(){
 
 		if (server2pid > 0) {
 			if (server2stt == 2)
-				$("server2_Block_Running").innerHTML = state_r;
+				$("server2_Block_Running").innerHTML = state_r + " - " + wan_addr + " " + server2pro.toUpperCase() + ":" + server2prt;
 			else if (server2stt == -1)
 				$("server2_Block_Running").innerHTML = state_e;
 			else
@@ -74,7 +85,7 @@ function initial(){
 
 		if (client1pid > 0) {
 			if (client1stt == 2)
-				$("client1_Block_Running").innerHTML = state_r;
+				$("client1_Block_Running").innerHTML = state_r + " - " + client1rip + " " + client1pro.toUpperCase() + ":" + client1prt;
 			else
 				$("client1_Block_Running").innerHTML = state_i;
 		} else
@@ -93,7 +104,7 @@ function initial(){
 
 		if (client2pid > 0) {
 			if (client2stt == 2)
-				$("client2_Block_Running").innerHTML = state_r;
+				$("client2_Block_Running").innerHTML = state_r + " - " + client2rip + " " + client2pro.toUpperCase() + ":" + client2prt;
 			else
 				$("client2_Block_Running").innerHTML = state_i;
 		} else
