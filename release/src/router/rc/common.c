@@ -1250,7 +1250,7 @@ void time_zone_x_mapping(void)
 
 	/* check time_zone_dst for daylight saving */
 	if (nvram_get_int("time_zone_dst"))
-		sprintf(tmpstr, "%s,%s", tmpstr, nvram_safe_get("time_zone_dstoff"));
+		snprintf(tmpstr, sizeof(tmpstr), "%s,%s", tmpstr, nvram_safe_get("time_zone_dstoff"));
 #ifdef CONVERT_TZ_TO_GMT_DST
 	else	gettzoffset(tmpstr, tmpstr, sizeof(tmpstr));
 #endif

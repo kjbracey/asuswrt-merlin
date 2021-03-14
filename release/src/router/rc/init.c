@@ -3357,6 +3357,12 @@ int init_nvram(void)
 	if(strstr(nvram_safe_get("wans_dualwan"), "usb") == NULL)
 		nvram_set_int("modem_enable", 0);
 
+	// fix DST flag
+	if((strstr(nvram_safe_get("time_zone"), "DST") != NULL) || (strstr(nvram_safe_get("time_zone"), "TDT") != NULL))
+		nvram_set_int("time_zone_dst", 1);
+	else
+		nvram_set_int("time_zone_dst", 0);
+
 // End special fork processing
 
 #if defined(CONFIG_BCMWL5) && !defined(RTCONFIG_DUALWAN)

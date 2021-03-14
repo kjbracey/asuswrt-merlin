@@ -111,7 +111,7 @@ function initial(){
 	load_timezones();
 	autofill_dst();
 	parse_dstoffset();
-	show_dst_chk();
+	select_time_zone();
 	load_dst_m_Options();
 	load_dst_w_Options();
 	load_dst_d_Options();
@@ -229,7 +229,6 @@ function applyRule(){
 		}
 
 		if(document.form.time_zone_select.value.search("DST") >= 0 || document.form.time_zone_select.value.search("TDT") >= 0){		// DST area
-				if(!document.getElementById("time_zone_dst_chk").checked) autofill_dst(); //reset to defaults
 				time_zone_tmp = document.form.time_zone_select.value.split("_");	//0:time_zone 1:serial number
 				time_zone_s_tmp = "M"+document.form.dst_start_m.value+"."+document.form.dst_start_w.value+"."+document.form.dst_start_d.value+"/"+document.form.dst_start_h.value;
 				time_zone_e_tmp = "M"+document.form.dst_end_m.value+"."+document.form.dst_end_w.value+"."+document.form.dst_end_d.value+"/"+document.form.dst_end_h.value;
@@ -415,12 +414,11 @@ function validForm(){
 			)
 		return false;
 
-	if(document.form.time_zone_dst_chk.checked
-			&& document.form.dst_start_m.value == document.form.dst_end_m.value
-			&& document.form.dst_start_w.value == document.form.dst_end_w.value
-			&& document.form.dst_start_d.value == document.form.dst_end_d.value){
-		alert("<#FirewallConfig_URLActiveTime_itemhint4#>");
-		return false;
+	if(document.form.dst_start_m.value == document.form.dst_end_m.value
+		&& document.form.dst_start_w.value == document.form.dst_end_w.value
+		&& document.form.dst_start_d.value == document.form.dst_end_d.value){
+			alert("<#FirewallConfig_URLActiveTime_itemhint4#>");
+			return false;
 	}
 
 	if(document.form.http_passwd2.value.length > 0)
@@ -511,31 +509,6 @@ function ntp_chk(obj){
 
 function done_validating(action){
 	refreshpage();
-}
-
-function show_dst_chk(){
-	var tzdst = new RegExp("^[a-z]+[0-9\-\.:]+[a-z]+", "i");
-	// match "[std name][offset][dst name]"
-	if(document.form.time_zone_select.value.match(tzdst)){
-		document.getElementById("chkbox_time_zone_dst").style.display="";
-		document.getElementById("adj_dst").innerHTML = "<#System_Change_TimeZone_manual#>";
-		if(!document.getElementById("time_zone_dst_chk").checked){
-				document.form.time_zone_dst.value=0;
-				document.getElementById("dst_start").style.display="none";
-				document.getElementById("dst_end").style.display="none";
-		}else{
-				parse_dstoffset();
-				document.form.time_zone_dst.value=1;
-				document.getElementById("dst_start").style.display="";
-				document.getElementById("dst_end").style.display="";
-		}
-	}else{
-		document.getElementById("chkbox_time_zone_dst").style.display="none";
-		document.getElementById("chkbox_time_zone_dst").checked=false;
-		document.form.time_zone_dst.value=0;
-		document.getElementById("dst_start").style.display="none";
-		document.getElementById("dst_end").style.display="none";
-	}
 }
 
 var timezones = [
@@ -1102,37 +1075,19 @@ function pass_checked(obj){
 	switchType(obj, document.form.show_pass_1.checked, true);
 }
 
-function daylight_save_check(){
-	if (document.form.time_zone_dst_chk.checked){
-		document.form.time_zone_dst.value = "1";
+function select_time_zone(){
+	var tzdst = new RegExp("^[a-zA-Z]+[0-9\-\.:]+[a-zA-Z]+", "gi"); // match "[std name][offset][dst name]"
+	document.getElementById('dstzone').innerHTML = "<#General_x_SystemTime_dst#><br>";
+
+	if(document.form.time_zone_select.value.match(tzdst)){
+		document.form.time_zone_dst.value=1;
+		parse_dstoffset();
+		document.getElementById('dstzone').style.display = "";
 		document.getElementById("dst_start").style.display="";
 		document.getElementById("dst_end").style.display="";
 	}else{
-		document.form.time_zone_dst.value = "0";
-		document.getElementById("dst_start").style.display="none";
-		document.getElementById("dst_end").style.display="none";
-	}
-}
-
-function select_time_zone(){
-	var tzdst = new RegExp("^[a-z]+[0-9\-\.:]+[a-z]+", "i"); // match "[std name][offset][dst name]"
-
-	if(document.form.time_zone_select.value.match(tzdst)){
-		document.getElementById("chkbox_time_zone_dst").style.display="";
-		document.getElementById("adj_dst").innerHTML = "<#System_Change_TimeZone_manual#>";
-		if(!document.getElementById("time_zone_dst_chk").checked){
-			document.form.time_zone_dst.value=0;
-			document.getElementById("dst_start").style.display="none";
-			document.getElementById("dst_end").style.display="none";
-		}else{
-			document.form.time_zone_dst.value=1;
-			document.getElementById("dst_start").style.display="";
-			document.getElementById("dst_end").style.display="";
-		}
-	}else{
 		document.form.time_zone_dst.value=0;
-		document.getElementById("chkbox_time_zone_dst").style.display="none";
-		document.getElementById("time_zone_dst_chk").checked = false;
+		document.getElementById('dstzone').style.display = "none";
 		document.getElementById("dst_start").style.display="none";
 		document.getElementById("dst_end").style.display="none";
 	}
@@ -1436,18 +1391,14 @@ function updateDateTime()
             <select name="time_zone_select" class="input_option" onchange="select_time_zone();autofill_dst();">
             </select>
           	<div>
-          		<span id="chkbox_time_zone_dst" style="color:white;display:none;">
-          			<input type="checkbox" name="time_zone_dst_chk" id="time_zone_dst_chk" <% nvram_match("time_zone_dst", "1", "checked"); %> class="input" onClick="daylight_save_check();">
-          			<label for="time_zone_dst_chk"><span id="adj_dst"></span></label>
-          			<br>
-			</span>
+				<span id="dstzone" style="display:none;color:#FFFFFF;"></span>
           		<span id="dst_start" style="color:white;display:none;">
           				<b>DST start time</b>
           				<select name="dst_start_m" class="input_option" onchange=""></select>&nbsp;month &nbsp;
           				<select name="dst_start_w" class="input_option" onchange=""></select>&nbsp;week &nbsp;
           				<select name="dst_start_d" class="input_option" onchange=""></select>&nbsp;weekday &nbsp;
           				<select name="dst_start_h" class="input_option" onchange=""></select>&nbsp;hour &nbsp;
-          			<br>
+						<br>
           		</span>
           		<span id="dst_end" style="color:white;display:none;">
           			<b>DST end time</b>&nbsp;&nbsp;
@@ -1455,7 +1406,7 @@ function updateDateTime()
   	        			<select name="dst_end_w" class="input_option" onchange=""></select>&nbsp;week &nbsp;
 	          			<select name="dst_end_d" class="input_option" onchange=""></select>&nbsp;weekday &nbsp;
           				<select name="dst_end_h" class="input_option" onchange=""></select>&nbsp;hour &nbsp;
-          				<br>
+						<br>
 			</span>
 		  		<div id="timezone_hint_div" style="display:none;"><span id="timezone_hint"></span></div>
           	</div>
