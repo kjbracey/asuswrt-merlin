@@ -46,6 +46,7 @@ endif
 
 # acme.sh command line utility/cert renew
 	install -m 0755 install-acme.sh $(INSTALLDIR)/usr/sbin
+	install -m 0755 uninstall-acme.sh $(INSTALLDIR)/usr/sbin
 	install -m 0755 renew-acme.sh $(INSTALLDIR)/usr/sbin
 	install -m 0755 dns_asusapi.sh $(INSTALLDIR)/usr/sbin
 
