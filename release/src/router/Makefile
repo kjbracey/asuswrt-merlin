@@ -3713,15 +3713,16 @@ ipset-7-clean:
 	@rm -f ipset-7/Makefile
 
 ncurses/Makefile:
-	cd ncurses && CFLAGS="$(EXTRACFLAGS) -Os -I$(STAGEDIR)/usr/include -ffunction-sections -fdata-sections -fPIC" \
-	$(CONFIGURE) --prefix=/usr --without-cxx --without-cxx-binding \
+	cd ncurses && \
+	CFLAGS="$(EXTRACFLAGS) -Os -I$(STAGEDIR)/usr/include -ffunction-sections -fdata-sections -fPIC" \
 	LDFLAGS="$(LDFLAGS) -ffunction-sections -fdata-sections -Wl,--gc-sections -L$(STAGEDIR)/usr/lib" \
+	CPPFLAGS="-P" \
+	$(CONFIGURE) --prefix=/usr --without-cxx --without-cxx-binding \
 	--enable-echo --enable-const --enable-overwrite --disable-rpath --without-ada \
 	$(if $(RTCONFIG_BCMARM),--enable-widec,) --enable-pc-files \
 	--without-debug --without-manpages --without-profile --without-progs --without-tests \
 	--disable-home-terminfo --with-normal --with-shared --with-build-cppflags=-D_GNU_SOURCE \
 	--disable-termcap --disable-database --with-fallbacks="xterm,vt100,vt200,linux,ansi,xterm-256color"
-
 #	--with-default-terminfo-dir=/usr/share/terminfo --with-terminfo-dirs=/usr/share/terminfo
 
 ncurses: ncurses/Makefile
@@ -3735,17 +3736,16 @@ ncurses-clean:
 ncurses-install:
 ifeq ($(RTCONFIG_BCMARM),y)
 	install -D ncurses/lib/libncursesw.so.6.0 $(INSTALLDIR)/ncurses/usr/lib/libncursesw.so.6.0
+	cd $(INSTALLDIR)/ncurses/usr/lib && \
+		ln -sf libncursesw.so.6.0 libncursesw.so.6 &&\
+		ln -sf libncursesw.so.6.0 libncursesw.so
 else
 	install -D ncurses/lib/libncurses.so.6.0 $(INSTALLDIR)/ncurses/usr/lib/libncurses.so.6.0
+	cd $(INSTALLDIR)/ncurses/usr/lib && \
+		ln -sf libncurses.so.6.0 libncurses.so.6 &&\
+		ln -sf libncurses.so.6.0 libncurses.so
 endif
-
 	$(STRIP) $(INSTALLDIR)/ncurses/usr/lib/*.so.*
-
-ifeq ($(RTCONFIG_BCMARM),y)
-	cd $(INSTALLDIR)/ncurses/usr/lib && ln -sf libncursesw.so.6.0 libncursesw.so.6
-else
-	cd $(INSTALLDIR)/ncurses/usr/lib && ln -sf libncurses.so.6.0 libncurses.so.6
-endif
 
 nano/Makefile:
 	cd nano && \
