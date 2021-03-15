@@ -4,6 +4,14 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_48D4j9527  (14-March-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: nvram: nvram_get return static ptr instead of mmap ptr
+* CHANGED: webui: add ipaddr and port to openvpn running status
+* CHANGED: openssl: update CA bundle to 2021 March 9th version
+* CHANGED: webui: update timezone data
+* FIXED: webui: fix dst time zone setting
+
+
 374.43_48D3j9527  (10-March-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: make: openssl: make openssl11 the cli default
 * CHANGED: others: link getrealip to getextip for Merlin compatibility
