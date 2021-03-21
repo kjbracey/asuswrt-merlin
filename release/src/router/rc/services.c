@@ -3858,7 +3858,7 @@ start_ntpc(void)
 	int pid;
 
 	if (getpid() != 1) {
-		notify_rc("start_ntpc");
+		notify_rc_after_period_wait("start_ntpc", 60);  //wait 60sec for ntpc to start
 		return 0;
 	}
 
