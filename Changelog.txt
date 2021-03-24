@@ -4,6 +4,16 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_48D5j9527  (20-March-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: nano: update to 5.6.1
+* CHANGED: ncurses: update to 6.0
+* CHANGED: make: update ncurses build recipe
+* CHANGED: others: add acme.sh uninstall script
+* CHANGED: webui: update release and beta firmware links
+* CHANGED: kernel: pppoe: (openwrt) only process PADT targeted at local interfaces
+* CHANGED: services: increase wait time for ntpc start to 1min
+
+
 374.43_48D4j9527  (14-March-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: nvram: nvram_get return static ptr instead of mmap ptr
 * CHANGED: webui: add ipaddr and port to openvpn running status
