@@ -4,6 +4,12 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_48D6j9527  (25-March-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: make: remove bwdpi override for nf_conntrack_events
+* CHANGED: kernel: add additional conntrack/netlink modules
+* CHANGED: openssl11: update to 1.1.1k
+
+
 374.43_48D5j9527  (20-March-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: nano: update to 5.6.1
 * CHANGED: ncurses: update to 6.0
