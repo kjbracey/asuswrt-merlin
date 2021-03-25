@@ -2353,12 +2353,6 @@ define KernelConfig
 	else \
 		echo "CONFIG_LINUX_MTD=$(LINUX_MTD)" >>$(1); \
 	fi; \
-	sed -i "/CONFIG_NF_CONNTRACK_EVENTS/d" $(1); \
-	if [ "$(BWDPI)" = "y" ]; then \
-		echo "CONFIG_NF_CONNTRACK_EVENTS=y" >>$(1); \
-	else \
-		echo "# CONFIG_NF_CONNTRACK_EVENTS is not set" >>$(1); \
-	fi; \
 	if [ "$(USB_DEBUG)" = "y" ]; then \
 		sed -i "/CONFIG_USB_DEBUG/d" $(1); \
 		echo "CONFIG_USB_DEBUG=y" >>$(1); \
