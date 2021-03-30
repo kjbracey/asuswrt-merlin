@@ -10,7 +10,7 @@ export PLATFORM := arm-uclibc
 export CROSS_COMPILE := arm-brcm-linux-uclibcgnueabi-
 export CROSS_COMPILER := $(CROSS_COMPILE)
 export CONFIGURE := ./configure --host=arm-linux --build=$(BUILD)
-export HOSTCONFIG := linux-armv4 -O2
+export HOSTCONFIG := linux-armv4
 export BCMEX := _arm
 export EXTRA_FLAG := -lgcc_s
 export ARCH := arm
