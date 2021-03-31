@@ -85,13 +85,13 @@ static void ntp_service()
 #ifdef RTCONFIG_DNSCRYPT
 		if (nvram_match("dnscrypt_proxy", "1")) {
 			/* restart dnscrypt to update timestamp check */
-			restart_dnscrypt(0);
+			restart_dnscrypt(1);
 		}
 #endif
 #ifdef RTCONFIG_STUBBY
 		if (nvram_match("stubby_proxy", "1")) {
 			/* restart stubby to invoke TLS */
-			restart_stubby(0);
+			restart_stubby(1);
 		}
 #endif
 	}
