@@ -157,6 +157,9 @@ then
 		if echo $option | grep "dhcp-option DOMAIN"; then searchdomains="$searchdomains $(echo $option | sed "s/dhcp-option DOMAIN //")"; fi
 	done
 
+	# Save list of VPN DNS servers
+	$(nvram set vpn_client$(echo $instance)_dns="${serverips}")
+
 	# Write resolv/conf file
 	for server in $serverips
 	do
@@ -166,10 +169,16 @@ then
 			create_client_list $server
 			setdns=1
 		fi
-		for domain in $searchdomains
-		do
-			echo "server=/$domain/$server" >> $conffile
-		done
+		# Add route for pushed private servers
+		if $(echo $server | grep -q -E '^(192\.168|10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.)')
+		then
+			logger -t "openvpn-updown" "Adding route for VPN private DNS $server via $route_vpn_gateway"
+			/usr/sbin/ip route add $server/32 via $route_vpn_gateway
+		fi
+	done
+	for domain in $searchdomains
+	do
+		echo "server=/$domain/$server" >> $conffile
 	done
 
 	if [ $setdns == 1 ]
