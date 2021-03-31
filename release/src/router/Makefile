@@ -1247,13 +1247,11 @@ openssl-stage:
 
 openssl-1.1/Makefile:
 	cd $(TOP)/openssl-1.1 && \
-	./Configure $(HOSTCONFIG) --prefix=/usr --openssldir=/etc/ssl --cross-compile-prefix=' ' --api=1.0.0 \
-	-O2 -ffunction-sections -fdata-sections -Wl,--gc-sections \
+	./Configure $(HOSTCONFIG) -O2 -ffunction-sections -fdata-sections -Wl,--gc-sections -DOPENSSL_NO_BUF_FREELISTS -DOPENSSL_PREFER_CHACHA_OVER_GCM \
+	--prefix=/usr --openssldir=/etc/ssl --cross-compile-prefix=' ' --api=1.0.0 \
 	shared no-err no-async $(if $(RTCONFIG_BCMARM),,no-threads) \
-	$(OPENSSL_CIPHERS) no-aria no-sm2 no-sm3 no-sm4 \
-	-DOPENSSL_PREFER_CHACHA_OVER_GCM
-	-@$(MAKE) -C openssl-1.1 depend
-	-@$(MAKE) -C openssl-1.1 clean
+	$(OPENSSL_CIPHERS) no-aria no-sm2 no-sm3 no-sm4
+	-@$(MAKE) -C openssl-1.1 depend clean
 	@touch $@
 
 openssl-1.1: openssl-1.1/Makefile
@@ -2944,7 +2942,7 @@ openvpn/Makefile:
 	LZO_LIBS="-L$(TOP)/lzo/src/.libs -llzo2" \
 	LZ4_CFLAGS="-I$(TOP)/lz4/lib" \
 	LZ4_LIBS="-L$(TOP)/lz4/lib -llz4" \
-	LDFLAGS="$(EXTRALDFLAGS) -L$(TOP)/nvram$(BCMEX) -lnvram -L$(TOP)/shared -lshared $(if $(RTCONFIG_HTTPS),-L$(TOP)/openssl-1.1 -lssl -lcrypto) -L$(TOP)/zlib -lz -lpthread -ldl -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+	LDFLAGS="$(EXTRALDFLAGS) -L$(TOP)/nvram$(BCMEX) -lnvram -L$(TOP)/shared -lshared -L$(TOP)/zlib -lz -lpthread -ldl -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	IPROUTE="/usr/sbin/ip" IFCONFIG="/sbin/ifconfig" ROUTE="/sbin/route" \
 	$(CONFIGURE) --prefix=/usr --bindir=/usr/sbin --libdir=/usr/lib  --enable-iproute2 \
 	--disable-debug --enable-management --disable-small --disable-selinux \
