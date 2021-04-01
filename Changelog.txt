@@ -4,6 +4,19 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_48E7j9527  (1-April-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: others: (backport) update amtm to 3.1.9 rev5; increase curl timeout
+* CHANGED: others: updown: automatically route private pushed vpn dns servers
+* CHANGED: openssl11: asuswrt-merlin customization for 1.1.x
+* CHANGED: make: clean up openssl11 recipe
+* CHANGED: Revert "arm: (backport) performance optimization"
+* CHANGED: rc: force restart stubby at first sync
+* CHANGED: getdns: (upstream) only check for and process read/write events if status is success
+* CHANGED: getdns: (upstream) build: fix exporting symbols for extension libraries
+* CHANGED: getdns: (upstream) build: fix naming of extension libraries
+* CHANGED: getdns: (upstream) Fix typo in cmakeconfig.h.in files
+
+
 374.43_48D6j9527  (25-March-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: make: remove bwdpi override for nf_conntrack_events
 * CHANGED: kernel: add additional conntrack/netlink modules
