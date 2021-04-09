@@ -236,10 +236,17 @@ int main (int argc, char **argv)
   if (option_bool(OPT_UBUS))
     die(_("Ubus not available: set HAVE_UBUS in src/config.h"), NULL, EC_BADCONF);
 #endif
-
+  
+  /* Handle only one of min_port/max_port being set. */
+  if (daemon->min_port != 0 && daemon->max_port == 0)
+    daemon->max_port = MAX_PORT;
+  
+  if (daemon->max_port != 0 && daemon->min_port == 0)
+    daemon->min_port = MIN_PORT;
+   
   if (daemon->max_port < daemon->min_port)
     die(_("max_port cannot be smaller than min_port"), NULL, EC_BADCONF);
-
+  
   now = dnsmasq_time();
 
   if (daemon->auth_zones)
@@ -392,6 +399,14 @@ int main (int argc, char **argv)
       cache_init();
       blockdata_init();
       hash_questions_init();
+
+      /* Scale random socket pool by ftabsize, but
+	 limit it based on available fds. */
+      daemon->numrrand = daemon->ftabsize/2;
+      if (daemon->numrrand > max_fd/3)
+	daemon->numrrand = max_fd/3;
+      /* safe_malloc returns zero'd memory */
+      daemon->randomsocks = safe_malloc(daemon->numrrand * sizeof(struct randfd));
     }
 
 #ifdef HAVE_INOTIFY
@@ -975,21 +990,21 @@ int main (int argc, char **argv)
 	if (p->missing)
 	   my_syslog(MS_TFTP | LOG_WARNING, _("warning: TFTP directory %s inaccessible"), p->prefix);
 
-      /* This is a guess, it assumes that for small limits,
-	 disjoint files might be served, but for large limits,
+      /* This is a guess, it assumes that for small limits, 
+	 disjoint files might be served, but for large limits, 
 	 a single file will be sent to may clients (the file only needs
 	 one fd). */
 
-      max_fd -= 30; /* use other than TFTP */
-
+      max_fd -= 30 + daemon->numrrand; /* use other than TFTP */
+      
       if (max_fd < 0)
 	max_fd = 5;
       else if (max_fd < 100 && !option_bool(OPT_SINGLE_PORT))
 	max_fd = max_fd/2;
       else
 	max_fd = max_fd - 20;
-
-      /* if we have to use a limited range of ports,
+      
+      /* if we have to use a limited range of ports, 
 	 that will limit the number of transfers */
       if (daemon->start_tftp_port != 0 &&
 	  daemon->end_tftp_port - daemon->start_tftp_port + 1 < max_fd)
@@ -1681,8 +1696,9 @@ static int set_dns_listeners(time_t now)
 {
   struct serverfd *serverfdp;
   struct listener *listener;
+  struct randfd_list *rfl;
   int wait = 0, i;
-
+  
 #ifdef HAVE_TFTP
   int  tftp = 0;
   struct tftp_transfer *transfer;
@@ -1701,11 +1717,14 @@ static int set_dns_listeners(time_t now)
   for (serverfdp = daemon->sfds; serverfdp; serverfdp = serverfdp->next)
     poll_listen(serverfdp->fd, POLLIN);
     
-  if (daemon->port != 0 && !daemon->osport)
-    for (i = 0; i < RANDOM_SOCKS; i++)
-      if (daemon->randomsocks[i].refcount != 0)
-	poll_listen(daemon->randomsocks[i].fd, POLLIN);
-	  
+  for (i = 0; i < daemon->numrrand; i++)
+    if (daemon->randomsocks[i].refcount != 0)
+      poll_listen(daemon->randomsocks[i].fd, POLLIN);
+
+  /* Check overflow random sockets too. */
+  for (rfl = daemon->rfl_poll; rfl; rfl = rfl->next)
+    poll_listen(rfl->rfd->fd, POLLIN);
+  
   for (listener = daemon->listeners; listener; listener = listener->next)
     {
       /* only listen for queries if we have resources */
@@ -1742,21 +1761,26 @@ static void check_dns_listeners(time_t now)
 {
   struct serverfd *serverfdp;
   struct listener *listener;
+  struct randfd_list *rfl;
   int i;
   int pipefd[2];
-
+  
   for (serverfdp = daemon->sfds; serverfdp; serverfdp = serverfdp->next)
     if (poll_check(serverfdp->fd, POLLIN))
-      reply_query(serverfdp->fd, serverfdp->source_addr.sa.sa_family, now);
+      reply_query(serverfdp->fd, now);
+  
+  for (i = 0; i < daemon->numrrand; i++)
+    if (daemon->randomsocks[i].refcount != 0 && 
+	poll_check(daemon->randomsocks[i].fd, POLLIN))
+      reply_query(daemon->randomsocks[i].fd, now);
 
-  if (daemon->port != 0 && !daemon->osport)
-    for (i = 0; i < RANDOM_SOCKS; i++)
-      if (daemon->randomsocks[i].refcount != 0 &&
-	  poll_check(daemon->randomsocks[i].fd, POLLIN))
-	reply_query(daemon->randomsocks[i].fd, daemon->randomsocks[i].family, now);
+  /* Check overflow random sockets too. */
+  for (rfl = daemon->rfl_poll; rfl; rfl = rfl->next)
+    if (poll_check(rfl->rfd->fd, POLLIN))
+      reply_query(rfl->rfd->fd, now);
 
   /* Races. The child process can die before we read all of the data from the
-     pipe, or vice versa. Therefore send tcp_pids to zero when we wait() the
+     pipe, or vice versa. Therefore send tcp_pids to zero when we wait() the 
      process, and tcp_pipes to -1 and close the FD when we read the last
      of the data - indicated by cache_recv_insert returning zero.
      The order of these events is indeterminate, and both are needed
