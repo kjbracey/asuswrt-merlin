@@ -2698,7 +2698,10 @@ TRACE_PT("writing Parental Control\n");
 
 		// ICMPv6 rules
 		for (i = 0; i < sizeof(allowed_icmpv6)/sizeof(int); ++i) {
-			fprintf(fp_ipv6, "-A FORWARD -p ipv6-icmp --icmpv6-type %i -j %s\n", allowed_icmpv6[i], logaccept);
+			if (nvram_match("misc_ping_x", "0") && (allowed_icmpv6[i] == 128)) // ratelimit ipv6 ping
+				fprintf(fp_ipv6, "-A FORWARD -p ipv6-icmp --icmpv6-type %i -m limit --limit 4/s -j %s\n", allowed_icmpv6[i], logaccept);
+			else
+				fprintf(fp_ipv6, "-A FORWARD -p ipv6-icmp --icmpv6-type %i -j %s\n", allowed_icmpv6[i], logaccept);
 		}
 	}
 #endif
@@ -3744,7 +3747,10 @@ TRACE_PT("writing Parental Control\n");
 
 		// ICMPv6 rules
 		for (i = 0; i < sizeof(allowed_icmpv6)/sizeof(int); ++i) {
-			fprintf(fp_ipv6, "-A FORWARD -p ipv6-icmp --icmpv6-type %i -j %s\n", allowed_icmpv6[i], logaccept);
+			if (nvram_match("misc_ping_x", "0") && (allowed_icmpv6[i] == 128)) // ratelimit ipv6 ping
+				fprintf(fp_ipv6, "-A FORWARD -p ipv6-icmp --icmpv6-type %i -m limit --limit 4/s -j %s\n", allowed_icmpv6[i], logaccept);
+			else
+				fprintf(fp_ipv6, "-A FORWARD -p ipv6-icmp --icmpv6-type %i -j %s\n", allowed_icmpv6[i], logaccept);
 		}
 	}
 #endif
