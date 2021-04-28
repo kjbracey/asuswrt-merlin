@@ -1598,7 +1598,11 @@ add_route(struct route_ipv4 *r,
 
     //Sam.B      2013/10/31
     if(current_route(htonl(r->network), htonl(r->netmask))) {
-        msg(M_WARN, "Ignore conflicted routing rule: %s %s", network, netmask);
+#ifdef ENABLE_IPROUTE
+        msg(M_WARN, "Ignore conflicted routing rule: %s/%d", network, netmask_to_netbits2(r->netmask));
+#else
+		msg(M_WARN, "Ignore conflicted routing rule: %s %s", network, netmask);
+#endif
         update_nvram_status(ROUTE_CONFLICTED);
         goto done;
     }
