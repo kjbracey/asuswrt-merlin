@@ -1,10 +1,16 @@
 #!/bin/sh
+
+scr_name="$(basename $0)[$$]"
+
+# file definitions
 filedir=/etc/openvpn/dns
 filebase=$(echo $filedir/$dev | sed 's/\(tun\|tap\)1/client/;s/\(tun\|tap\)2/server/')
 conffile=$filebase\.conf
 resolvfile=$filebase\.resolv
 dnsscript=$(echo /etc/openvpn/fw/$(echo $dev)-dns\.sh | sed 's/\(tun\|tap\)1/client/;s/\(tun\|tap\)2/server/')
 fileexists=
+
+# client definitions
 instance=$(echo $dev | sed "s/tun1//;s/tun2//")
 serverips=
 searchdomains=
@@ -12,6 +18,8 @@ lan_if=$(nvram get lan_ifname)
 lan_ip=$(nvram get lan_ipaddr)
 vpn_dns_mode=$(nvram get vpn_dns_mode); if [ "$vpn_dns_mode" == "" ]; then vpn_dns_mode=0; fi
 vpn_block_ipv6=$(nvram get vpn_block_ipv6); if [ "$vpn_block_ipv6" == "" ]; then vpn_block_ipv6=0; fi
+
+# system definitions
 ipv6_if=$(nvram get ipv6_ifname)
 if [ "$(nvram get ipv6_service)" == "disabled" ]; then ipv6_enabled=0; else ipv6_enabled=1; fi
 machine_arm=$(uname -r); if [ "$machine_arm" != "${machine_arm%"arm"*}" ]; then machine_arm=1; else machine_arm=0; fi
@@ -76,6 +84,7 @@ then
 	allow_ext_resolver=1
 fi
 
+# functions
 create_client_list(){
 	server=$1
 	if [ "$VPNserver" == "" ]
@@ -189,7 +198,6 @@ then
 
 	if [ $ipv6_enabled == 1 -a $(nvram get vpn_client$(echo $instance)_rgw) -gt 0 ]
 	then
-		# user DROP instead of REJECT for 'Happy Eyeballs' RFC6555
 		if [ $vpn_block_ipv6 = 1 ] # hard block all ipv6
 		then
 			$(ip6tables-save -t filter | grep -q -i "\-i $lan_if \-o $ipv6_if \-j REJECT")
@@ -198,23 +206,8 @@ then
 				echo ip6tables -I FORWARD -i $lan_if -o $ipv6_if -j REJECT >> $dnsscript
 			fi
 		fi
-
-		# default block some ipv6 dns queries
-#		$(ip6tables-save -t filter | grep -q -i "dport 53 \-j REJECT")
-#		if [ $? -eq 1 ]
-#		then
-#			if [ $(nvram get ipv6_dns_router) == 1 ]
-#			then #dnsmasq as ipv6 dns server
-#				echo ip6tables -I INPUT -i $lan_if -p tcp -m tcp --dport 53 -j REJECT >> $dnsscript
-#				echo ip6tables -I INPUT -i $lan_if -p udp -m udp --dport 53 -j REJECT >> $dnsscript
-#				logger -t "openvpn-updown" "Block IPv6 DNS queries to router (INPUT mode)"
-#			else #router not ipv6 dns server
-#				echo ip6tables -I FORWARD -i $lan_if -p tcp -m tcp --dport 53 -j REJECT >> $dnsscript
-#				echo ip6tables -I FORWARD -i $lan_if -p udp -m udp --dport 53 -j REJECT >> $dnsscript
-#				logger -t "openvpn-updown" "Block IPv6 DNS queries to internet (FORWARD mode)"
-#			fi
-#		fi
 	fi
+
 fi
 
 
@@ -235,15 +228,9 @@ then
 	then
 		if [ $vpn_force == 0 ] || [ $vpn_force == 2 -a $vpn_off == 1 ]
 		then
-#			/usr/sbin/ip6tables -D INPUT -i $lan_if -p tcp -m tcp --dport 53 -j REJECT
-#			/usr/sbin/ip6tables -D INPUT -i $lan_if -p udp -m udp --dport 53 -j REJECT
-#			/usr/sbin/ip6tables -D FORWARD -i $lan_if -p tcp -m tcp --dport 53 -j REJECT
-#			/usr/sbin/ip6tables -D FORWARD -i $lan_if -p udp -m udp --dport 53 -j REJECT
 			/usr/sbin/ip6tables -D FORWARD -i $lan_if -o $ipv6_if -j REJECT
 			if [ $vpn_block_ipv6 != 1 ]
 			then
-#				logger -t "openvpn-updown" "Removed IPv6 DNS blocking"
-#			else
 				logger -t "openvpn-updown" "Removed IPv6 blocking"
 			fi
 		fi

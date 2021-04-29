@@ -64,7 +64,9 @@ endif
 # Easy-rsa scripts (for OpenVPN)
 ifeq ($(RTCONFIG_OPENVPN),y)
 	install -m 0700 setuprsa.sh $(INSTALLDIR)/usr/sbin
-	install -m 0700 -D updown.sh $(INSTALLDIR)/usr/sbin
+	install -m 0700 -D updown-client.sh $(INSTALLDIR)/usr/sbin
+	install -m 0700 -D updown-server.sh $(INSTALLDIR)/usr/sbin
+	install -m 0700 -D openvpn-event.sh $(INSTALLDIR)/usr/sbin
 	install -m 0700 -D vpnrouting.sh $(INSTALLDIR)/usr/sbin
 	install -m 0700 -D ovpnauth.sh $(INSTALLDIR)/usr/sbin
 endif

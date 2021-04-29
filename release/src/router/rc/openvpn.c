@@ -319,7 +319,7 @@ void start_vpnclient(int clientNum)
 		if ( nvram_get_int(&buffer[0]) >= 0 )
 		{
 			sprintf(&buffer[0], "/etc/openvpn/client%d/updown.sh", clientNum);
-			symlink("/usr/sbin/updown.sh", &buffer[0]);
+			symlink("/usr/sbin/updown-client.sh", &buffer[0]);
 			fprintf(fp, "up updown.sh\n");
 			fprintf(fp, "down updown.sh\n");
 		}
@@ -375,10 +375,10 @@ void start_vpnclient(int clientNum)
 	}
 
 	// All other cryptmodes need a default up/down script set
-	if ( (cryptMode != TLS) && (check_if_file_exist("/jffs/scripts/openvpn-event")) )
+	if (cryptMode != TLS)
 	{
 		sprintf(&buffer[0], "/etc/openvpn/client%d/updown.sh", clientNum);
-		symlink("/jffs/scripts/openvpn-event", &buffer[0]);
+		symlink("/usr/sbin/openvpn-event.sh", &buffer[0]);
 		fprintf(fp, "up updown.sh\n");
 		fprintf(fp, "down updown.sh\n");
 	}
@@ -1185,19 +1185,16 @@ void start_vpnserver(int serverNum)
 			fprintf(fp, "secret static.key\n");
 	}
 
-	if (check_if_file_exist("/jffs/scripts/openvpn-event"))
-	{
-		sprintf(&buffer[0], "/etc/openvpn/server%d/updown.sh", serverNum);
-		symlink("/jffs/scripts/openvpn-event", &buffer[0]);
+	sprintf(&buffer[0], "/etc/openvpn/server%d/updown.sh", serverNum);
+	symlink("/usr/sbin/updown-server.sh", &buffer[0]);
 #ifdef RTCONFIG_BCMARM
-		fprintf(fp, "script-security 2\n");
+	fprintf(fp, "script-security 2\n");
 #else
-		if ( !userauth )
-			fprintf(fp, "script-security 2\n");
+	if ( !userauth )
+		fprintf(fp, "script-security 2\n");
 #endif
-		fprintf(fp, "up updown.sh\n");
-		fprintf(fp, "down updown.sh\n");
-	}
+	fprintf(fp, "up updown.sh\n");
+	fprintf(fp, "down updown.sh\n");
 
 	fprintf(fp, "status-version 2\n");
 	fprintf(fp, "status status 10\n"); //update status file every 10 sec
