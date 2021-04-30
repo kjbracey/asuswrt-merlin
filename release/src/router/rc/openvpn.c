@@ -2261,9 +2261,22 @@ int check_ovpn_client_enabled(int unit){
 }
 
 void update_vpnrouting(int unit){
-	char tmp[56];
-	snprintf(tmp, sizeof (tmp), "dev=tun1%d script_type=rmupdate /usr/sbin/vpnrouting.sh", unit);
-	system(tmp);
+	struct stat sb;
+	char tmp[8];
+    char *cmd[4];
+	int pid;
+    int timeout = 120;
+	char *error;
+
+	snprintf(tmp, sizeof (tmp), "tun1%d", unit);
+	setenv("dev", tmp, 1);
+	setenv("script_type", "rmupdate", 1);
+
+	cmd[0]="/usr/sbin/vpnrouting.sh";
+	cmd[1]=NULL;
+	cmd[2]=NULL;
+	cmd[3]=NULL;
+	_eval( cmd, NULL, timeout, (timeout ? NULL : &pid));
 }
 
 void reset_vpn_settings(int type, int unit){
