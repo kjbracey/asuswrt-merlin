@@ -4,6 +4,19 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_49E4j9527  (2-May-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: others: openvpn: improve script processing; add fix for server sequencing (eibgrad)
+* CHANGED: openvpn: run update_vpnrouting as blocking script
+* CHANGED: firewall: rate limit ipv6 ping when allow ping request disabled
+* CHANGED: webui: add validator.js for merlin addon compatibility
+* CHANGED: avahi: (user) don't conflict with self #309
+* CHANGED: webui: change performance tuning labels to more accurate temperature refs
+* CHANGED: openvpn: update to 2.5.2
+* CHANGED: dnsmasq: update to 2.85
+* CHANGED: nettle: update to 3.7.2
+* FIXED: webui: limit samba workgroup name to 15 chars
+
+
 374.43_48E7j9527  (1-April-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: others: (backport) update amtm to 3.1.9 rev5; increase curl timeout
 * CHANGED: others: updown: automatically route private pushed vpn dns servers
