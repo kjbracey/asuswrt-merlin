@@ -360,8 +360,8 @@ function openHint(hint_array_id, hint_show_id, flag){
 			_caption = "ADSL Log";
 		}
 		else if(hint_show_id == 5){
-			statusmenu = "<span class='StatusClickHint' onclick='gotocooler();' onmouseout='this.className=\"StatusClickHint\"' onmouseover='this.className=\"StatusClickHint_mouseover\"'>Go to Performance tuning</span>";
-			_caption = "Perfomance Tuning";
+			statusmenu = "<span class='StatusClickHint' onclick='gotocooler();' onmouseout='this.className=\"StatusClickHint\"' onmouseover='this.className=\"StatusClickHint_mouseover\"'>Go to Temperature</span>";
+			_caption = "System Temperature";
 		}
 		else if(hint_show_id == 4){
 			statusmenu = "<span class='StatusClickHint' onclick='gotoguestnetwork();' onmouseout='this.className=\"StatusClickHint\"' onmouseover='this.className=\"StatusClickHint_mouseover\"'><#go_GuestNetwork#></span>";
