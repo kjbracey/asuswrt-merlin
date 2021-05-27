@@ -1504,7 +1504,7 @@ function defaultSettings() {
 									<tr>							
 										<div id="VPNClientList_Block_PC" class="VPNClientList_Block_PC"></div>
 										<td width="36%">
-						 					<input type="text" class="input_25_table" maxlength="25" name="vpn_clientlist_commonname_0"  onKeyPress="">
+						 					<input type="text" class="input_25_table" maxlength="64" name="vpn_clientlist_commonname_0"  onKeyPress="">
 						 				</td>
 										<td width="20%">
 						 					<input type="text" class="input_15_table" maxlength="15" name="vpn_clientlist_subnet_0"  onkeypress="return is_ipaddr(this, event);">
