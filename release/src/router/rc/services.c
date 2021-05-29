@@ -4030,8 +4030,8 @@ int generate_mdns_config()
 	fprintf(fp, "aliases=%s\n",get_productid());
 	fprintf(fp, "aliases_llmnr=%s\n",get_productid());
 	fprintf(fp, "use-ipv4=yes\n");
-	fprintf(fp, "use-ipv6=no\n");
-	fprintf(fp, "allow-interfaces=\n"); //workaround for avahi bug
+	fprintf(fp, "use-ipv6=%s\n",ipv6_enabled() ? "yes" : "no");
+	fprintf(fp, "allow-interfaces=%s\n",nvram_safe_get("lan_ifname")); //workaround for avahi bug
 	fprintf(fp, "deny-interfaces=%s", nvram_safe_get("wan0_ifname"));
 #ifdef RTCONFIG_DUALWAN
 	wan1_ifname = nvram_safe_get("wan1_ifname");
@@ -4045,17 +4045,16 @@ int generate_mdns_config()
 	/* Set [publish] configuration */
 	fprintf(fp, "\n[publish]\n");
 	fprintf(fp, "publish-a-on-ipv6=no\n");
-	fprintf(fp, "publish-aaaa-on-ipv4=no\n");
+	fprintf(fp, "publish-aaaa-on-ipv4=%s\n",ipv6_enabled() ? "yes" : "no");
 
 	/* Set [wide-area] configuration */
 	fprintf(fp, "\n[wide-area]\n");
 	fprintf(fp, "enable-wide-area=yes\n");
 
 	/* Set [reflector] configuration */
-	if (!nvram_match("mdns_reflector","0")) {
-	        fprintf(fp, "\n[reflector]\n");
-        	fprintf(fp, "enable-reflector=yes\n");
-	}
+    fprintf(fp, "\n[reflector]\n");
+	if (!nvram_match("mdns_reflector","0"))
+       	fprintf(fp, "enable-reflector=yes\n");
 
 	/* Set [rlimits] configuration */
 	fprintf(fp, "\n[rlimits]\n");
