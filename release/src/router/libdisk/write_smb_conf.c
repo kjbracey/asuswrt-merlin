@@ -282,12 +282,12 @@ int main(int argc, char *argv[])
 	// 0 - smb1, 1 = smb2, 2 = smb1 + smb2
 	if (nvram_get_int("smbd_protocol") == 2)
 		fprintf(fp, "min protocol = NT1\n");
-	if (nvram_get_int("smbd_protocol") == 1)
-		fprintf(fp, "min protocol = SMB2\n");
+	//if (nvram_get_int("smbd_protocol") == 1)
+	//	fprintf(fp, "min protocol = SMB2\n");
 	if (nvram_get_int("smbd_protocol") == 0)
 		fprintf(fp, "max protocol = NT1\n");
 	else
-		fprintf(fp, "max protocol = SMB2\n");
+		fprintf(fp, "protocol = SMB2\n");
 
 	fprintf(fp, "passdb backend = smbpasswd\n");
 	fprintf(fp, "smb encrypt = disabled\n");
