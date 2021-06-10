@@ -894,8 +894,15 @@ void timecheck(void)
 
 		if(svcStatus[item]!=activeNow) {
 			svcStatus[item] = activeNow;
-			if(activeNow) eval("radio", "on", tmp);
-			else eval("radio", "off", tmp);
+			if(activeNow) {
+				eval("radio", "on", tmp);
+				logmessage("wireless scheduler", "[%s] %s radio enabled by scheduler", __FUNCTION__, (unit == 0) ? "2.4GHz" : "5GHz");
+			}
+			else
+			{
+				eval("radio", "off", tmp);
+				logmessage("wireless scheduler", "[%s] %s radio disabled by scheduler", __FUNCTION__, (unit == 0) ? "2.4GHz" : "5GHz");
+			}
 		}
 		item++;
 		unit++;
