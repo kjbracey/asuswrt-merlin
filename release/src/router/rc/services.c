@@ -538,6 +538,9 @@ void create_passwd(void)
 #ifdef RTCONFIG_SAMBASRV	//!!TB
 		"nas:x:100:\n"
 #endif
+#ifdef RTCONFIG_MDNS
+		"nogroup:x:5:\n"
+#endif
 		"nobody:x:65534:\n",
 		0, 0644);
 	fappend_file("/etc/group", "/etc/group.custom");
