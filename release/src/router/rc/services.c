@@ -578,6 +578,10 @@ void start_dnsmasq(int force)
 
 	TRACE_PT("begin\n");
 
+	if (g_reboot) {
+		TRACE_PT("reboot\n");
+		return;
+	}
 	if(!force && getpid() != 1){
 		notify_rc("start_dnsmasq");
 		return;
@@ -585,11 +589,6 @@ void start_dnsmasq(int force)
 
 	if (pids("dnsmasq"))
 		stop_dnsmasq(force);
-
-	if (g_reboot) {
-		TRACE_PT("reboot\n");
-		return;
-	}
 
 #ifdef RTCONFIG_DNSCRYPT
 	if (nvram_match("dnscrypt_proxy", "1")) {
