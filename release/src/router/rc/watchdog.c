@@ -965,8 +965,10 @@ void timecheck(void)
 			{
 				_dprintf("reboot plan alert...\n");
 				logmessage("reboot scheduler", "[%s] The system is going down for reboot", __FUNCTION__);
+				g_reboot = 1;
 				sleep(1);
-				eval("reboot");
+//				eval("reboot");
+				kill(1, SIGTERM);
 			}
 		}
 	}
