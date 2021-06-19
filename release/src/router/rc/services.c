@@ -4483,8 +4483,8 @@ stop_services(void)
 #endif
 	stop_upnp();
 	stop_lltd();
-	stop_watchdog();
 	stop_watchdog02();
+	stop_watchdog();
 #ifdef RTCONFIG_FANCTRL
 	stop_phy_tempsense();
 #endif
@@ -4575,7 +4575,7 @@ stop_watchdog(void)
 	return 0;
 }
 
-void
+int
 stop_watchdog02(void)
 {
 	if (g_reboot) {
@@ -4584,7 +4584,7 @@ stop_watchdog02(void)
 		return 0;
 	} else
 		/* do nothing */
-		return;
+		return 1;
 }
 
 int
