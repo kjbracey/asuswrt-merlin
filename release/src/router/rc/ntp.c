@@ -78,20 +78,22 @@ static void ntp_service()
 #endif
 
 #if defined(RTCONFIG_DNSSEC)
-		/* notify dnsmasq */
-		kill_pidfile_s("/var/run/dnsmasq.pid", SIGINT);
+		if (nvram_match("dnssec_enable", "1") && pids("dnsmasq")) {
+			/* notify dnsmasq */
+			kill_pidfile_s("/var/run/dnsmasq.pid", SIGINT);
+		}
 #endif
 
 #ifdef RTCONFIG_DNSCRYPT
 		if (nvram_match("dnscrypt_proxy", "1")) {
 			/* restart dnscrypt to update timestamp check */
-			restart_dnscrypt(1);
+			restart_dnscrypt(0);
 		}
 #endif
 #ifdef RTCONFIG_STUBBY
 		if (nvram_match("stubby_proxy", "1")) {
 			/* restart stubby to invoke TLS */
-			restart_stubby(1);
+			restart_stubby(0);
 		}
 #endif
 	}
