@@ -4,6 +4,11 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_49D6j9527  (07-June-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: wl_arm: fragattack patches to wireless driver (ac68u)
+* CHANGED: smb: make config compatible with avahi smb.service
+
+
 374.43_49D5j9527  (28-May-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: webui: update chart.min.js to 2.9.4
 * CHANGED: webui: (backport) allow OpenVPN CommonName up to 64 chars long for server clientlist
