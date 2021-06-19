@@ -4821,6 +4821,7 @@ void handle_notifications(void)
 	int count;
 	int i, j;
 
+	nvram_set_int("g_reboot", g_reboot);  //pass state to sig handler
 	// handle command one by one only
 	// handle at most 7 parameters only
 	// maximum rc_service strlen is 256
@@ -4871,6 +4872,7 @@ again:
 
 	if (strcmp(script, "reboot") == 0 || strcmp(script,"rebootandrestore")==0) {
 		g_reboot = 1;
+		nvram_set_int("g_reboot", g_reboot);  //pass state to sig handler
 		nvram_set("login_ip_restart", nvram_safe_get("login_ip"));  //save ip initiating reboot
 		nvram_commit();
 		run_custom_script_blocking("services-stop", NULL, NULL);
@@ -4899,6 +4901,7 @@ again:
 	}
 	else if (strcmp(script, "resetdefault") == 0) {
 		g_reboot = 1;
+		nvram_set_int("g_reboot", g_reboot);  //pass state to sig handler
 		run_custom_script_blocking("services-stop", NULL, NULL);
 		stop_wan();
 #ifdef RTCONFIG_USB

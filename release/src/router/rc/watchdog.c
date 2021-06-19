@@ -966,6 +966,7 @@ void timecheck(void)
 				_dprintf("reboot plan alert...\n");
 				logmessage("reboot scheduler", "[%s] The system is going down for reboot", __FUNCTION__);
 				g_reboot = 1;
+				nvram_set_int("g_reboot", g_reboot);  //pass state to sig handler
 				sleep(1);
 //				eval("reboot");
 				kill(1, SIGTERM);

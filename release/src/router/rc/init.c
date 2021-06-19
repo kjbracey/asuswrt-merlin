@@ -4289,6 +4289,8 @@ int init_main(int argc, char *argv[])
 		case SIGINT:		/* STOP */
 		case SIGQUIT:		/* HALT */
 		case SIGTERM:		/* REBOOT */
+			g_reboot = nvram_get_int("g_reboot");  //pass state to sig handler
+
 			stop_services();
 
 			if (!g_reboot)
