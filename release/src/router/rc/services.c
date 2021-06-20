@@ -4473,7 +4473,9 @@ stop_services(void)
 	if(f_exists("/opt/etc/init.d/S50aicloud"))
 		system("sh /opt/etc/init.d/S50aicloud scan");
 #endif
-
+#if defined(RTCONFIG_MDNS)
+	stop_mdns();
+#endif
 #ifdef RTCONFIG_USB
 //_dprintf("restart_nas_services(%d): test 9.\n", getpid());
 	restart_nas_services(1, 0);
@@ -4510,9 +4512,6 @@ stop_services(void)
 #else
 	stop_dns();
 	stop_dhcpd();
-#endif
-#if defined(RTCONFIG_MDNS)
-	stop_mdns();
 #endif
 #ifdef RTCONFIG_IPV6
 	stop_rdnssd();
@@ -5091,14 +5090,14 @@ again:
 		stop_wanduck();
 		stop_logger();
 		stop_wanduck();
+#if defined(RTCONFIG_MDNS)
+		stop_mdns();
+#endif
 #ifdef RTCONFIG_DNSMASQ
 		stop_dnsmasq(0);
 #else
 		stop_dns();
 		stop_dhcpd();
-#endif
-#if defined(RTCONFIG_MDNS)
-		stop_mdns();
 #endif
 		stop_ots();
 		stop_networkmap();
@@ -5112,14 +5111,14 @@ again:
 			// used for system mode change and vlan setting change
 			sleep(2); // wait for all httpd event done
 			stop_httpd();
+#if defined(RTCONFIG_MDNS)
+			stop_mdns();
+#endif
 #ifdef RTCONFIG_DNSMASQ
 			stop_dnsmasq(0);
 #else
 			stop_dns();
 			stop_dhcpd();
-#endif
-#if defined(RTCONFIG_MDNS)
-			stop_mdns();
 #endif
 			stop_upnp();
 			stop_wps();
@@ -5182,14 +5181,14 @@ again:
 #endif
 			stop_networkmap();
 			stop_httpd();
+#if defined(RTCONFIG_MDNS)
+			stop_mdns();
+#endif
 #ifdef RTCONFIG_DNSMASQ
 			stop_dnsmasq(0);
 #else
 			stop_dns();
 			stop_dhcpd();
-#endif
-#if defined(RTCONFIG_MDNS)
-			stop_mdns();
 #endif
 			stop_wps();
 #ifdef CONFIG_BCMWL5
@@ -5263,15 +5262,16 @@ again:
 #endif
 			stop_networkmap();
 			stop_httpd();
+#if defined(RTCONFIG_MDNS)
+			stop_mdns();
+#endif
 #ifdef RTCONFIG_DNSMASQ
 			stop_dnsmasq(0);
 #else
 			stop_dns();
 			stop_dhcpd();
 #endif
-#if defined(RTCONFIG_MDNS)
-			stop_mdns();
-#endif
+
 			stop_wps();
 #ifdef CONFIG_BCMWL5
 			stop_nas();
@@ -6106,6 +6106,9 @@ check_ddr_done:
 #endif
 			stop_networkmap();
 			stop_httpd();
+#if defined(RTCONFIG_MDNS)
+			stop_mdns();
+#endif
 			stop_dnsmasq(0);
 			stop_lan_wlc();
 			stop_lan_port();
