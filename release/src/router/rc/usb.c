@@ -2180,6 +2180,11 @@ _dprintf("%s: cmd=%s.\n", __FUNCTION__, cmd);
 	/* Start wsdd2 */
 	// start_wsdd();
 
+#if defined(RTCONFIG_MDNS)
+	if (nvram_get_int("smbd_avahi") && pids("avahi-daemon"))
+		restart_mdns();
+#endif
+
 	return;
 }
 

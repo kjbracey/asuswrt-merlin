@@ -41,6 +41,7 @@ var NN_status = get_cifs_status();  // Network-Neighborhood
 var FTP_status = get_ftp_status(); // FTP
 var AM_to_cifs = get_share_management_status("cifs");  // Account Management for Network-Neighborhood
 var AM_to_ftp = get_share_management_status("ftp");  // Account Management for FTP
+var enable_avahi = '<% nvram_get("mdns_enable"); %>';
 
 var accounts = [<% get_all_accounts(); %>];
 
@@ -66,6 +67,15 @@ function initial(){
 		$('ntfs_sparse_files').style.display = "none";
 	else
 		$('ntfs_sparse_files').style.display = "";
+
+	if(based_modelid == "RT-AC56U" || based_modelid == "RT-AC68U" || based_modelid == "RT-AC68U_V2"){
+		if (enable_avahi == "0")
+			$('broadcast_avahi').style.display = "none";
+		else
+			$('broadcast_avahi').style.display = "";
+	}
+	else
+		$('broadcast_avahi').style.display = "none";
 
 	// show accounts
 	showAccountMenu();
@@ -832,16 +842,24 @@ function validForm(){
 				</tr>
 
 				<tr>
-					<th>Force as Master Browser</i></th>
+					<th>Force as Master Browser</th>
 					<td>
 						<input type="radio" name="smbd_master" class="input" value="1" <% nvram_match_x("", "smbd_master", "1", "checked"); %>><#checkbox_Yes#>
 						<input type="radio" name="smbd_master" class="input" value="0" <% nvram_match_x("", "smbd_master", "0", "checked"); %>><#checkbox_No#>
 					</td>
 				</tr>
-					<th>Set as WINS server</i></th>
+				<tr>
+					<th>Set as WINS server</th>
 					<td>
 						<input type="radio" name="smbd_wins" class="input" value="1" <% nvram_match_x("", "smbd_wins", "1", "checked"); %>><#checkbox_Yes#>
 						<input type="radio" name="smbd_wins" class="input" value="0" <% nvram_match_x("", "smbd_wins", "0", "checked"); %>><#checkbox_No#>
+					</td>
+				</tr>
+				<tr id="broadcast_avahi" style="">
+					<th>Broadcast sharing via AVAHI</th>
+					<td>
+						<input type="radio" name="smbd_avahi" class="input" value="1" <% nvram_match_x("", "smbd_avahi", "1", "checked"); %>><#checkbox_Yes#>
+						<input type="radio" name="smbd_avahi" class="input" value="0" <% nvram_match_x("", "smbd_avahi", "0", "checked"); %>><#checkbox_No#>
 					</td>
 				</tr>
 				<tr id="ntfs_sparse_files" style="">

@@ -4006,6 +4006,7 @@ int stop_lltd(void)
 #define AVAHI_AFPD_SERVICE_FN	"afpd.service"
 #define AVAHI_ADISK_SERVICE_FN	"adisk.service"
 #define AVAHI_ITUNE_SERVICE_FN  "mt-daap.service"
+#define AVAHI_SMB_SERVICE_FN    "smb.service"
 #define TIMEMACHINE_BACKUP_NAME	"Backups.backupdb"
 
 int generate_mdns_config()
@@ -4052,6 +4053,10 @@ int generate_mdns_config()
 	fprintf(fp, "\n[publish]\n");
 	fprintf(fp, "publish-a-on-ipv6=no\n");
 	fprintf(fp, "publish-aaaa-on-ipv4=%s\n",ipv6_enabled() ? "yes" : "no");
+	fprintf(fp, "publish-addresses=yes\n");
+	fprintf(fp, "publish-domain=yes\n");
+//	fprintf(fp, "publish-hinfo=yes\n");
+//	fprintf(fp, "publish-workstation=no\n");
 
 	/* Set [wide-area] configuration */
 	fprintf(fp, "\n[wide-area]\n");
@@ -4184,6 +4189,51 @@ int generate_itune_service_config()
 	return ret;
 }
 
+int generate_smb_service_config()
+{
+	FILE *fp;
+	char smb_service_config[80];
+	int ret = 0;
+	char servername[32];
+
+	sprintf(smb_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_SMB_SERVICE_FN);
+
+	/* Generate smb service configuration file */
+	if (!(fp = fopen(smb_service_config, "w"))) {
+		perror(smb_service_config);
+		return -1;
+	}
+
+	if (is_valid_hostname(nvram_safe_get("daapd_friendly_name")))
+		strncpy(servername, nvram_safe_get("daapd_friendly_name"), sizeof(servername));
+	else
+		servername[0] = '\0';
+	if(strlen(servername)==0) strncpy(servername, get_productid(), sizeof(servername));
+
+/*
+<?xml version="1.0" standalone='no'?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+*/
+	fprintf(fp, "<service-group>\n");
+	fprintf(fp, "<name replace-wildcards=\"yes\">%%h</name>\n");
+	fprintf(fp, "<service>\n");
+	fprintf(fp, "<type>_smb._tcp</type>\n");
+	fprintf(fp, "<port>445</port>\n");
+	fprintf(fp, "</service>\n");
+	fprintf(fp, "<service>\n");
+	fprintf(fp, "<type>_device-info._tcp</type>\n");
+	fprintf(fp, "<port>0</port>\n");
+	fprintf(fp, "<txt-record>model=%s</txt-record>\n", servername);
+	fprintf(fp, "</service>\n");
+	fprintf(fp, "</service-group>\n");
+
+	append_custom_config(AVAHI_SMB_SERVICE_FN, fp);
+	fclose(fp);
+	use_custom_config(AVAHI_SMB_SERVICE_FN, smb_service_config);
+
+	return ret;
+}
+
 int start_mdns()
 {
 	int ret = 0;
@@ -4192,13 +4242,14 @@ int start_mdns()
 	char afpd_service_config[80];
 	char adisk_service_config[80];
 	char itune_service_config[80];
+	char smb_service_config[80];
 	char *avahi_daemon_argv[] = {"avahi-daemon", "-D", NULL};
 	pid_t pid;
 
 	if (g_reboot)
 		return 0;
 
-	if ((pids("afpd") && nvram_match("timemachine_enable", "1")) ||
+	if ((nvram_match("timemachine_enable", "1") && pids("afpd")) ||
 		(nvram_match("daapd_enable", "1") && pids("mt-daapd")))
 			mdns_force = 1;
 
@@ -4209,12 +4260,13 @@ int start_mdns()
 	sprintf(afpd_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_AFPD_SERVICE_FN);
 	sprintf(adisk_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_ADISK_SERVICE_FN);
 	sprintf(itune_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_ITUNE_SERVICE_FN);
+	sprintf(smb_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_SMB_SERVICE_FN);
 	mkdir_if_none(AVAHI_CONFIG_PATH);
 	mkdir_if_none(AVAHI_SERVICES_PATH);
 
 	generate_mdns_config();
 
-	if (pids("afpd") && nvram_match("timemachine_enable", "1"))
+	if (nvram_match("timemachine_enable", "1") && pids("afpd"))
 	{
 		if (!f_exists(afpd_service_config))
 			generate_afpd_service_config();
@@ -4239,6 +4291,15 @@ int start_mdns()
 		}
 	}
 
+	if(nvram_match("enable_samba", "1") && nvram_match("smbd_avahi", "1") && pids("smbd")){
+		if (!f_exists(smb_service_config))
+			generate_smb_service_config();
+	}else{
+		if (f_exists(smb_service_config)){
+			unlink(smb_service_config);
+		}
+	}
+
 	// Execute avahi_daemon daemon
 	//xstart("avahi-daemon");
 	return _eval(avahi_daemon_argv, NULL, 0, &pid);
@@ -4257,19 +4318,35 @@ void restart_mdns()
 {
 	char afpd_service_config[80];
 	char itune_service_config[80];
+	char smb_service_config[80];
 	sprintf(afpd_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_AFPD_SERVICE_FN);
 	sprintf(itune_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_ITUNE_SERVICE_FN);
+	sprintf(smb_service_config, "%s/%s", AVAHI_SERVICES_PATH, AVAHI_SMB_SERVICE_FN);
+	bool restart = TRUE;
 
 	if (g_reboot)
 		return;
 
 	if (nvram_match("timemachine_enable", "1") == f_exists(afpd_service_config)){
 		if(nvram_match("daapd_enable", "1") == f_exists(itune_service_config)){
-			unlink(itune_service_config);
+//			unlink(itune_service_config);
 			generate_itune_service_config();
-			return;
-		}
+			restart = FALSE;
+		}else
+			restart = TRUE;
 	}
+
+	if (nvram_match("enable_samba", "1")){
+		if (nvram_match("smbd_avahi", "1") == f_exists(smb_service_config)){
+//			unlink(smb_service_config);
+			generate_smb_service_config();
+			restart = FALSE;
+		}else
+			restart = TRUE;
+	}
+
+	if (!restart)
+		return;
 
 	stop_mdns();
 	sleep(2);
