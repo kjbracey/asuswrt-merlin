@@ -4508,12 +4508,6 @@ stop_services(void)
 	stop_dns();
 	stop_dhcpd();
 #endif
-#ifdef RTCONFIG_DNSCRYPT
-	stop_dnscrypt(0);
-#endif
-#ifdef RTCONFIG_STUBBY
-	stop_stubby(0);
-#endif
 #if defined(RTCONFIG_MDNS)
 	stop_mdns();
 #endif
@@ -5042,12 +5036,6 @@ again:
 #elif defined(RTCONFIG_TEMPROOTFS)
 				stop_lan_wl();
 				stop_dnsmasq(0);
-#ifdef RTCONFIG_DNSCRYPT
-				stop_dnscrypt(0);
-#endif
-#ifdef RTCONFIG_STUBBY
-				stop_stubby(0);
-#endif
 				stop_networkmap();
 				stop_wpsaide();
 #endif
@@ -5103,12 +5091,6 @@ again:
 		stop_dns();
 		stop_dhcpd();
 #endif
-#ifdef RTCONFIG_DNSCRYPT
-	stop_dnscrypt(0);
-#endif
-#ifdef RTCONFIG_STUBBY
-	stop_stubby(0);
-#endif
 #if defined(RTCONFIG_MDNS)
 		stop_mdns();
 #endif
@@ -5129,12 +5111,6 @@ again:
 #else
 			stop_dns();
 			stop_dhcpd();
-#endif
-#ifdef RTCONFIG_DNSCRYPT
-			stop_dnscrypt(0);
-#endif
-#ifdef RTCONFIG_STUBBY
-			stop_stubby(0);
 #endif
 #if defined(RTCONFIG_MDNS)
 			stop_mdns();
@@ -5205,12 +5181,6 @@ again:
 #else
 			stop_dns();
 			stop_dhcpd();
-#endif
-#ifdef RTCONFIG_DNSCRYPT
-			stop_dnscrypt(0);
-#endif
-#ifdef RTCONFIG_STUBBY
-			stop_stubby(0);
 #endif
 #if defined(RTCONFIG_MDNS)
 			stop_mdns();
@@ -5292,12 +5262,6 @@ again:
 #else
 			stop_dns();
 			stop_dhcpd();
-#endif
-#ifdef RTCONFIG_DNSCRYPT
-			stop_dnscrypt(0);
-#endif
-#ifdef RTCONFIG_STUBBY
-			stop_stubby(0);
 #endif
 #if defined(RTCONFIG_MDNS)
 			stop_mdns();
@@ -6137,12 +6101,6 @@ check_ddr_done:
 			stop_networkmap();
 			stop_httpd();
 			stop_dnsmasq(0);
-#ifdef RTCONFIG_DNSCRYPT
-			stop_dnscrypt(0);
-#endif
-#ifdef RTCONFIG_STUBBY
-			stop_stubby(0);
-#endif
 			stop_lan_wlc();
 			stop_lan_port();
 			stop_lan_wlport();
