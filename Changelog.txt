@@ -4,6 +4,18 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_50D1j9527  (19-June-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: watchdog: reboot scheduler set SIGTERM instead of linux reboot
+* CHANGED: watchdog: add syslog for reboot scheduler events
+* CHANGED: wireless: add syslog for radio scheduler events
+* CHANGED: watchdog: ensure watchdog shut down during reboot
+* CHANGED: ntp: optimize restart of dns services
+* CHANGED: services: stubby: do not restart during reboot
+* CHANGED: services: dnsmasq: check for reboot earlier during start
+* CHANGED: services: remove unnecessary stop_dnscrypt/stubby from service functions
+* FIXED: init: pass reboot global to sighandler via nvram
+
+
 374.43_49D6j9527  (07-June-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: wl_arm: fragattack patches to wireless driver (ac68u)
 * CHANGED: smb: make config compatible with avahi smb.service
