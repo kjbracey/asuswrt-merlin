@@ -142,8 +142,8 @@ function gen_gntable_tr(unit, gn_array, slicesb){
 	htmlcode += '<tr><th align="left" style="height:40px;"><#mssid_time_remaining#></th></tr>';
 	if(sw_mode != "3"){
 			htmlcode += '<tr><th align="left" style="height:40px;"><#Access_Intranet#></th></tr>';
-			htmlcode += "<tr><th align=\"left\" style=\"width:20%;height:28px;\"><#WLANConfig11b_x_IsolateAP_itemname#></th></tr>";
 	}
+	htmlcode += "<tr><th align=\"left\" style=\"width:20%;height:28px;\"><#WLANConfig11b_x_IsolateAP_itemname#></th></tr>";
 	htmlcode += '<tr><th align="left" style="height:40px;"></th></tr>';		
 	htmlcode += '</table></th>';
 	
@@ -201,9 +201,12 @@ function gen_gntable_tr(unit, gn_array, slicesb){
 			if(sw_mode != "3"){
 					if(gn_array[i][0] == "1") {
 							htmlcode += '<tr><td align="center" onclick="change_guest_unit('+ unit +','+ subunit +');">'+ gn_array[i][12] +'</td></tr>';
-							isolate_enable = (gn_array[i][13] == "1") ? "on" : "off";
-							htmlcode += '<tr><td align="center" onclick="change_guest_unit('+ unit +','+ subunit +');">'+ isolate_enable +'</td></tr>';
 					}
+			}
+
+			isolate_enable = (gn_array[i][13] == "1") ? "on" : "off";
+			if(gn_array[i][0] == "1") {
+				htmlcode += '<tr><td align="center" onclick="change_guest_unit('+ unit +','+ subunit +');">'+ isolate_enable +'</td></tr>';
 			}
 										
 			if(gn_array[i][0] == "1"){
