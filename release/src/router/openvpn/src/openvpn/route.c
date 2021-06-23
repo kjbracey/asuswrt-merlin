@@ -5,7 +5,7 @@
  *             packet encryption, packet authentication, and
  *             packet compression.
  *
- *  Copyright (C) 2002-2018 OpenVPN Inc <sales@openvpn.net>
+ *  Copyright (C) 2002-2021 OpenVPN Inc <sales@openvpn.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2
@@ -1598,11 +1598,7 @@ add_route(struct route_ipv4 *r,
 
     //Sam.B      2013/10/31
     if(current_route(htonl(r->network), htonl(r->netmask))) {
-#ifdef ENABLE_IPROUTE
-        msg(M_WARN, "Ignore conflicted routing rule: %s/%d", network, netmask_to_netbits2(r->netmask));
-#else
-		msg(M_WARN, "Ignore conflicted routing rule: %s %s", network, netmask);
-#endif
+        msg(M_WARN, "Ignore conflicted routing rule: %s %s", network, netmask);
         update_nvram_status(ROUTE_CONFLICTED);
         goto done;
     }
