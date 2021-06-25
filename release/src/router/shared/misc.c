@@ -1648,3 +1648,27 @@ int get_primaryif_dualwan_unit(void)
 	return unit;
 }
 #endif
+
+void get_parent_leases(void)
+{
+	int rc, http_enable;
+	char cmd[2048];
+	const char *lan_gateway, *http_lanport;
+
+	lan_gateway = nvram_safe_get("lan_gateway");
+	http_lanport = nvram_safe_get("http_lanport");
+	http_enable = nvram_get_int("http_enable");
+
+	memset(cmd, 0, 2048);
+
+	if (http_enable == 0 || http_enable == 2) {
+		sprintf(cmd, "/usr/sbin/curl --user-agent asusrouter-asuswrt-curl "
+			"--user %s:%s --referer http://%s:%s/httpd_check.htm "
+			"http://%s:%s/user/dnsmasq.leases.htm -o /var/lib/misc/dnsmasq.leases",
+			nvram_safe_get("http_username"), nvram_safe_get("http_passwd"),
+			lan_gateway, http_lanport, lan_gateway, http_lanport);
+		rc = system(cmd);
+		if (rc != 0)
+			logmessage("system", "failed to retrieve parent dnsmasq leases (%d)", rc);
+	}
+}

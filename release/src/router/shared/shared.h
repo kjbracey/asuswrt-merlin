@@ -541,6 +541,7 @@ extern char *get_productid(void);
 extern void logmessage_normal(char *logheader, char *fmt, ...);
 extern char *get_logfile_path(void);
 extern char *get_syslog_fname(unsigned int idx);
+extern void get_parent_leases(void);
 #if defined(RTCONFIG_SSH) || defined(RTCONFIG_HTTPS)
 extern int nvram_get_file(const char *key, const char *fname, int max);
 extern int nvram_set_file(const char *key, const char *fname, int max);
