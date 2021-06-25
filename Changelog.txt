@@ -4,6 +4,15 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_50D3j9527  (25-June-2021) ARM SDK, MIPS,ARM KRACK
+* NEW: mdns: samba: add option to broadcast sharing via avahi (arm only)
+* NEW: webui: retrieve parent leases for wireless log in ap mode
+* CHANGED: avahi: add required nogroup to group system file
+* CHANGED: services: update start/stop_mdns in service functions
+* CHANGED: openvpn: update to 2.5.3
+* FIXED: wireless: show ap isolate status/link when in ap mode
+
+
 374.43_50D1j9527  (19-June-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: watchdog: reboot scheduler set SIGTERM instead of linux reboot
 * CHANGED: watchdog: add syslog for reboot scheduler events
