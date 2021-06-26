@@ -1662,6 +1662,7 @@ void get_parent_leases(void)
 	memset(cmd, 0, 2048);
 
 	if (http_enable == 0 || http_enable == 2) {
+		unlink("/var/lib/misc/dnsmasq.leases");
 		sprintf(cmd, "/usr/sbin/curl --user-agent asusrouter-asuswrt-curl "
 			"--user %s:%s --referer http://%s:%s/httpd_check.htm "
 			"http://%s:%s/user/dnsmasq.leases.htm -o /var/lib/misc/dnsmasq.leases",
