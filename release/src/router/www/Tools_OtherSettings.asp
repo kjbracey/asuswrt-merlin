@@ -93,6 +93,7 @@ function initial() {
 	hide_rstats_storage(document.form.rstats_location.value);
 	hide_cstats(getRadioValue(document.form.cstats_enable));
 	hide_cstats_ip(getRadioValue(document.form.cstats_all));
+	hide_parent_data(sw_mode);
 	if (document.form.usb_idle_exclude.value.indexOf("a") != -1)
 		document.form.usb_idle_exclude_a.checked = true;
 	if (document.form.usb_idle_exclude.value.indexOf("b") != -1)
@@ -509,6 +510,12 @@ function hide_cstats(_value){
         showhide("cstats_exc_tr", (_value == "1"));
 }
 
+function hide_parent_data(_value){
+
+        showhide("ap_parent_data_tr", (_value == "3"));
+}
+
+
 function initConntrackValues(){
 
 	tcp_array = document.form.ct_tcp_timeout.value.split(" ");
@@ -825,6 +832,13 @@ function done_validating(action){
 							<input type="radio" name="led_disable" class="input" value="1" <% nvram_match_x("", "led_disable", "1", "checked"); %>><#checkbox_Yes#>
 							<input type="radio" name="led_disable" class="input" value="2" <% nvram_match_x("", "led_disable", "2", "checked"); %>>Show power status only
 							<input type="radio" name="led_disable" class="input" value="0" <% nvram_match_x("", "led_disable", "0", "checked"); %>><#checkbox_No#>
+						</td>
+					</tr>
+					<tr id="ap_parent_data_tr">
+						<th>Access Point enhanced data<br><i>Requires ASUS parent router with<br>&nbsp;&nbsp;equivalent HTTP access</i></th>
+						<td>
+							<input type="radio" name="ap_parent_data" class="input" value="1" <% nvram_match_x("", "ap_parent_data", "1", "checked"); %>><#checkbox_Yes#>
+							<input type="radio" name="ap_parent_data" class="input" value="0" <% nvram_match_x("", "ap_parent_data", "0", "checked"); %>><#checkbox_No#>
 						</td>
 					</tr>
 				</table>

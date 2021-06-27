@@ -1655,6 +1655,9 @@ void get_parent_leases(void)
 	char cmd[2048];
 	const char *lan_gateway, *http_lanport;
 
+	if (!nvram_match("ap_parent_data", "1"))
+		return;
+
 	lan_gateway = nvram_safe_get("lan_gateway");
 	http_lanport = nvram_safe_get("http_lanport");
 	http_enable = nvram_get_int("http_enable");

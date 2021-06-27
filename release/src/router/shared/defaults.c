@@ -2039,6 +2039,7 @@ struct nvram_tuple router_defaults[] = {
 #endif
 	{ "webui_resolve_conn", "0"},
 	{ "led_disable", "0"},
+	{ "ap_parent_data", "0"},	//collect parent data in ap mode
 
 	{ NULL, NULL }
 };
