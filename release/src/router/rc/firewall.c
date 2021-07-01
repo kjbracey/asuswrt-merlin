@@ -3133,6 +3133,10 @@ TRACE_PT("write url filter\n");
 				if (*filterstr) {
 					fprintf(fp, "-I FORWARD -p tcp %s -m webstr --url \"%s\" -j REJECT --reject-with tcp-reset\n",
 						timef, filterstr);
+#ifdef RTCONFIG_IPV6
+					if (ipv6_enabled())
+						fprintf(fp_ipv6, "-I FORWARD -p tcp %s -m webstr --url \"%s\" -j REJECT --reject-with tcp-reset\n", timef, filterstr);
+#endif
 				}
 			}
 			free(nv);
@@ -3146,6 +3150,10 @@ TRACE_PT("write url filter\n");
 				if (*filterstr) {
 					fprintf(fp, "-I FORWARD -p tcp %s -m webstr --url \"%s\" -j REJECT --reject-with tcp-reset\n",
 						timef2, filterstr);
+#ifdef RTCONFIG_IPV6
+					if (ipv6_enabled())
+						fprintf(fp_ipv6, "-I FORWARD -p tcp %s -m webstr --url \"%s\" -j REJECT --reject-with tcp-reset\n", timef2, filterstr);
+#endif
 				}
 			}
 			free(nv);
@@ -4304,6 +4312,10 @@ TRACE_PT("write url filter\n");
 				if (*filterstr) {
 					fprintf(fp, "-I FORWARD -p tcp %s -m webstr --url \"%s\" -j REJECT --reject-with tcp-reset\n",
 						timef, filterstr);
+#ifdef RTCONFIG_IPV6
+					if (ipv6_enabled())
+						fprintf(fp_ipv6, "-I FORWARD -p tcp %s -m webstr --url \"%s\" -j REJECT --reject-with tcp-reset\n", timef, filterstr);
+#endif
 				}
 			}
 			free(nv);
@@ -4317,6 +4329,10 @@ TRACE_PT("write url filter\n");
 				if (*filterstr) {
 					fprintf(fp, "-I FORWARD -p tcp %s -m webstr --url \"%s\" -j REJECT --reject-with tcp-reset\n",
 						timef2, filterstr);
+#ifdef RTCONFIG_IPV6
+					if (ipv6_enabled())
+						fprintf(fp_ipv6, "-I FORWARD -p tcp %s -m webstr --url \"%s\" -j REJECT --reject-with tcp-reset\n", timef2, filterstr);
+#endif
 				}
 			}
 			free(nv);
