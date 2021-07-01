@@ -67,6 +67,8 @@
 #include <openssl/rsa.h>
 #endif
 
+#define WEBSTRFILTER 1
+
 extern char *crypt __P((const char *, const char *)); //should be defined in unistd.h with _XOPEN_SOURCE defined
 #define sin_addr(s) (((struct sockaddr_in *)(s))->sin_addr)
 
@@ -570,7 +572,7 @@ void start_dnsmasq(int force)
 	FILE *fp;
 	char *lan_ifname;
 	char *lan_ipaddr;
-	char *nv, *nv2;
+	char *nv, *nv2, *nvp, *b, *filterstr;
 	int i, n;
 	int unit;
 	char tmp1[32], prefix[] = "wanXXXXXXXXXX_";
@@ -831,6 +833,20 @@ void start_dnsmasq(int force)
 		if (nvram_get_int("ntpd_server")) {
 			fprintf(fp, "dhcp-option=lan,42,%s\n", lan_ipaddr);
 		}
+
+#ifdef WEBSTRFILTER
+		/* URL filter */
+		if (nvram_match("url_enable_x", "1")) {
+			nv = nvp = strdup(nvram_safe_get("url_rulelist"));
+			while (nvp && (b = strsep(&nvp, "<")) != NULL) {
+				if (vstrsep(b, ">", &filterstr) != 1)
+					continue;
+				if (*filterstr)
+					fprintf(fp, "address=/%s/\n", filterstr);
+			}
+			free(nv);
+		}
+#endif
 
 #ifdef RTCONFIG_SAMBASRV
 		/* Samba will serve as a WINS server */
