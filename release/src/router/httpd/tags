@@ -707,6 +707,7 @@ get_fanctrl_info	web.c	/^static int get_fanctrl_info(int eid, webs_t wp, int arg
 get_ipv6_client_info	web.c	/^static void get_ipv6_client_info()$/;"	f	file:
 get_ipv6_client_list	web.c	/^static void get_ipv6_client_list(void)$/;"	f	file:
 get_machine_name	web.c	/^static int get_machine_name(int eid, webs_t wp, int argc, char_t **argv)$/;"	f	file:
+get_parent_leases	web.c	/^void get_parent_leases()$/;"	f	file:
 get_nat_vserver_table	web.c	/^get_nat_vserver_table(int eid, webs_t wp, int argc, char_t **argv)$/;"	f
 get_status_field	apps.c	/^char *get_status_field(const char *target, const char *field){$/;"	f
 get_stok	web.c	/^static char *get_stok(char *str, char *dest, char delimiter)$/;"	f	file:

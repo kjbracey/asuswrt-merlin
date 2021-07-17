@@ -20,6 +20,9 @@
 wan_route_x = '<% nvram_get("wan_route_x"); %>';
 wan_nat_x = '<% nvram_get("wan_nat_x"); %>';
 wan_proto = '<% nvram_get("wan_proto"); %>';
+
+<% get_parent_leases(); %>
+
 function initial(){
 	var wlstatus = $('wlstatus').innerHTML;
 	wlstatus = '<pre>' + wlstatus.replace(/[\n]/g, '<br />');

@@ -1901,10 +1901,8 @@ int FindHostname(P_CLIENT_DETAIL_INFO_TABLE p_client_detail_info_tab)
 	char *next;
 
 // Get current hostname from DHCP leases
-	if (nvram_get_int("sw_mode") == SW_MODE_AP)
-		get_parent_leases();
-
-	if ((!nvram_get_int("dhcp_enable_x") || !nvram_match("sw_mode", "1")) && !f_exists("/var/lib/misc/dnsmasq.leases"))
+	get_parent_leases();
+	if (!nvram_get_int("dhcp_enable_x") && !f_exists("/var/lib/misc/dnsmasq.leases"))
 		return 0;
 
 	if ((fp = fopen("/var/lib/misc/dnsmasq.leases", "r"))) {

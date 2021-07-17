@@ -1415,8 +1415,6 @@ ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 	/* Obtain lease list - we still need the arp list for
 	   cases where a device uses a static IP rather than DHCP */
 #ifdef RTCONFIG_DNSMASQ
-	if (nvram_get_int("sw_mode") == SW_MODE_AP)
-		get_parent_leases();
 	leaselist = read_whole_file("/var/lib/misc/dnsmasq.leases");
 #endif
 

@@ -9710,6 +9710,7 @@ struct ej_handler ej_handlers[] = {
 	{ "check_hwnat", check_hwnat},
 	{ "get_parameter", ej_get_parameter},
 	{ "login_state_hook", login_state_hook},
+	{ "get_parent_leases", get_parent_leases},
 #ifdef RTCONFIG_FANCTRL
 	{ "get_fanctrl_info", get_fanctrl_info},
 #endif
