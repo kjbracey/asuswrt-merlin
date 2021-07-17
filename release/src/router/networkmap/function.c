@@ -1895,10 +1895,26 @@ int FindHostname(P_CLIENT_DETAIL_INFO_TABLE p_client_detail_info_tab)
 	sprintf(ipaddr, "%d.%d.%d.%d",(int)*(dest_ip),(int)*(dest_ip+1),(int)*(dest_ip+2),(int)*(dest_ip+3));
 
 	char *nv, *nvp, *b;
-	char *mac, *ip, *name, *expire;
+	char *mac, *ip, *name, *clientname, *expire;
 	FILE *fp;
 	char line[256];
 	char *next;
+
+// Get current hostname from hosts file
+	if ((fp = fopen("/etc/hosts", "r"))) {
+		while ((next = fgets(line, sizeof(line), fp)) != NULL) {
+			if (vstrsep(next, " ", &ip, &name) == 2) {
+				if (!strcmp(ipaddr, ip)) {
+					vstrsep(name, ".", &clientname);
+					if ((strlen(clientname) > 0) &&
+						(!strchr(clientname, '*')) &&
+						(!strchr(clientname, ':')))
+							strlcpy(p_client_detail_info_tab->device_name[p_client_detail_info_tab->detail_info_num], clientname, 17);
+				}
+			}
+		}
+		fclose(fp);
+	}
 
 // Get current hostname from DHCP leases
 	get_parent_leases();
