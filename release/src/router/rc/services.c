@@ -1034,9 +1034,6 @@ void start_dnsmasq(int force)
 			// Make the router use dnsmasq for its own local resolution if it did start
 			unlink("/etc/resolv.conf");
 			symlink("/rom/etc/resolv.conf", "/etc/resolv.conf");	// nameserver 127.0.0.1
-			// Create link for AP access to leases
-			unlink("/var/wwwext/dnsmasq.leases.htm");
-			symlink("/var/lib/misc/dnsmasq.leases", "/var/wwwext/dnsmasq.leases.htm");
 			i = 4;
 		}
 	}

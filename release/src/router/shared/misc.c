@@ -1655,7 +1655,7 @@ void get_parent_leases(void)
 	char cmd[2048];
 	const char *lan_gateway, *http_lanport;
 
-	if (!nvram_match("ap_parent_data", "1"))
+	if (!nvram_match("ap_parent_data", "1") || !(nvram_get_int("sw_mode") == SW_MODE_AP))
 		return;
 
 	lan_gateway = nvram_safe_get("lan_gateway");
@@ -1667,10 +1667,8 @@ void get_parent_leases(void)
 	if (http_enable == 0 || http_enable == 2) {
 		unlink("/var/lib/misc/dnsmasq.leases");
 		sprintf(cmd, "/usr/sbin/curl --user-agent asusrouter-asuswrt-curl "
-			"--user %s:%s --referer http://%s:%s/httpd_check.htm "
-			"http://%s:%s/user/dnsmasq.leases.htm -o /var/lib/misc/dnsmasq.leases",
-			nvram_safe_get("http_username"), nvram_safe_get("http_passwd"),
-			lan_gateway, http_lanport, lan_gateway, http_lanport);
+			"http://%s:%s/dnsmasq_leases.txt -o /var/lib/misc/dnsmasq.leases",
+			lan_gateway, http_lanport);
 		rc = system(cmd);
 		if (rc != 0)
 			logmessage("system", "failed to retrieve parent dnsmasq leases (%d)", rc);

@@ -6783,6 +6783,7 @@ struct mime_handler mime_handlers[] = {
 	{ "**.swf", "application/x-shockwave-flash", NULL, NULL, do_file, NULL  },
 	{ "**.htc", "text/x-component", NULL, NULL, do_file, NULL  },
 	// end Viz
+	{ "dnsmasq_leases.txt", "text/html", NULL, NULL, do_file, NULL },
 #ifdef TRANSLATE_ON_FLY
 	/* Only general.js and quick.js are need to translate. (reduce translation time) */
 	{ "general.js|quick.js",  "text/javascript", no_cache_IE7, NULL, do_ej, do_auth },
@@ -6874,6 +6875,7 @@ struct except_mime_handler except_mime_handlers[] = {
 	{ "error_page.htm", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "httpd_check.htm", MIME_EXCEPTION_NOAUTH_ALL},
 	{ "UploadError.asp", MIME_EXCEPTION_NOAUTH_ALL},
+	{ "dnsmasq_leases.txt", MIME_EXCEPTION_NOAUTH_ALL},
 	{ NULL, 0 }
 };
 

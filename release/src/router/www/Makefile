@@ -314,3 +314,6 @@ endif
 	ln -sf user/user18.asp $(INSTALLDIR)/www/user18.asp
 	ln -sf user/user19.asp $(INSTALLDIR)/www/user19.asp
 	ln -sf user/user20.asp $(INSTALLDIR)/www/user20.asp
+
+# mountpoint for dnsmasq leases access
+	ln -sf /var/lib/misc/dnsmasq.leases $(INSTALLDIR)/www/dnsmasq_leases.txt
