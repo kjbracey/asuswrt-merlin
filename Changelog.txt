@@ -4,6 +4,16 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_50D7j9527  (10-July-2021) ARM SDK, MIPS,ARM KRACK
+* NEW: webui: add tools option for get parent data in ap mode
+* CHANGED: networkmap: get parent leases file when in ap mode
+* CHANGED: shared: clear parent leases file before refresh
+* CHANGED: avahi: (upstream) cleanup: ensure entries are dead for at least 1s
+* CHANGED: webui: allow 64 chars for url filter
+* CHANGED: dnsmasq: urlfilter: implement dns blocking for url filter
+* CHANGED: firewall: urlfilter: add ipv6 support for url filter
+
+
 374.43_50D3j9527  (25-June-2021) ARM SDK, MIPS,ARM KRACK
 * NEW: mdns: samba: add option to broadcast sharing via avahi (arm only)
 * NEW: webui: retrieve parent leases for wireless log in ap mode
