@@ -4,6 +4,12 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_50E8j9527  (21-July-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: webui: improve method of getting dnsmasq leases in ap mode
+* CHANGED: webui: get parent leases in ap mode via gui instead of inline
+* CHANGED: networkmap: check local hosts file to resolve hostnames
+
+
 374.43_50D7j9527  (10-July-2021) ARM SDK, MIPS,ARM KRACK
 * NEW: webui: add tools option for get parent data in ap mode
 * CHANGED: networkmap: get parent leases file when in ap mode
