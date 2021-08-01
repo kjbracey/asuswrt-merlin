@@ -1637,8 +1637,12 @@ void watchdog_check()
 {
 	if (!pids("watchdog")){
 		if(nvram_match("upgrade_fw_status", "0") && !g_reboot){
-			logmessage("watchdog02", "no watchdog, restarting");
-			kill(1, SIGTERM);
+			if (nvram_get_int("wd_norestart"))
+				logmessage("watchdog02", "no watchdog, restart disabled");
+			else {
+				logmessage("watchdog02", "no watchdog, restarting");
+				kill(1, SIGTERM);
+			}
 		}
 	}
 	return;
