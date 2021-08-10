@@ -1482,7 +1482,7 @@ void httpd_check()
 {
 	int rc, http_enable;
 	char url[64];
-	char *args[] = {"/usr/sbin/curl", "--silent", "--connect-timeout", "10", "--head", "--user-agent", "asusrouter-asuswrt-curl", "--referer", NULL, NULL, NULL, NULL, NULL};
+	char *args[] = {"/usr/sbin/curl", "--silent", "--connect-timeout", "6", "--head", "--user-agent", "asusrouter-asuswrt-curl", "--referer", NULL, NULL, NULL, NULL, NULL};
 
 	if(get_invoke_later()&INVOKELATER_HTTPD) // don't check if start was deferred
 		return;
