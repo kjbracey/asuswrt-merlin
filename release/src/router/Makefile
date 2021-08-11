@@ -527,7 +527,7 @@ obj-y += openssl-1.1
 obj-y += libyaml
 obj-y += getdns
 endif
-obj-$(RTCONFIG_NANO) += ncurses
+obj-$(RTCONFIG_NANO) += ncurses-6.0
 obj-$(RTCONFIG_NANO) += nano
 ifeq ($(RTCONFIG_SAMBASRV),y)
 obj-y += wsdd2
@@ -3710,8 +3710,8 @@ ipset-7-clean:
 	[ ! -f ipset-7/Makefile ] || $(MAKE) -C ipset-7 distclean
 	@rm -f ipset-7/Makefile
 
-ncurses/Makefile:
-	cd ncurses && \
+ncurses-6.0/Makefile:
+	cd ncurses-6.0 && \
 	CFLAGS="$(EXTRACFLAGS) -Os -I$(STAGEDIR)/usr/include -ffunction-sections -fdata-sections -fPIC" \
 	LDFLAGS="$(LDFLAGS) -ffunction-sections -fdata-sections -Wl,--gc-sections -L$(STAGEDIR)/usr/lib" \
 	CPPFLAGS="-P" \
@@ -3723,34 +3723,39 @@ ncurses/Makefile:
 	--disable-termcap --disable-database --with-fallbacks="xterm,vt100,vt200,linux,ansi,xterm-256color"
 #	--with-default-terminfo-dir=/usr/share/terminfo --with-terminfo-dirs=/usr/share/terminfo
 
-ncurses: ncurses/Makefile
+ncurses-6.0: ncurses-6.0/Makefile
 	@$(SEP)
-	cd ncurses && $(MAKE) -C ncurses && $(MAKE) -C misc pc-files
+	cd ncurses-6.0 && $(MAKE) -C ncurses && $(MAKE) -C misc pc-files
 
-ncurses-clean:
-	-@$(MAKE) -C ncurses distclean
-	@rm -f ncurses/Makefile
+ncurses-6.0-clean:
+	-@$(MAKE) -C ncurses-6.0 distclean
+	@rm -f ncurses-6.0/Makefile
 
-ncurses-install:
+ncurses-6.0-install:
 ifeq ($(RTCONFIG_BCMARM),y)
-	install -D ncurses/lib/libncursesw.so.6.0 $(INSTALLDIR)/ncurses/usr/lib/libncursesw.so.6.0
-	cd $(INSTALLDIR)/ncurses/usr/lib && \
+	install -D ncurses-6.0/lib/libncursesw.so.6.0 $(INSTALLDIR)/ncurses-6.0/usr/lib/libncursesw.so.6.0
+	cd $(INSTALLDIR)/ncurses-6.0/usr/lib && \
 		ln -sf libncursesw.so.6.0 libncursesw.so.6 &&\
 		ln -sf libncursesw.so.6.0 libncursesw.so
 else
-	install -D ncurses/lib/libncurses.so.6.0 $(INSTALLDIR)/ncurses/usr/lib/libncurses.so.6.0
-	cd $(INSTALLDIR)/ncurses/usr/lib && \
+	install -D ncurses-6.0/lib/libncurses.so.6.0 $(INSTALLDIR)/ncurses-6.0/usr/lib/libncurses.so.6.0
+	cd $(INSTALLDIR)/ncurses-6.0/usr/lib && \
 		ln -sf libncurses.so.6.0 libncurses.so.6 &&\
 		ln -sf libncurses.so.6.0 libncurses.so
 endif
-	$(STRIP) $(INSTALLDIR)/ncurses/usr/lib/*.so.*
+	$(STRIP) $(INSTALLDIR)/ncurses-6.0/usr/lib/*.so.*
 
 nano/Makefile:
 	cd nano && \
 	autoreconf -i -f && $(CONFIGURE) --prefix=$(INSTALLDIR)/nano/usr --sysconfdir=/jffs/configs \
-	CFLAGS="$(EXTRACFLAGS) -Os -I$(TOP)/ncurses/include -ffunction-sections -fdata-sections" \
-	LDFLAGS="$(LDFLAGS) -L$(TOP)/ncurses/lib -ffunction-sections -fdata-sections -Wl,--gc-sections" \
-	PKG_CONFIG_PATH="$(TOP)/ncurses/misc" PKG_CONFIG_LIBDIR="$(TOP)/ncurses/misc"\
+	CFLAGS="$(EXTRACFLAGS) -Os -ffunction-sections -fdata-sections" \
+	LDFLAGS="$(LDFLAGS) -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+	NCURSESW_CFLAGS="-I$(TOP)/ncurses-6.0/include" \
+	NCURSESW_LIBS="-L$(TOP)/ncurses-6.0/lib $(if $(RTCONFIG_BCMARM),-lncursesw,-lncurses)" \
+	NCURSES_CFLAGS="-I$(TOP)/ncurses-6.0/include" \
+	NCURSES_LIBS="-L$(TOP)/ncurses-6.0/lib -lncurses" \
+	PKG_CONFIG_PATH="$(TOP)/ncurses-6.0/misc" \
+	PKG_CONFIG_LIBDIR="$(TOP)/ncurses-6.0/misc" \
 	$(if $(RTCONFIG_BCMARM),ac_cv_lib_ncursesw_get_wch=yes,ac_cv_lib_ncursesw_get_wch=no) \
 	$(if $(RTCONFIG_BCMARM),--enable-utf8,--enable-tiny) \
 	--disable-speller --disable-extra --disable-tabcomp --enable-wrapping --disable-glibtest \
@@ -3764,7 +3769,7 @@ nano-install:
 	@$(MAKE) -C nano install-exec INSTALLDIR=$(INSTALLDIR)/nano/usr/bin/nano
 	$(STRIP) $(INSTALLDIR)/nano/usr/bin/nano
 
-nano: ncurses nano/Makefile
+nano: ncurses-6.0 nano/Makefile
 	@$(SEP)
 	$(MAKE) -C $@
 
