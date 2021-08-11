@@ -896,12 +896,12 @@ void timecheck(void)
 			svcStatus[item] = activeNow;
 			if(activeNow) {
 				eval("radio", "on", tmp);
-				logmessage("wireless scheduler", "[%s] %s radio enabled by scheduler", __FUNCTION__, (unit == 0) ? "2.4GHz" : "5GHz");
+				logmessage("wireless scheduler", "%s radio enabled by scheduler", (unit == 0) ? "2.4GHz" : "5GHz");
 			}
 			else
 			{
 				eval("radio", "off", tmp);
-				logmessage("wireless scheduler", "[%s] %s radio disabled by scheduler", __FUNCTION__, (unit == 0) ? "2.4GHz" : "5GHz");
+				logmessage("wireless scheduler", "%s radio disabled by scheduler", (unit == 0) ? "2.4GHz" : "5GHz");
 			}
 		}
 		item++;
@@ -964,7 +964,7 @@ void timecheck(void)
 			if(timecheck_reboot(reboot_schedule))
 			{
 				_dprintf("reboot plan alert...\n");
-				logmessage("reboot scheduler", "[%s] The system is going down for reboot", __FUNCTION__);
+				logmessage("reboot scheduler", "The system is going down for reboot");
 				g_reboot = 1;
 				nvram_set_int("g_reboot", g_reboot);  //pass state to sig handler
 				sleep(1);
