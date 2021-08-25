@@ -4,6 +4,19 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_50DAj9527  (11-August-2021) ARM SDK, MIPS,ARM KRACK
+* FIXED: webui: add jQuery.noConflict to wireless status page
+* CHANGED: watchdog: shorten timeout for httpd_check
+* CHANGED: ncurses: rename directory to sync with merlinng
+* CHANGED: make: update nano/ncurses build recipes
+* CHANGED: watchdog: remove FUNCTION refs from wireless/reboot syslogs
+* CHANGED: Revert "make: remove bwdpi override for nf_conntrack_events"
+
+
+374.43_50D9j9527  (1-August-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: watchdog: add nvram switch to disable auto restart
+
+
 374.43_50E8j9527  (21-July-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: webui: improve method of getting dnsmasq leases in ap mode
 * CHANGED: webui: get parent leases in ap mode via gui instead of inline
