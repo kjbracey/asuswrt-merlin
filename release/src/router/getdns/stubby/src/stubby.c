@@ -72,6 +72,8 @@ print_usage(FILE *out)
 	fprintf(out, "\t\t\t\"%s\"\n", system_conf_fn);
 	fprintf(out, "\t\tA default file (Using Strict mode) is installed as\n");
 	fprintf(out, "\t\t\t\"%s\"\n", system_conf_fn);
+	fprintf(out, "\t-F\t<filename>\n");
+	fprintf(out, "\t\tWrite log output to <filename> (used with -g background mode)\n");
 #if !defined(STUBBY_ON_WINDOWS)
 	fprintf(out, "\t-g\tRun stubby in background (default is foreground)\n");
 #endif
@@ -103,6 +105,8 @@ int
 main(int argc, char **argv)
 {
 	const char *custom_config_fn = NULL;
+	const char *custom_log_fn = NULL;
+	FILE *lfn;
 	int print_api_info = 0;
 	int run_in_foreground = 1;
 	int log_connections = 0;
@@ -117,10 +121,21 @@ main(int argc, char **argv)
 	long log_level = 7; 
 	char *ep;
 
-	while ((opt = getopt(argc, argv, "C:ighlv:w:V")) != -1) {
+	while ((opt = getopt(argc, argv, "C:F:ighlv:w:V")) != -1) {
 		switch (opt) {
 		case 'C':
 			custom_config_fn = optarg;
+			break;
+		case 'F':
+			custom_log_fn = optarg;
+			if ((lfn = fopen(custom_log_fn, "w")) != NULL) {
+				dup2(fileno(lfn), STDOUT_FILENO);
+				dup2(fileno(lfn), STDERR_FILENO);
+				fclose(lfn);
+			} else {
+				fprintf(stderr, "Could not open log file '%s'\n", custom_log_fn);
+				exit(EXIT_FAILURE);
+			}
 			break;
 		case 'g':
 			run_in_foreground = 0;
@@ -151,7 +166,7 @@ main(int argc, char **argv)
 			windows_service_arg = optarg;
 			break;
 #endif
-                case 'V':
+		case 'V':
 			print_version(stdout);
 			exit(EXIT_SUCCESS);
 		default:
