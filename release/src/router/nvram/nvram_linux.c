@@ -67,7 +67,6 @@ char *nvram_get(const char *name)
 {
 	char tmp[100];
 	char *value;
-	char *out;
 	size_t count = strlen(name) + 1;
 	unsigned long *off = (unsigned long *)tmp;
 
@@ -79,25 +78,20 @@ char *nvram_get(const char *name)
 		if ((off = malloc(count)) == NULL) return NULL;
 	}
 
-    /* Get offset into mmap() space */
-    strcpy((char *) off, name);
-    count = read(nvram_fd, off, count);
+	/* Get offset into mmap() space */
+	strcpy((char *) off, name);
+	count = read(nvram_fd, off, count);
 
-    if (count == sizeof(*off)) {
-        value = &nvram_buf[*off];
-        out = malloc(strlen(value)+1);
-        memset(out,0,strlen(value)+1);
-        sprintf(out,"%s",value);
-    }
-    else {
-        value = NULL;
-        out = NULL;
-        if (count < 0) perror(PATH_DEV_NVRAM);
-    }
+	if (count == sizeof(*off)) {
+		value = &nvram_buf[*off];
+	}
+	else {
+		value = NULL;
+		if (count < 0) perror(PATH_DEV_NVRAM);
+	}
 
-    if (off != (unsigned long *)tmp) free(off);
-    //fprintf(stderr,"value = %s\n",out);
-    return out;
+	if (off != (unsigned long *)tmp) free(off);
+	return value;
 }
 
 int nvram_getall(char *buf, int count)
