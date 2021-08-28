@@ -4,6 +4,18 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_51E3j9527  (28-August-2021) ARM SDK, MIPS,ARM KRACK 
+* Equivalent to 51D3j9527
+* CHANGED: Revert "nvram: nvram_get return static ptr instead of mmap ptr"
+
+
+374.43_51D2j9527  (26-August-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: openssl11: update to 1.1.1l
+* CHANGED: getdns/stubby: update to 1.7.0/0/4.0
+* CHANGED: stubby fork customizations
+* CHANGED: curl: update to 7.78.0
+
+
 374.43_50DAj9527  (11-August-2021) ARM SDK, MIPS,ARM KRACK
 * FIXED: webui: add jQuery.noConflict to wireless status page
 * CHANGED: watchdog: shorten timeout for httpd_check
