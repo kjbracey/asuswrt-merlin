@@ -102,7 +102,7 @@ struct connection {
 	struct sockaddr_storage remote_in;
 	socklen_t               addrlen;
 
-//	size_t                  max_udp_size;
+	size_t                  max_udp_size;
 
 	connection             *next;
 	connection            **prev_next;
@@ -222,7 +222,7 @@ static void tcp_write_cb(void *userarg)
 		return;
 	}
 	to_write = conn->to_write;
-	if (conn->fd == -1 ||
+	if (conn->fd == -1 || 
 	    (written = send(conn->fd,
 	    (const void *)&to_write->write_buf[to_write->written],
 	    to_write->write_buf_len - to_write->written, 0)) == -1) {
@@ -328,17 +328,17 @@ getdns_reply(getdns_context *context,
 	else if (conn->l->transport == GETDNS_TRANSPORT_UDP) {
 		listener *l = conn->l;
 
-//		if (len > conn->max_udp_size) {
-//			_getdns_rr_iter qi_spc, *qi;
-//
-//			(void)memset(buf + 6, 0, 6);
-//			GLDNS_TC_SET(buf);
-//			if ((qi = _getdns_rr_iter_init(&qi_spc, buf, len))) {
-//				DEBUG_SERVER("Truncating reply to: %d\n",
-//					(int)(qi->nxt - buf));
-//				len = qi->nxt - buf;
-//			}
-//		}
+		if (len > conn->max_udp_size) {
+			_getdns_rr_iter qi_spc, *qi;
+
+			(void)memset(buf + 6, 0, 6);
+			GLDNS_TC_SET(buf);
+			if ((qi = _getdns_rr_iter_init(&qi_spc, buf, len))) {
+				DEBUG_SERVER("Truncating reply to: %d\n",
+					(int)(qi->nxt - buf));
+				len = qi->nxt - buf;
+			}
+		}
 		if (conn->l->fd >= 0 && sendto(conn->l->fd, (void *)buf, len, 0,
 		    (struct sockaddr *)&conn->remote_in, conn->addrlen) == -1) {
 			/* TODO: handle _getdns_socketerror_wants_retry() */
@@ -558,7 +558,7 @@ static void tcp_accept_cb(void *userarg)
 		return;
 
 	(void) memset(conn, 0, sizeof(tcp_connection));
-//	conn->super.max_udp_size = 65536;
+	conn->super.max_udp_size = 65536;
 	conn->super.l = l;
 	conn->super.addrlen = sizeof(conn->super.remote_in);
 	if ((conn->fd = accept(l->fd, (struct sockaddr *)
@@ -608,7 +608,7 @@ static void tcp_accept_cb(void *userarg)
 		conn->super.next->prev_next = &conn->super.next;
 	conn->super.prev_next = &l->connections;
 	l->connections = (connection *)conn;
-
+	
 
 	(void) loop->vmt->schedule(loop, conn->fd,
 	    DOWNSTREAM_IDLE_TIMEOUT, &conn->event);
@@ -626,7 +626,7 @@ static void udp_read_cb(void *userarg)
 	uint8_t buf[4096];
 	ssize_t len;
 	getdns_return_t r;
-
+	
 	assert(userarg);
 
 	if (l->fd == -1)
@@ -643,7 +643,7 @@ static void udp_read_cb(void *userarg)
 
 	conn->l = l;
 	conn->addrlen = sizeof(conn->remote_in);
-//	conn->max_udp_size = 512;
+	conn->max_udp_size = 512;
 	if ((len = recvfrom(l->fd, (void *)buf, sizeof(buf), 0,
 	    (struct sockaddr *)&conn->remote_in, &conn->addrlen)) == -1) {
 		if ( _getdns_socketerror_wants_retry() &&
@@ -671,7 +671,7 @@ static void udp_read_cb(void *userarg)
 
 				l = strlen(addrbuf);
 				(void) snprintf(addrbuf + l,
-				    sizeof(addrbuf) - l, ":%d",
+				    sizeof(addrbuf) - l, ":%d", 
 				    (int)((struct sockaddr_in*)
 				    &conn->remote_in)->sin_port);
 			} else
@@ -687,7 +687,7 @@ static void udp_read_cb(void *userarg)
 
 				l = strlen(addrbuf);
 				(void) snprintf(addrbuf + l,
-				    sizeof(addrbuf) - l, ":%d",
+				    sizeof(addrbuf) - l, ":%d", 
 				    (int)((struct sockaddr_in6*)
 				    &conn->remote_in)->sin6_port);
 			} else
@@ -728,7 +728,7 @@ static void udp_read_cb(void *userarg)
 		; /* FROMERR on input, ignore */
 
 	else {
-//		uint32_t max_udp_size = 512;
+		uint32_t max_udp_size = 512;
 
 		/* Insert connection */
 		conn->super.key = conn;
@@ -741,13 +741,13 @@ static void udp_read_cb(void *userarg)
 		DEBUG_SERVER("[connection add] count: %d\n",
 		    (int)l->set->connections_set.count);
 
-//		if (!getdns_dict_get_int(request_dict,
-//		    "/additional/0/udp_payload_size", &max_udp_size))
-//			conn->max_udp_size = max_udp_size;
-//
-//		else if (!getdns_dict_get_int(request_dict,
-//		    "/additional/1/udp_payload_size", &max_udp_size))
-//			conn->max_udp_size = max_udp_size;
+		if (!getdns_dict_get_int(request_dict,
+		    "/additional/0/udp_payload_size", &max_udp_size))
+			conn->max_udp_size = max_udp_size;
+
+		else if (!getdns_dict_get_int(request_dict,
+		    "/additional/1/udp_payload_size", &max_udp_size))
+			conn->max_udp_size = max_udp_size;
 
 		if ((conn->next = l->connections))
 			conn->next->prev_next = &conn->next;
@@ -825,7 +825,7 @@ static void remove_listeners(listen_set *set)
 
 		if (l->transport != GETDNS_TRANSPORT_TCP)
 			continue;
-
+		
 		conn_p = (tcp_connection **)&l->connections;
 		while (*conn_p) {
 			tcp_connection *prev_conn_p = *conn_p;
@@ -974,7 +974,7 @@ getdns_return_t getdns_context_set_listen_addresses(
 	if (new_set_count == 0) {
 		if (!current_set)
 			return GETDNS_RETURN_GOOD;
-
+		
 		context->server = NULL;
 		/* action is already to_remove */
 		remove_listeners(current_set);
@@ -1088,7 +1088,7 @@ getdns_return_t getdns_context_set_listen_addresses(
 			}
 			for (j = 0; j < current_set->count; j++) {
 				cl = &current_set->items[j];
-
+				
 				if (l->transport == cl->transport &&
 				    l->addr_len == cl->addr_len &&
 				    !memcmp(&l->addr, &cl->addr, l->addr_len))

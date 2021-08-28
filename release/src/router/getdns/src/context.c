@@ -301,7 +301,7 @@ add_local_host(getdns_context *context, getdns_dict *address, const char *str)
 		return GETDNS_RETURN_BAD_DOMAIN_NAME;
 
 	canonicalize_dname(host_name);
-
+	
 	if (!(hnas = (host_name_addrs *)_getdns_rbtree_search(
 	    &context->local_hosts, host_name))) {
 
@@ -316,7 +316,7 @@ add_local_host(getdns_context *context, getdns_dict *address, const char *str)
 
 	} else
 		hnas_found = 1;
-
+	
 	if ((r = getdns_dict_get_bindata(address,"address_type",&address_type))
 	||  address_type->size < 4
 	||  !(addrs = address_type->data[3] == '4'? &hnas->ipv4addrs
@@ -413,7 +413,7 @@ str_addr_dict(getdns_context *context, const char *str)
 		return NULL;
 	if (!ai)
 		return NULL;
-
+		
 	address = sockaddr_dict(context, ai->ai_addr);
 	freeaddrinfo(ai);
 
@@ -872,7 +872,7 @@ static getdns_tsig_algo _getdns_get_tsig_algo(getdns_bindata *algo)
 			    strncasecmp((const char *)algo->data, i->name,
 			    i->strlen_name) == 0)
 				return i->alg;
-
+		
 	} else if (!_getdns_bindata_is_dname(algo)) {
 		/* Terminated string */
 		for (i = tsig_info; i < last_tsig_info; i++)
@@ -926,6 +926,7 @@ upstream_init(getdns_upstream *upstream,
 	/* For sharing a socket to this upstream with TCP  */
 	upstream->fd       = -1;
 	upstream->expires  = 0;
+	upstream->tls_fallback_ok = 0;
 	upstream->tls_obj  = NULL;
 	upstream->tls_session = NULL;
 	upstream->tls_cipher_list = NULL;
@@ -952,9 +953,12 @@ upstream_init(getdns_upstream *upstream,
 	(void) getdns_eventloop_event_init(
 	    &upstream->finished_event, upstream, NULL, NULL, NULL);
 
-	upstream->has_client_cookie = 0;
-	upstream->has_prev_client_cookie = 0;
-	upstream->has_server_cookie = 0;
+	upstream->server_cookie_len = 0;
+	(void) memset(&upstream->server_cookie, 0,
+	        sizeof(upstream->server_cookie));
+	upstream->src_addr_checked = 0;
+	(void) memset(&upstream->src_addr, 0, sizeof(upstream->src_addr));
+	upstream->src_addr_len = 0;
 
 	upstream->tsig_alg  = GETDNS_NO_TSIG;
 	upstream->tsig_dname_len = 0;
@@ -1048,7 +1052,7 @@ set_os_defaults_windows(getdns_context *context)
 
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_UNSPEC;      /* Allow IPv4 or IPv6 */
-	hints.ai_socktype  = SOCK_DGRAM;    /* Datagram socket */
+    hints.ai_socktype = 0;              /* Datagram socket */
     hints.ai_flags = AI_NUMERICHOST; /* No reverse name lookups */
     hints.ai_protocol = 0;              /* Any protocol */
     hints.ai_canonname = NULL;
@@ -1289,7 +1293,7 @@ transaction_id_cmp(const void *id1, const void *id2)
 static void
 NULL_update_callback(
     getdns_context *context, getdns_context_code_t code, void *userarg)
-{ (void)context; (void)code; (void)userarg; }
+{ (void)context; (void)code; (void)userarg; /* unused parameters */ }
 
 static int
 netreq_expiry_cmp(const void *id1, const void *id2)
@@ -1431,6 +1435,7 @@ getdns_context_create_with_extended_memory_functions(
 
 	result->timeout = 5000;
 	result->idle_timeout = 0;
+	result->tcp_send_timeout = -1;
 	result->follow_redirects = GETDNS_REDIRECTS_FOLLOW;
 	result->dns_root_servers = NULL;
 #if defined(HAVE_LIBUNBOUND) && !defined(HAVE_UB_CTX_SET_STUB)
@@ -2026,7 +2031,7 @@ getdns_set_base_dns_transports(
 	}
 	if ( u>1 || t>1 || l>1)
 		return GETDNS_RETURN_CONTEXT_UPDATE_FAIL;
-
+	
 	if (!(new_transports = GETDNS_XMALLOC(context->my_mf,
 		getdns_transport_list_t, transport_count)))
 		return GETDNS_RETURN_CONTEXT_UPDATE_FAIL;
@@ -2363,6 +2368,34 @@ getdns_context_set_idle_timeout(getdns_context *context, uint64_t timeout)
 	return GETDNS_RETURN_GOOD;
 }               /* getdns_context_set_timeout */
 
+/*
+ * getdns_context_unset_tcp_send_timeout
+ *
+ */
+getdns_return_t
+getdns_context_unset_tcp_send_timeout(getdns_context *context)
+{
+	if (!context)
+		return GETDNS_RETURN_INVALID_PARAMETER;
+
+	context->tcp_send_timeout = -1;
+	return GETDNS_RETURN_GOOD;
+}
+
+/*
+ * getdns_context_set_tcp_send_timeout
+ *
+ */
+getdns_return_t
+getdns_context_set_tcp_send_timeout(struct getdns_context *context,
+    uint32_t value)
+{
+	if (!context || value > INT_MAX)
+		return GETDNS_RETURN_INVALID_PARAMETER;
+
+	context->tcp_send_timeout = value;
+	return GETDNS_RETURN_GOOD;
+}
 
 /*
  * getdns_context_set_follow_redirects
@@ -2469,7 +2502,7 @@ getdns_context_set_dns_root_servers(
 			if (ub_ctx_set_stub(context->unbound_ctx,".",dst,1)) {
 				return GETDNS_RETURN_CONTEXT_UPDATE_FAIL;
 			}
-
+		
 		} else if (addr_bd->size == 4 &&
 		    inet_ntop(AF_INET, addr_bd->data, dst, sizeof(dst))) {
 			if (ub_ctx_set_stub(context->unbound_ctx,".",dst,1)) {
@@ -3620,8 +3653,8 @@ _getdns_context_prepare_for_resolution(getdns_context *context)
 				_getdns_tls_context_free(&context->my_mf, context->tls_ctx);
 				context->tls_ctx = NULL;
 				return r;
-			}
-
+			}			
+			
 			/* For strict authentication, we must have local root certs available
 		       Set up is done only when the tls_ctx is created (per getdns_context)*/
 			if (_getdns_tls_context_set_ca(context->tls_ctx, context->tls_ca_file, context->tls_ca_path)) {
@@ -3728,7 +3761,7 @@ uint32_t
 getdns_context_get_num_pending_requests(const getdns_context* context,
     struct timeval* next_timeout)
 {
-	(void)next_timeout;
+	(void)next_timeout; /* unused parameter */
 
 	if (!context)
 		return GETDNS_RETURN_INVALID_PARAMETER;
@@ -3833,6 +3866,9 @@ _get_context_settings(const getdns_context* context)
 	                           (context->timeout > 0xFFFFFFFFull) ? 0xFFFFFFFF: (uint32_t) context->timeout)
 	    || getdns_dict_set_int(result, "idle_timeout",
 	                           (context->idle_timeout > 0xFFFFFFFFull) ? 0xFFFFFFFF : (uint32_t) context->idle_timeout)
+	    || (  context->tcp_send_timeout != -1
+	       && getdns_dict_set_int(result, "tcp_send_timeout",
+	                              context->tcp_send_timeout))
 	    || getdns_dict_set_int(result, "limit_outstanding_queries",
 	                           context->limit_outstanding_queries)
             || getdns_dict_set_int(result, "dnssec_allowed_skew",
@@ -3870,7 +3906,7 @@ _get_context_settings(const getdns_context* context)
 	                           context->trust_anchors_backoff_time)
 	    )
 		goto error;
-
+	
 	/* list fields */
 	if (getdns_context_get_suffix(context, &list))
 		goto error;
@@ -3892,6 +3928,14 @@ _get_context_settings(const getdns_context* context)
 
 	else if (list && _getdns_dict_set_this_list(
 	    result, "dnssec_trust_anchors", list)) {
+		getdns_list_destroy(list);
+		goto error;
+	}
+	if (getdns_context_get_dns_root_servers(context, &list))
+		; /* pass */
+
+	else if (list && _getdns_dict_set_this_list(
+	    result, "dns_root_servers", list)) {
 		getdns_list_destroy(list);
 		goto error;
 	}
@@ -4033,7 +4077,7 @@ getdns_context_get_api_information(const getdns_context* context)
 	getdns_dict* settings;
 
 	if ((result = getdns_dict_create_with_context(context))
-
+			
 	    && ! getdns_dict_util_set_string(
 	    result, "version_string", GETDNS_VERSION)
 
@@ -4102,7 +4146,7 @@ getdns_context_set_use_threads(getdns_context* context, int use_threads) {
     else
         r = ub_ctx_async(context->unbound_ctx, 0);
 #else
-    (void)use_threads;
+    (void)use_threads; /* unused parameter */
 #endif
     return r == 0 ? GETDNS_RETURN_GOOD : GETDNS_RETURN_CONTEXT_UPDATE_FAIL;
 }
@@ -4297,6 +4341,16 @@ CONTEXT_GETTER(idle_timeout               , uint64_t)
 CONTEXT_GETTER(follow_redirects           , getdns_redirects_t)
 
 getdns_return_t
+getdns_context_get_tcp_send_timeout(
+    const getdns_context *context, uint32_t* value)
+{
+	if (!context || !value) return GETDNS_RETURN_INVALID_PARAMETER;
+	*value = context->tcp_send_timeout == -1 ? 0
+	       : context->tcp_send_timeout;
+	return GETDNS_RETURN_GOOD;
+}
+
+getdns_return_t
 getdns_context_get_dns_root_servers(
     const getdns_context *context, getdns_list **value)
 {
@@ -4323,7 +4377,7 @@ getdns_context_get_suffix(const getdns_context *context, getdns_list **value)
 
 	if (!(list = getdns_list_create_with_context(context)))
 		return GETDNS_RETURN_MEMORY_ERROR;
-
+	
 	assert(context->suffixes);
 	dname_len = context->suffixes[0];
 	dname = context->suffixes + 1;
@@ -4635,6 +4689,7 @@ _getdns_context_config_setting(getdns_context *context,
 	CONTEXT_SETTING_INT(dns_transport)
 	CONTEXT_SETTING_ARRAY(dns_transport_list, transport_list)
 	CONTEXT_SETTING_INT(idle_timeout)
+	CONTEXT_SETTING_INT(tcp_send_timeout)
 	CONTEXT_SETTING_INT(limit_outstanding_queries)
 	CONTEXT_SETTING_INT(timeout)
 	CONTEXT_SETTING_INT(follow_redirects)
@@ -4877,7 +4932,7 @@ FILE *_getdns_context_get_priv_fp(
 		_getdns_log(&context->log
 		           , GETDNS_LOG_SYS_ANCHOR, GETDNS_LOG_INFO
 		           , "Error opening \"%s\": %s\n"
-			   , path, _getdns_errnostr());
+			   , path, _getdns_fileerrnostr());
 	return f;
 }
 
@@ -4956,31 +5011,31 @@ int _getdns_context_write_priv_file(getdns_context *context,
 		_getdns_log(&context->log
 		           , GETDNS_LOG_SYS_ANCHOR, GETDNS_LOG_INFO
 		           , "Could not create temporary file \"%s\": %s\n"
-			   , tmpfn, _getdns_errnostr());
+			   , tmpfn, _getdns_fileerrnostr());
 
 	else if (!(f = fdopen(fd, "w")))
 		_getdns_log(&context->log
 		           , GETDNS_LOG_SYS_ANCHOR, GETDNS_LOG_ERR
 		           , "Error opening temporary file \"%s\": %s\n"
-			   , tmpfn, _getdns_errnostr());
+			   , tmpfn, _getdns_fileerrnostr());
 
 	else if (fwrite(content->data, 1, content->size, f) < content->size)
 		_getdns_log(&context->log
 		           , GETDNS_LOG_SYS_ANCHOR, GETDNS_LOG_ERR
 		           , "Error writing to temporary file \"%s\": %s\n"
-			   , tmpfn, _getdns_errnostr());
+			   , tmpfn, _getdns_fileerrnostr());
 
-	else if (fclose(f) < 0)
+	else if (fclose(f))
 		_getdns_log(&context->log
 		           , GETDNS_LOG_SYS_ANCHOR, GETDNS_LOG_ERR
-		           , "Error closing temporary file \"%s\": %s\n"
-			   , tmpfn, _getdns_errnostr());
+		           , "Error closing temporary file \"%s\": %s (%p)\n"
+			    , tmpfn, _getdns_fileerrnostr(), f);
 
 	else if (rename(tmpfn, path) < 0)
 		_getdns_log(&context->log
 		           , GETDNS_LOG_SYS_ANCHOR, GETDNS_LOG_ERR
 		           , "Error renaming temporary file \"%s\" to \"%s\""
-			     ": %s\n", tmpfn, path, _getdns_errnostr());
+			     ": %s\n", tmpfn, path, _getdns_fileerrnostr());
 	else {
 		context->can_write_appdata = PROP_ABLE;
 		return 1;
@@ -5033,7 +5088,7 @@ int _getdns_context_can_write_appdata(getdns_context *context)
 		_getdns_log(&context->log
 		           , GETDNS_LOG_SYS_ANCHOR, GETDNS_LOG_ERR
 		           , "Error unlinking write test file: \"%s\": %s\n"
-			   , path, _getdns_errnostr());
+			   , path, _getdns_fileerrnostr());
 	return 1;
 }
 
@@ -5346,7 +5401,7 @@ getdns_context_set_tls_curves_list(
 	dispatch_updated(context, GETDNS_CONTEXT_CODE_TLS_CIPHER_LIST);
 	return GETDNS_RETURN_GOOD;
 #else
-	(void)tls_curves_list;
+	(void)tls_curves_list; /* unused parameter */
 	return GETDNS_RETURN_NOT_IMPLEMENTED;
 #endif
 }

@@ -922,7 +922,7 @@ static getdns_dict *CD_extension(getdns_dns_req *dnsreq)
 	     ? dnssec_ok_checking_disabled_roadblock_avoidance
 	     : dnssec_ok_checking_disabled_avoid_roadblocks;
 #else
-	(void)dnsreq;
+	(void)dnsreq; /* unused parameter */
 	return dnssec_ok_checking_disabled;
 #endif
 }
@@ -3616,23 +3616,17 @@ void _getdns_get_validation_chain(getdns_dns_req *dnsreq)
 	getdns_network_req *netreq, **netreq_p;
 	chain_head *chain = NULL, *chain_p;
 
-#ifdef DNSSEC_ROADBLOCK_AVOIDANCE
 	if (dnsreq->avoid_dnssec_roadblocks) {
 		chain = dnsreq->chain;
 
-	} else
-#endif
-	if (dnsreq->validating)
+	} else if (dnsreq->validating)
 		return;
 	dnsreq->validating = 1;
 
-#ifdef DNSSEC_ROADBLOCK_AVOIDANCE
 	if (dnsreq->avoid_dnssec_roadblocks && chain->lock == 0)
 		; /* pass */
 
-	else
-#endif
-	for (netreq_p = dnsreq->netreqs; (netreq = *netreq_p) ; netreq_p++) {
+	else for (netreq_p = dnsreq->netreqs; (netreq = *netreq_p) ; netreq_p++) {
 		if (!  netreq->response
 		    || netreq->response_len < GLDNS_HEADER_SIZE
 		    || ( GLDNS_RCODE_WIRE(netreq->response)
@@ -3663,10 +3657,8 @@ void _getdns_get_validation_chain(getdns_dns_req *dnsreq)
 			if (chain_p->lock) chain_p->lock--;
 		}
 		dnsreq->chain = chain;
-#ifdef DNSSEC_ROADBLOCK_AVOIDANCE
 		if (dnsreq->avoid_dnssec_roadblocks && chain->lock)
 			chain->lock -= 1;
-#endif
 
 		check_chain_complete(chain);
 	} else {

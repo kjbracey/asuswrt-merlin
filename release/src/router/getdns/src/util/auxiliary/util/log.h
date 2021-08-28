@@ -42,7 +42,6 @@
 #ifdef DEBUGGING
 #define verbose(x, ...) DEBUG_NL(__VA_ARGS__)
 #define log_err(...)	DEBUG_NL(__VA_ARGS__)
-#define log_warn(...)	DEBUG_NL(__VA_ARGS__)
 #define log_info(...)	DEBUG_NL(__VA_ARGS__)
 #define fatal_exit(...) do { DEBUG_NL(__VA_ARGS__); exit(EXIT_FAILURE); } while(0)
 #define log_assert(x)	do { if(!(x)) fatal_exit("%s:%d: %s: assertion %s failed", \
@@ -51,7 +50,6 @@
 #else
 #define verbose(...)	((void)0)
 #define log_err(...)	((void)0)
-#define log_warn(...)	((void)0)
 #define log_info(...)	((void)0)
 #define fatal_exit(...)	((void)0)
 #define log_assert(x)	((void)0)

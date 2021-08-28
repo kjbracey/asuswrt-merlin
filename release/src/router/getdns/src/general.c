@@ -220,11 +220,7 @@ _getdns_check_dns_req_complete(getdns_dns_req *dns_req)
 	            dns_req->dnssec_return_only_secure ||
 	            dns_req->dnssec ||
 	            dns_req->dnssec_return_all_statuses
-	           )
-#ifdef DNSSEC_ROADBLOCK_AVOIDANCE
-	        && !dns_req->avoid_dnssec_roadblocks
-#endif
-				)
+	           ))
 #endif
 	    || (   dns_req->context->resolution_type == GETDNS_RESOLUTION_RECURSING
 	       && (dns_req->dnssec_return_status ||
@@ -260,7 +256,7 @@ static void
 ub_resolve_event_callback(void* arg, int rcode, void *pkt, int pkt_len,
     int sec, char* why_bogus, int was_ratelimited)
 {
-	(void) was_ratelimited;
+	(void) was_ratelimited; /* unused parameter */
 #else
 static void
 ub_resolve_event_callback(void* arg, int rcode, void *pkt, int pkt_len,
