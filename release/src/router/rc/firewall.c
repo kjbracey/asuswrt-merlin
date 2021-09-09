@@ -964,6 +964,7 @@ void convert_routes(void)
 			while ((b = strsep(&nvp, "<")) != NULL) {
 				int i = 0;
 				char *routes;
+				int len;
 
 				if ((vstrsep(b, ">", &ip, &netmask, &gateway, &metric, &interface) != 5))
 					continue;
@@ -976,12 +977,14 @@ void convert_routes(void)
 				else
 					continue;
 
+				len = strlen(routes);
 				_dprintf("%x %s %s %s %s %s\n", ++i, ip, netmask, gateway, metric, interface);
-				sprintf(routes, "%s %s:%s:%s:%d", routes, ip, netmask, gateway, atoi(metric)+1);
+				sprintf(routes + len, " %s:%s:%s:%d", ip, netmask, gateway, atoi(metric)+1);
 			}
 			free(nv);
 		}
 	}
+
 
 	nvram_set("lan_route", lroutes);
 

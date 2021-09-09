@@ -10,6 +10,8 @@ function isWLclient(){  //detect login client is by wireless or wired
 	return false; //wired
 }
 
+﻿// Use AJAX to detect LAN connection
+
 var http_request2 = false;
 
 function makeRequest_lan(url) {
@@ -21,7 +23,7 @@ function makeRequest_lan(url) {
 
 	http_request2.onreadystatechange = alertContents_lan;
 	http_request2.open('GET', url, true);
-	http_request2.send(null);
+	http_request2.send();
 }
 
 var xmlDoc_ie2;
@@ -116,16 +118,16 @@ function updateLAN()
 	var ie = window.ActiveXObject;
 
 	if (ie)
-		makeRequest_ie_lan('/WPS_info.asp');
+		makeRequest_ie_lan('/httpd_check.xml');
 	else
-		makeRequest_lan('/WPS_info.asp');
+		makeRequest_lan('/httpd_check.xml');
 }
 
 function refresh_laninfo(xmldoc)
 {
-	var wpss=xmldoc.getElementsByTagName("wps");
+	var httpds=xmldoc.getElementsByTagName("httpd");
 	
-	if (wpss!=null && wpss[0]!=null)
+	if (httpds!=null && httpds[0]!=null)
 	{
 		if($("drword")){
 			$("drword").innerHTML = "<#DrSurf_sweet_advise2#><br/><br/>";

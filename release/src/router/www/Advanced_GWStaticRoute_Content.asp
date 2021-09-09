@@ -59,6 +59,7 @@
 wan_route_x = '<% nvram_get("wan_route_x"); %>';
 wan_nat_x = '<% nvram_get("wan_nat_x"); %>';
 wan_proto = '<% nvram_get("wan_proto"); %>';
+ipv6_service = '<% nvram_get("ipv6_service"); %>';
 
 <% login_state_hook(); %>
 var wireless = [<% wl_auth_list(); %>];	// [[MAC, associated, authorized], ...]
@@ -87,6 +88,10 @@ function applyRule(){
 		tmp_value = "";
 
 	document.form.sr_rulelist.value = tmp_value;
+
+	// Unpredictable results with restart_net, always reboot when enabling or changing options for native ipv6
+	if(ipv6_service == "dhcp6")
+		FormActions("start_apply.htm", "apply", "reboot", "<% get_default_reboot_time(); %>");
 
 	showLoading();
 	document.form.submit();
@@ -343,11 +348,11 @@ function Ctrl_LANIPList(obj){
 <iframe name="hidden_frame" id="hidden_frame" src="" width="0" height="0" frameborder="0"></iframe>
 <form method="post" name="form" id="ruleForm" action="/start_apply.htm" target="hidden_frame">
 <input type="hidden" name="current_page" value="Advanced_GWStaticRoute_Content.asp">
-<input type="hidden" name="next_page" value="">
+<input type="hidden" name="next_page" value="Advanced_GWStaticRoute_Content.asp">
 <input type="hidden" name="modified" value="0">
 <input type="hidden" name="action_mode" value="apply_new">
-<input type="hidden" name="action_wait" value="60">
-<input type="hidden" name="action_script" value="restart_allnet">
+<input type="hidden" name="action_wait" value="10">
+<input type="hidden" name="action_script" value="restart_net">
 <input type="hidden" name="first_time" value="">
 <input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get("preferred_lang"); %>">
 <input type="hidden" name="firmver" value="<% nvram_get("firmver"); %>">
