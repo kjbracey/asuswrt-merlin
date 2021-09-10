@@ -379,7 +379,11 @@ int main(int argc, char *argv[])
 #endif
 	if (!strcmp(nvram_safe_get("smbd_wins"), "1")) {
 		fprintf(fp, "wins support = yes\n");
-		fprintf(fp, "dns proxy = yes\n");
+	if (!(!is_routing_enabled()
+#ifdef RTCONFIG_WIRELESSREPEATER
+	 && nvram_get_int("sw_mode") != SW_MODE_REPEATER
+#endif
+	)) fprintf(fp, "dns proxy = yes\n");
 	}
 
 	if (!strcmp(nvram_safe_get("smbd_master"), "1")) {
