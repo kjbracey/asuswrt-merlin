@@ -822,13 +822,6 @@ void start_dnsmasq(int force)
 			fprintf(fp, "dhcp-option=lan,6,%s\n",
 				lan_ipaddr);
 
-		/* WINS server */
-		nv = nvram_safe_get("dhcp_wins_x");
-		if (*nv && inet_addr(nv)) {
-			fprintf(fp, "dhcp-option=lan,44,%s\n"
-			/*	    "dhcp-option=lan,46,8\n"*/, nv);
-		}
-
 		/* NTP server */
 		if (nvram_get_int("ntpd_server")) {
 			fprintf(fp, "dhcp-option=lan,42,%s\n", lan_ipaddr);
@@ -847,6 +840,13 @@ void start_dnsmasq(int force)
 			free(nv);
 		}
 #endif
+
+		/* WINS server */
+		nv = nvram_safe_get("dhcp_wins_x");
+		if (*nv && inet_addr(nv)) {
+			fprintf(fp, "dhcp-option=lan,44,%s\n"
+			/*	    "dhcp-option=lan,46,8\n"*/, nv);
+		}
 
 #ifdef RTCONFIG_SAMBASRV
 		/* Samba will serve as a WINS server */
