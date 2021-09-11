@@ -614,7 +614,7 @@ function check_vpn(){		//true: (DHCP ip pool & static ip ) conflict with VPN cli
 <form method="post" name="form" id="ruleForm" action="/start_apply.htm" target="hidden_frame">
 <input type="hidden" name="productid" value="<% nvram_get("productid"); %>">
 <input type="hidden" name="current_page" value="Advanced_DHCP_Content.asp">
-<input type="hidden" name="next_page" value="Advanced_GWStaticRoute_Content.asp">
+<input type="hidden" name="next_page" value="Advanced_DHCP_Content.asp">
 <input type="hidden" name="modified" value="0">
 <input type="hidden" name="action_mode" value="apply_new">
 <input type="hidden" name="action_wait" value="30">
