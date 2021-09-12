@@ -905,8 +905,8 @@ function applyRule(){
     		FormActions("start_apply.htm", "apply", "reboot", "<% get_default_reboot_time(); %>");
 		}*/
 
-		if(based_modelid == "RT-AC66U" || based_modelid == "RT-N66U" )	//Viz 2014.16: SDK 6.x need to shut down CTF while switch 6in4, do reboot
-		{ // MODELDEP: RT-AC66U, RT-N66U
+		if(based_modelid == "RT-AC66U" || based_modelid == "RT-N66U" || based_modelid == "RT-N16")	//Viz 2014.16: SDK 6.x need to shut down CTF while switch 6in4, do reboot
+		{ // MODELDEP: RT-AC66U, RT-N66U, RT-N16
 			if((document.form.ipv6_service.value != document.form.ipv6_service_orig.value) 
 				&& (document.form.ipv6_service.value == "6in4" || document.form.ipv6_service_orig.value == "6in4"))
     		FormActions("start_apply.htm", "apply", "reboot", "<% get_default_reboot_time(); %>");
@@ -915,6 +915,13 @@ function applyRule(){
 		// 2016.4 Unpredictable results with restart_allnet, always reboot when enabling or changing options for native ipv6
 		if(document.form.ipv6_service.value == "dhcp6")
 			FormActions("start_apply.htm", "apply", "reboot", "<% get_default_reboot_time(); %>");
+		if(based_modelid == "RT-AC66U" || based_modelid == "RT-N66U" || based_modelid == "RT-N16 || based_modelid == "RT-AC56U")  //2021.9 Reboot all except AC68U if disabling native ipv6
+		{ // MODELDEP: RT-AC66U, RT-N66U, RT-N16, RT-AC56U
+			if((document.form.ipv6_service.value != document.form.ipv6_service_orig.value) 
+				&& (document.form.ipv6_service_orig.value == "dhcp6"))
+    		FormActions("start_apply.htm", "apply", "reboot", "<% get_default_reboot_time(); %>");
+		}
+
 	
 //		document.form.ipv6_accept_ra.value=1;			// 0/1/2 default:1
 
