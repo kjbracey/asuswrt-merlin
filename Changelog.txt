@@ -4,6 +4,21 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_51D6j9527  (12-September-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: samba: only enable dns proxy w/wins if dnsmasq started
+* CHANGED: webui: remove auto redirect to static routes from DHCP server page
+* CHANGED: webui: webui: reboot all except ac68U when disabling native ipv6
+* CHANGED: getdns: revert upstream Record and guard UDP max payload size with servers 6cb1593
+* FIXED: services: dnsmasq: smbd_wins sets lan ipaddr insted of wildcard addr
+* FIXED: services: dnsmasq: smbd_wins not used if url filter active
+
+
+374.43_51D4j9527  (09-September-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: webui: add javascript jquery to wireless status
+* CHANGED: webui: (backport) update dst start/stop data
+* CHANGED: webui: fix hang when changing static routes
+
+
 374.43_51E3j9527  (28-August-2021) ARM SDK, MIPS,ARM KRACK 
 * Equivalent to 51D3j9527
 * CHANGED: Revert "nvram: nvram_get return static ptr instead of mmap ptr"
