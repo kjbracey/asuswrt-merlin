@@ -1655,7 +1655,7 @@ void get_parent_leases(void)
 	char cmd[2048];
 	const char *lan_gateway, *http_lanport;
 
-	if (!nvram_match("ap_parent_data", "1") || !(nvram_get_int("sw_mode") == SW_MODE_AP))
+	if (nvram_match("ap_parent_data", "0") || !(nvram_get_int("sw_mode") == SW_MODE_AP))
 		return;
 
 	lan_gateway = nvram_safe_get("lan_gateway");
@@ -1666,11 +1666,30 @@ void get_parent_leases(void)
 
 	if (http_enable == 0 || http_enable == 2) {
 		unlink("/var/lib/misc/dnsmasq.leases");
-		sprintf(cmd, "/usr/sbin/curl --user-agent asusrouter-asuswrt-curl "
-			"http://%s:%s/dnsmasq_leases.txt -o /var/lib/misc/dnsmasq.leases",
-			lan_gateway, http_lanport);
+		if(nvram_match("ap_parent_data", "1")) {
+			sprintf(cmd, "/usr/sbin/wget -q --user-agent asusrouter-asuswrt-curl "
+				"http://%s:%s/dnsmasq_leases.txt -O /var/lib/misc/dnsmasq.leases",
+				lan_gateway, http_lanport);
+		}
+		else if(nvram_match("ap_parent_data", "2")) {
+			sprintf(cmd, "/usr/sbin/wget -q --user-agent asusrouter-asuswrt-wget "
+				"http://%s:%s/local/dnsmasq_leases.txt -O /var/lib/misc/dnsmasq.leases",
+				lan_gateway, http_lanport);
+		}
+		else
+			return; //uknown parent
+		
 		rc = system(cmd);
-		if (rc != 0)
+		if (rc != 0) { //wget return codes include generic and server errors, rc 0 = 200 OK
+			if (f_exists("/var/lib/misc/dnsmasq.leases"))
+				unlink("/var/lib/misc/dnsmasq.leases");  //clear results if something returned with error
 			logmessage("system", "failed to retrieve parent dnsmasq leases (%d)", rc);
+		}
 	}
+	else
+	{
+		logmessage("system", "http access not enabled - unable to retrieve parent dnsmasq leases");
+	}
+
+	return;
 }
