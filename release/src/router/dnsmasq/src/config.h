@@ -4,12 +4,12 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; version 2 dated June, 1991, or
    (at your option) version 3 dated 29 June, 2007.
-
+ 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+     
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -23,7 +23,7 @@
 #define SAFE_PKTSZ 1280 /* "go anywhere" UDP packet size */
 #define KEYBLOCK_LEN 40 /* choose to minimise fragmentation when storing DNSSEC keys */
 #define DNSSEC_WORK 50 /* Max number of queries to validate one question */
-#define TIMEOUT 10 /* drop UDP queries after TIMEOUT seconds */
+#define TIMEOUT 10     /* drop UDP queries after TIMEOUT seconds */
 #define FORWARD_TEST 50 /* try all servers every 50 queries */
 #define FORWARD_TIME 20 /* or 20 seconds */
 #define UDP_TEST_TIME 60 /* How often to reset our idea of max packet size. */
@@ -58,7 +58,7 @@
 #define SOA_EXPIRY 1209600 /* SOA expiry default */
 #define LOOP_TEST_DOMAIN "test" /* domain for loop testing, "test" is reserved by RFC 2606 and won't therefore clash */
 #define LOOP_TEST_TYPE T_TXT
-
+ 
 /* compile-time options: uncomment below to enable or do eg.
    make COPTS=-DHAVE_BROKEN_RTC
 
@@ -68,19 +68,13 @@ HAVE_BROKEN_RTC
    for timing, and keep lease lengths rather than expiry times
    in its leases file. This also make dnsmasq "flash disk friendly".
    Normally, dnsmasq tries very hard to keep the on-disk leases file
-   up-to-date: rewriting it after every renewal.  When HAVE_BROKEN_RTC
-   is in effect, the lease file is only written when a new lease is
-   created, or an old one destroyed. (Because those are the only times
+   up-to-date: rewriting it after every renewal.  When HAVE_BROKEN_RTC 
+   is in effect, the lease file is only written when a new lease is 
+   created, or an old one destroyed. (Because those are the only times 
    it changes.) This vastly reduces the number of file writes, and makes
    it viable to keep the lease file on a flash filesystem.
    NOTE: when enabling or disabling this, be sure to delete any old
    leases file, otherwise dnsmasq may get very confused.
-
-HAVE_LEASEFILE_EXPIRE
-   define this if you want to enable lease file update with expire
-   timeouts instead of expiry times or lease lengths, if HAVE_BROKEN_RTC
-   is also enabled. Lease file will be rewritten upon SIGUSR2 signal
-   reception and/or dnsmasq termination.
 
 HAVE_TFTP
    define this to get dnsmasq's built-in TFTP server.
@@ -95,11 +89,11 @@ HAVE_SCRIPT
    define this to get the ability to call scripts on lease-change.
 
 HAVE_LUASCRIPT
-   define this to get the ability to call Lua script on lease-change. (implies HAVE_SCRIPT)
+   define this to get the ability to call Lua script on lease-change. (implies HAVE_SCRIPT) 
 
 HAVE_DBUS
    define this if you want to link against libdbus, and have dnsmasq
-   support some methods to allow (re)configuration of the upstream DNS
+   support some methods to allow (re)configuration of the upstream DNS 
    servers via DBus.
 
 HAVE_UBUS
@@ -107,7 +101,7 @@ HAVE_UBUS
 
 HAVE_IDN
    define this if you want international domain name 2003 support.
-
+   
 HAVE_LIBIDN2
    define this if you want international domain name 2008 support.
 
@@ -149,9 +143,10 @@ NO_SCRIPT
 NO_LARGEFILE
 NO_AUTH
 NO_DUMPFILE
+NO_LOOP
 NO_INOTIFY
-   these are available to explicitly disable compile time options which would
-   otherwise be enabled automatically or which are enabled  by default
+   these are available to explicitly disable compile time options which would 
+   otherwise be enabled automatically or which are enabled  by default 
    in the distributed source tree. Building dnsmasq
    with something like "make COPTS=-DNO_SCRIPT" will do the trick.
 NO_GMP
@@ -160,32 +155,31 @@ NO_GMP
 LEASEFILE
 CONFFILE
 RESOLVFILE
-   the default locations of these files are determined below, but may be overridden
+   the default locations of these files are determined below, but may be overridden 
    in a build command line using COPTS.
 
 */
 
-/* Defining this builds a binary which handles time differently and works better on a system without a
-   stable RTC (it uses uptime, not epoch time) and writes the DHCP leases file less often to avoid flash wear.
+/* Defining this builds a binary which handles time differently and works better on a system without a 
+   stable RTC (it uses uptime, not epoch time) and writes the DHCP leases file less often to avoid flash wear. 
 */
 
 /* #define HAVE_BROKEN_RTC */
-/* #define HAVE_LEASEFILE_EXPIRE */
 
 /* The default set of options to build. Built with these options, dnsmasq
    has no library dependencies other than libc */
 
 #define HAVE_DHCP
-#define HAVE_DHCP6
+#define HAVE_DHCP6 
 #define HAVE_TFTP
 #define HAVE_SCRIPT
 #define HAVE_AUTH
-#define HAVE_IPSET
+#define HAVE_IPSET 
 #define HAVE_LOOP
 #define HAVE_DUMPFILE
 
 /* Build options which require external libraries.
-
+   
    Defining HAVE_<opt>_STATIC as _well_ as HAVE_<opt> will link the library statically.
 
    You can use "make COPTS=-DHAVE_<opt>" instead of editing these.
@@ -246,10 +240,10 @@ HAVE_SOLARIS_NETWORK
    define exactly one of these to alter interaction with kernel networking.
 
 HAVE_GETOPT_LONG
-   defined when GNU-style getopt_long available.
+   defined when GNU-style getopt_long available. 
 
 HAVE_SOCKADDR_SA_LEN
-   defined if struct sockaddr has sa_len field (*BSD)
+   defined if struct sockaddr has sa_len field (*BSD) 
 */
 
 #if defined(__UCLIBC__)
@@ -259,12 +253,10 @@ HAVE_SOCKADDR_SA_LEN
 #    define HAVE_GETOPT_LONG
 #endif
 #undef HAVE_SOCKADDR_SA_LEN
-#if defined(__UCLIBC_HAS_IPV6__) && defined(USE_IPV6)
+#if defined(__UCLIBC_HAS_IPV6__)
 #  ifndef IPV6_V6ONLY
 #    define IPV6_V6ONLY 26
 #  endif
-#elif !defined(NO_IPV6)
-#  define NO_IPV6
 #endif
 
 /* This is for glibc 2.x */
@@ -291,7 +283,7 @@ HAVE_SOCKADDR_SA_LEN
 #define NO_IPSET
 /* Define before sys/socket.h is included so we get socklen_t */
 #define _BSD_SOCKLEN_T_
-/* Select the RFC_3542 version of the IPv6 socket API.
+/* Select the RFC_3542 version of the IPv6 socket API. 
    Define before netinet6/in6.h is included. */
 #define __APPLE_USE_RFC_3542
 /* Required for Mojave. */
@@ -309,11 +301,11 @@ HAVE_SOCKADDR_SA_LEN
 #define HAVE_SOLARIS_NETWORK
 #define HAVE_GETOPT_LONG
 #undef HAVE_SOCKADDR_SA_LEN
-#define ETHER_ADDR_LEN 6
-
+#define ETHER_ADDR_LEN 6 
+ 
 #endif
 
-/* rules to implement compile-time option dependencies and
+/* rules to implement compile-time option dependencies and 
    the NO_XXX flags */
 
 #ifdef NO_TFTP
@@ -369,7 +361,7 @@ HAVE_SOCKADDR_SA_LEN
 
 #ifdef DNSMASQ_COMPILE_OPTS
 
-static char *compile_opts =
+static char *compile_opts = 
 "IPv6 "
 #ifndef HAVE_GETOPT_LONG
 "no-"
@@ -395,8 +387,8 @@ static char *compile_opts =
 #else
  #if !defined(HAVE_IDN)
 "no-"
- #endif
-"IDN "
+ #endif 
+"IDN " 
 #endif
 #ifndef HAVE_DHCP
 "no-"
@@ -405,7 +397,7 @@ static char *compile_opts =
 #if defined(HAVE_DHCP)
 #  if !defined (HAVE_DHCP6)
      "no-"
-#  endif
+#  endif  
      "DHCPv6 "
 #endif
 #if !defined(HAVE_SCRIPT)
@@ -456,5 +448,4 @@ static char *compile_opts =
 #endif
 "dumpfile";
 
-#endif
-
+#endif /* defined(HAVE_DHCP) */
