@@ -4,12 +4,12 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; version 2 dated June, 1991, or
    (at your option) version 3 dated 29 June, 2007.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-     
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -43,7 +43,7 @@ int send_from(int fd, int nowild, char *packet, size_t len,
 #endif
     char control6[CMSG_SPACE(sizeof(struct in6_pktinfo))];
   } control_u;
-  
+
   iov[0].iov_base = packet;
   iov[0].iov_len = len;
 
@@ -54,7 +54,7 @@ int send_from(int fd, int nowild, char *packet, size_t len,
   msg.msg_namelen = sa_len(to);
   msg.msg_iov = iov;
   msg.msg_iovlen = 1;
-  
+
   if (!nowild)
     {
       struct cmsghdr *cmptr;
@@ -93,7 +93,7 @@ int send_from(int fd, int nowild, char *packet, size_t len,
 	  cmptr->cmsg_level = IPPROTO_IPV6;
 	}
     }
-  
+
   while (retry_send(sendmsg(fd, &msg, 0)));
 
   if (errno != 0)
@@ -576,13 +576,13 @@ static size_t process_reply(struct dns_header *header, time_t now, struct server
       struct ipsets *ipset_pos;
       unsigned int namelen = strlen(daemon->namebuff);
       unsigned int matchlen = 0;
-      for (ipset_pos = daemon->ipsets; ipset_pos; ipset_pos = ipset_pos->next) 
+      for (ipset_pos = daemon->ipsets; ipset_pos; ipset_pos = ipset_pos->next)
 	{
 	  unsigned int domainlen = strlen(ipset_pos->domain);
 	  char *matchstart = daemon->namebuff + namelen - domainlen;
 	  if (namelen >= domainlen && hostname_isequal(matchstart, ipset_pos->domain) &&
 	      (domainlen == 0 || namelen == domainlen || *(matchstart - 1) == '.' ) &&
-	      domainlen >= matchlen) 
+	      domainlen >= matchlen)
 	    {
 	      matchlen = domainlen;
 	      sets = ipset_pos->sets;
@@ -601,7 +601,7 @@ static size_t process_reply(struct dns_header *header, time_t now, struct server
 	  my_syslog(LOG_WARNING, _("discarding DNS reply: subnet option mismatch"));
 	  return 0;
 	}
-      
+
       if (!is_sign)
 	{
 	  if (added_pheader)
@@ -708,7 +708,7 @@ static size_t process_reply(struct dns_header *header, time_t now, struct server
       if (doctored)
 	cache_secure = 0;
     }
-  
+
 #ifdef HAVE_DNSSEC
   if (bogusanswer && !(header->hb4 & HB4_CD) && !option_bool(OPT_DNSSEC_DEBUG))
     {
@@ -720,10 +720,10 @@ static size_t process_reply(struct dns_header *header, time_t now, struct server
   if (option_bool(OPT_DNSSEC_VALID))
     {
       header->hb4 &= ~HB4_AD;
-      
+
       if (!(header->hb4 & HB4_CD) && ad_reqd && cache_secure)
 	header->hb4 |= HB4_AD;
-      
+
       /* If the requestor didn't set the DO bit, don't return DNSSEC info. */
       if (!do_bit)
 	n = rrfilter(header, n, 1);
@@ -739,7 +739,7 @@ static size_t process_reply(struct dns_header *header, time_t now, struct server
       header->arcount = htons(0);
       header->hb3 &= ~HB3_TC;
     }
-  
+
   /* the bogus-nxdomain stuff, doctor and NXDOMAIN->NODATA munging can all elide
      sections of the packet. Find the new length here and put back pseudoheader
      if it was removed. */
@@ -1071,7 +1071,7 @@ void reply_query(int fd, time_t now)
       server->edns_pktsz = SAFE_PKTSZ;
       server->pktsz_reduced = now;
       (void)prettyprint_addr(&server->addr, daemon->addrbuff);
-      my_syslog(LOG_WARNING, _("reducing DNS packet size for nameserver %s to %d"), daemon->addrbuff, SAFE_PKTSZ);
+      my_syslog(LOG_DEBUG, _("reducing DNS packet size for nameserver %s to %d"), daemon->addrbuff, SAFE_PKTSZ);
     }
 
   forward->sentto = server;
@@ -1320,11 +1320,11 @@ void receive_query(struct listener *listen, time_t now)
   msg.msg_namelen = sizeof(source_addr);
   msg.msg_iov = iov;
   msg.msg_iovlen = 1;
-  
+
   if ((n = recvmsg(listen->fd, &msg, 0)) == -1)
     return;
-  
-  if (n < (int)sizeof(struct dns_header) || 
+
+  if (n < (int)sizeof(struct dns_header) ||
       (msg.msg_flags & MSG_TRUNC) ||
       (header->hb3 & HB3_QR))
     return;
@@ -1384,7 +1384,7 @@ void receive_query(struct listener *listen, time_t now)
 	  return;
 	}
     }
-		
+
   if (check_dst)
     {
       struct ifreq ifr;
@@ -1489,8 +1489,8 @@ void receive_query(struct listener *listen, time_t now)
 	    dst_addr_4.s_addr = 0;
 	}
     }
-   
-  /* log_query gets called indirectly all over the place, so 
+
+  /* log_query gets called indirectly all over the place, so
      pass these in global variables - sorry. */
   daemon->log_display_id = ++daemon->log_id;
   daemon->log_source_addr = &source_addr;
@@ -1529,26 +1529,26 @@ void receive_query(struct listener *listen, time_t now)
 	      break;
 	    }
 #endif
-      
+
 #ifdef HAVE_LOOP
       /* Check for forwarding loop */
       if (detect_loop(daemon->namebuff, type))
 	return;
 #endif
     }
-  
+
   if (find_pseudoheader(header, (size_t)n, NULL, &pheader, NULL, NULL))
-    { 
+    {
       unsigned short flags;
-      
+
       have_pseudoheader = 1;
       GETSHORT(udp_size, pheader);
       pheader += 2; /* ext_rcode */
       GETSHORT(flags, pheader);
-      
+
       if (flags & 0x8000)
-	do_bit = 1;/* do bit */ 
-	
+	do_bit = 1;/* do bit */
+
       /* If the client provides an EDNS0 UDP size, use that to limit our reply.
 	 (bounded by the maximum configured). If no EDNS0, then it
 	 defaults to 512 */
@@ -1900,7 +1900,7 @@ unsigned char *tcp_request(int confd, time_t now,
 	  for (addr = daemon->interface_addrs; addr; addr = addr->next)
 	    {
 	      netmask.s_addr = htonl(~(in_addr_t)0 << (32 - addr->prefixlen));
-	      if (!(addr->flags & ADDRLIST_IPV6) && 
+	      if (!(addr->flags & ADDRLIST_IPV6) &&
 		  is_same_net(addr->addr.addr4, peer_addr.in.sin_addr, netmask))
 		break;
 	    }
