@@ -1487,6 +1487,9 @@ void httpd_check()
 	if(get_invoke_later()&INVOKELATER_HTTPD) // don't check if start was deferred
 		return;
 
+	if (nvram_get_int("httpd_check_disable"))
+		return;
+
 	if (!pids("httpd")){
 		logmessage("watchdog", "restart httpd, process not found");
 		start_httpd();
@@ -1494,7 +1497,7 @@ void httpd_check()
 	else {
 		if (nvram_match("upgrade_fw_status", "0") && nvram_match("ntp_sync", "1")) {  //only check if not during upgrade and time is set
 			http_enable = nvram_get_int("http_enable");
-			if ((http_enable == 0 || http_enable == 2) && (http_err < 5) && !(nvram_get_int("httpd_check_disable") & 1)){	//check http access
+			if ((http_enable == 0 || http_enable == 2) && (http_err < 5)){	//check http access
 				snprintf(url, sizeof(url), "http://%s:%s/%s", nvram_safe_get("lan_ipaddr"), nvram_safe_get("http_lanport"), "httpd_check.htm");
 				args[8] = url; //referer
 				args[9] = url;
@@ -1509,7 +1512,7 @@ void httpd_check()
 				else
 					http_err = 0;
 			}
-			if ((http_enable == 1 || http_enable == 2) && check_if_file_exist("/etc/cert.pem") && (https_err < 5) && !(nvram_get_int("httpd_check_disable") & 2)){	//check https access
+			if ((http_enable == 1 || http_enable == 2) && check_if_file_exist("/etc/cert.pem") && (https_err < 5)){	//check https access
 				snprintf(url, sizeof(url), "https://%s:%s/%s", nvram_safe_get("lan_ipaddr"), nvram_safe_get("https_lanport"), "httpd_check.htm");
 				args[8] = url; //referer
 				args[9] = "--insecure";  //Use insecure transfer to allow for private XCA CA
