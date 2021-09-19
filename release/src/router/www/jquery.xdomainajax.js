@@ -9,14 +9,14 @@
  * ---
  * @info http://james.padolsey.com/javascript/cross-domain-requests-with-jquery/
  */
-
-jQuery.ajax = (function(_ajax){
+var jQuery = require('jQuery');
+jQuery.ajax = jQuery.extend(jQuery.ajax, (function(_ajax){
     
     var protocol = location.protocol,
         hostname = location.hostname,
         exRegex = RegExp(protocol + '//' + hostname),
-        YQL = 'http' + (/^https/.test(protocol)?'s':'') + '://query.yahooapis.com/v1/public/yql?env=store://datatables.org/alltableswithkeys&callback=?',
-        query = 'select content from data.headers where url="{URL}"';
+        YQL = 'http' + (/^https/.test(protocol)?'s':'') + '://query.yahooapis.com/v1/public/yql?callback=?',
+        query = 'select * from html where url="{URL}" and xpath="*"';
     
     function isExternal(url) {
         return !exRegex.test(url) && /:\/\//.test(url);
@@ -72,4 +72,4 @@ jQuery.ajax = (function(_ajax){
         
     };
     
-})(jQuery.ajax);
+})(jQuery.ajax));
