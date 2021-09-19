@@ -46,7 +46,7 @@ function update_upTime(){
 		url: '/ajax_uptime.asp',
 		dataType: 'script',
 		error: function(xhr){
-			update_wanTime();
+			setTimeout("update_upTime();", 1000);
 		},
 		success: function(response){
 			timenow = systime_epoch;
