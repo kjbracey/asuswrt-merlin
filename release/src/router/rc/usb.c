@@ -4088,23 +4088,30 @@ void stop_nfsd(void)
 void start_wsdd()
 {
 	unsigned char ea[ETHER_ADDR_LEN];
-	char serial[18];
+	char serial[18], ifnames[21];
 	int i;
+	int argc;
 	pid_t pid;
 	char bootparms[64];
 	char *wsdd_argv[] = { "/usr/sbin/wsdd2",
 				"-d",
 				"-w",
-				"-i",
-				nvram_safe_get("lan_ifname"),
-				"-b",
-				NULL,	// boot parameters
+				NULL,   //-i interface(s)
+				NULL,
+				NULL,
+				NULL,
+				NULL,
+				NULL,
+				NULL,   // -b boot parameters
+				NULL,
 				NULL };
 
 	stop_wsdd();
 
 	if (!nvram_get_int("wsdd_enable"))
 		return;
+
+	for (argc = 0; wsdd_argv[argc]; argc++);
 
 	strcpy(serial, nvram_safe_get("lan_hwaddr"));
 	if (strlen(serial)) {
@@ -4118,8 +4125,24 @@ void start_wsdd()
 			ea[0], ea[1], ea[2], ea[3], ea[4], ea[5]);
 	}
 
+	wsdd_argv[argc++] = "-i";
+	strncpy(ifnames, nvram_safe_get("wsdd_ifnames"), sizeof(ifnames));
+	if(strlen(ifnames) > 0){
+		char *pt;
+		i = 0;
+	    pt = strtok (ifnames,",");
+		while (pt != NULL && i < 5) {
+			i++;
+			wsdd_argv[argc++] = pt;
+			pt = strtok (NULL, ",");
+		}
+	}
+	else
+		wsdd_argv[argc++] = nvram_safe_get("lan_ifname");
+
+	wsdd_argv[argc++] = "-b";
 	snprintf(bootparms, sizeof(bootparms), "sku:%s,serial:%s", get_productid(), serial);
-	wsdd_argv[6] = bootparms;
+	wsdd_argv[argc++] = bootparms;
 
 #if 0
 	if(!f_exists("/etc/machine-id"))
