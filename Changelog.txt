@@ -4,6 +4,15 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_51D7j9527  (25-September-2021) ARM SDK, MIPS,ARM KRACK
+* NEW: shared: support openwrt for enhanced ap data (function)
+* CHANGED: dnsmasq: update to 2.86
+* CHANGED: watchdog: change http check disable covers both http/httpd
+* CHANGED: usb: wsdd: allow multiple listening interfaces via nvram
+* FIXED: webui: remove orphan call to deprecated wan uptime function
+* FIXED: webui: openvpn: set client off flag when resetting client
+
+
 374.43_51D6j9527  (12-September-2021) ARM SDK, MIPS,ARM KRACK
 * CHANGED: samba: only enable dns proxy w/wins if dnsmasq started
 * CHANGED: webui: remove auto redirect to static routes from DHCP server page
