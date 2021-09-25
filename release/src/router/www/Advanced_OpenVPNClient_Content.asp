@@ -885,6 +885,7 @@ function pullLANIPList(obj){
 
 function defaultSettings() {
 	if (confirm("WARNING: This will reset this OpenVPN client to factory default settings!\n\nKeys and certificates associated to this instance will also be DELETED!\n\nProceed?")) {
+		document.form.vpn_client_off.value = 1;
 		document.form.action_script.value = "stop_vpnclient" + openvpn_unit + ";clearvpnclient" + openvpn_unit;
 		parent.showLoading();
 		document.form.submit();
