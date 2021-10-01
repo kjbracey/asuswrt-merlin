@@ -835,10 +835,11 @@ function done_validating(action){
 						</td>
 					</tr>
 					<tr id="ap_parent_data_tr">
-						<th>Access Point enhanced data<br><i>Requires ASUS parent router with<br>&nbsp;&nbsp;equivalent HTTP access</i></th>
+						<th>Access Point enhanced data<br><i>Requires supported parent router with<br>&nbsp;&nbsp;equivalent HTTP access</i></th>
 						<td>
-							<input type="radio" name="ap_parent_data" class="input" value="1" <% nvram_match_x("", "ap_parent_data", "1", "checked"); %>><#checkbox_Yes#>
 							<input type="radio" name="ap_parent_data" class="input" value="0" <% nvram_match_x("", "ap_parent_data", "0", "checked"); %>><#checkbox_No#>
+							<input type="radio" name="ap_parent_data" class="input" value="1" <% nvram_match_x("", "ap_parent_data", "1", "checked"); %>>Asuswrt-Merlin LTS
+							<input type="radio" name="ap_parent_data" class="input" value="2" <% nvram_match_x("", "ap_parent_data", "2", "checked"); %>>OpenWrt
 						</td>
 					</tr>
 				</table>
