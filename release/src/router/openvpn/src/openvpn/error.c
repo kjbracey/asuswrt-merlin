@@ -375,11 +375,6 @@ x_msg_va(const unsigned int flags, const char *format, va_list arglist)
         }
     }
 
-    if (flags & M_SSL_DH)
-        update_nvram_status(SSLPARAM_DH_ERROR);
-    else if (flags & M_SSL)
-        update_nvram_status(SSLPARAM_ERROR);
-
     if (flags & M_FATAL)
     {
         msg(M_INFO, "Exiting due to fatal error");
@@ -457,8 +452,6 @@ assert_failed(const char *filename, int line, const char *condition)
 void
 out_of_memory(void)
 {
-    update_nvram_status(EXIT_ERROR);
-
     fprintf(stderr, PACKAGE_NAME ": Out of Memory\n");
     exit(1);
 }
@@ -505,22 +498,12 @@ close_syslog(void)
 }
 
 #ifdef _WIN32
+static int orig_stderr;
 
-static HANDLE orig_stderr;
-
-HANDLE
-get_orig_stderr(void)
+int get_orig_stderr()
 {
-    if (orig_stderr)
-    {
-        return orig_stderr;
-    }
-    else
-    {
-        return GetStdHandle(STD_ERROR_HANDLE);
-    }
+    return orig_stderr ? orig_stderr : _fileno(stderr);
 }
-
 #endif
 
 void
@@ -564,16 +547,12 @@ redirect_stdout_stderr(const char *file, bool append)
         }
 
         /* save original stderr for password prompts */
-        orig_stderr = GetStdHandle(STD_ERROR_HANDLE);
-
-#if 0 /* seems not be necessary with stdout/stderr redirection below*/
-        /* set up for redirection */
-        if (!SetStdHandle(STD_OUTPUT_HANDLE, log_handle)
-            || !SetStdHandle(STD_ERROR_HANDLE, log_handle))
+        orig_stderr = _dup(_fileno(stderr));
+        if (orig_stderr == -1)
         {
-            msg(M_ERR, "Error: cannot redirect stdout/stderr to --log file: %s", file);
+            msg(M_WARN | M_ERRNO, "Warning: cannot duplicate stderr, password prompts will appear in log file instead of console.");
+            orig_stderr = _fileno(stderr);
         }
-#endif
 
         /* direct stdout/stderr to point to log_handle */
         log_fd = _open_osfhandle((intptr_t)log_handle, _O_TEXT);
@@ -780,13 +759,6 @@ openvpn_exit(const int status)
         {
             perf_output_results();
         }
-
-        //Sam.B	2013/10/31
-        if(status)
-            update_nvram_status(EXIT_ERROR);
-        else
-            update_nvram_status(EXIT_GOOD);
-        //Sam.E	2013/10/31
     }
 
     exit(status);

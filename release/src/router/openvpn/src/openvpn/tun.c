@@ -38,12 +38,6 @@
 #include "syshead.h"
 
 #include "tun.h"
-#ifndef TUNSETOWNER
-#define TUNSETOWNER     _IOW('T', 204, int)
-#endif
-#ifndef TUNSETGROUP
-#define TUNSETGROUP     _IOW('T', 206, int)
-#endif
 #include "fdmisc.h"
 #include "common.h"
 #include "run_command.h"
@@ -700,13 +694,6 @@ do_ifconfig_setenv(const struct tuntap *tt, struct env_set *es)
     struct gc_arena gc = gc_new();
     const char *ifconfig_local = print_in_addr_t(tt->local, 0, &gc);
     const char *ifconfig_remote_netmask = print_in_addr_t(tt->remote_netmask, 0, &gc);
-
-    //Sam.B  2013/10/31
-    if(current_addr(htonl(tt->local))) {
-        msg (M_WARN, "ifconfig addr '%s' conflicted", ifconfig_local);
-        update_nvram_status(ADDR_CONFLICTED);
-    }
-    //Sam.E  2013/10/31
 
     /*
      * Set environmental variables with ifconfig parameters.

@@ -48,7 +48,6 @@
 #include "lladdr.h"
 #include "ping.h"
 #include "mstats.h"
-#include "status.h"
 #include "ssl_verify.h"
 #include "ssl_ncp.h"
 #include "tls_crypt.h"
@@ -1203,7 +1202,7 @@ do_persist_tuntap(const struct options *options, openvpn_net_ctx_t *ctx)
                ctx);
         if (options->persist_mode && options->lladdr)
         {
-            set_lladdr(options->dev, options->lladdr, NULL);
+            set_lladdr(ctx, options->dev, options->lladdr, NULL);
         }
         return true;
 #else  /* ifdef ENABLE_FEATURE_TUN_PERSIST */
@@ -1632,8 +1631,6 @@ initialization_sequence_completed(struct context *c, const unsigned int flags)
         msg(M_INFO, "%s", message);
     }
 
-    update_nvram_status(RUNNING);        //Sam, 2013/10/31
-
     /* Flag that we initialized */
     if ((flags & (ISC_ERRORS|ISC_SERVER)) == 0)
     {
@@ -1877,7 +1874,8 @@ do_open_tun(struct context *c)
     /* set the hardware address */
     if (c->options.lladdr)
     {
-        set_lladdr(c->c1.tuntap->actual_name, c->options.lladdr, c->c2.es);
+        set_lladdr(&c->net_ctx, c->c1.tuntap->actual_name, c->options.lladdr,
+                   c->c2.es);
     }
 
     /* do ifconfig */

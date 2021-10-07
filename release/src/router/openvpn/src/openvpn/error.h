@@ -98,11 +98,6 @@ extern int x_msg_line_num;
 
 #define M_ERRNO           (1<<8)         /* show errno description */
 
-#ifdef ENABLE_CRYPTO_OPENSSL
-#  define M_SSL_DH          (1<<9)
-#  define M_SSL             (1<<10)      /* show SSL error */
-#endif
-
 #define M_NOMUTE          (1<<11)        /* don't do mute processing */
 #define M_NOPREFIX        (1<<12)        /* don't show date/time prefix */
 #define M_USAGE_SMALL     (1<<13)        /* fatal options error, call usage_small */
@@ -272,8 +267,8 @@ void close_syslog(void);
 void redirect_stdout_stderr(const char *file, bool append);
 
 #ifdef _WIN32
-/* get original stderr handle, even if redirected by --log/--log-append */
-HANDLE get_orig_stderr(void);
+/* get original stderr fd, even if redirected by --log/--log-append */
+int get_orig_stderr(void);
 
 #endif
 

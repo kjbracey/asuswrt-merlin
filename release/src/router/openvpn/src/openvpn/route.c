@@ -41,7 +41,6 @@
 #include "manage.h"
 #include "win32.h"
 #include "options.h"
-#include "status.h"
 #include "networking.h"
 
 #include "memdbg.h"
@@ -1573,36 +1572,37 @@ add_route(struct route_ipv4 *r,
 {
     struct gc_arena gc;
     struct argv argv = argv_new();
+#if !defined(TARGET_LINUX)
     const char *network;
+#if !defined(TARGET_AIX)
     const char *netmask;
+#endif
     const char *gateway;
+#endif
     bool status = false;
     int is_local_route;
 
     if (!(r->flags & RT_DEFINED))
     {
+        argv_free(&argv);
         return;
     }
 
     gc_init(&gc);
 
+#if !defined(TARGET_LINUX)
     network = print_in_addr_t(r->network, 0, &gc);
+#if !defined(TARGET_AIX)
     netmask = print_in_addr_t(r->netmask, 0, &gc);
+#endif
     gateway = print_in_addr_t(r->gateway, 0, &gc);
+#endif
 
     is_local_route = local_route(r->network, r->netmask, r->gateway, rgi);
     if (is_local_route == LR_ERROR)
     {
         goto done;
     }
-
-    //Sam.B      2013/10/31
-    if(current_route(htonl(r->network), htonl(r->netmask))) {
-        msg(M_WARN, "Ignore conflicted routing rule: %s %s", network, netmask);
-        update_nvram_status(ROUTE_CONFLICTED);
-        goto done;
-    }
-    //Sam.E      2013/10/31
 
 #if defined(TARGET_LINUX)
     const char *iface = NULL;
@@ -1892,6 +1892,7 @@ add_route_ipv6(struct route_ipv6 *r6, const struct tuntap *tt,
 
     if (!(r6->flags & RT_DEFINED) )
     {
+        argv_free(&argv);
         return;
     }
 
@@ -3379,7 +3380,7 @@ get_default_gateway_ipv6(struct route_ipv6_gateway_info *rgi6,
     if (net_route_v6_best_gw(ctx, dest, &rgi6->gateway.addr_ipv6,
                              rgi6->iface) == 0)
     {
-        if (!IN6_IS_ADDR_UNSPECIFIED(rgi6->gateway.addr_ipv6.s6_addr))
+        if (!IN6_IS_ADDR_UNSPECIFIED(&rgi6->gateway.addr_ipv6))
         {
             rgi6->flags |= RGI_ADDR_DEFINED;
         }
