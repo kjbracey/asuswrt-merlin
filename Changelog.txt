@@ -4,6 +4,16 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_52E2j9527  (18-October-2021) ARM SDK, MIPS,ARM KRACK
+* NEW: webui: support openwrt-orion for enhanced ap data (webui)
+* CHANGED: Revert "usb: wsdd: allow multiple listening interfaces via nvram"
+* CHANGED: rndis_host: support Novatel Verizon USB730L (MIPS)
+* CHANGED: rndis_host: support Novatel Verizon USB730L (ARM)
+* CHANGED: webui: update jquery.xdomainajax.js to 1.0.0
+* CHANGED: openvpn: update to 2.5.4
+* FIXED: stubby: update open logfile with append; don't redirect stdout (reapply)
+
+
 374.43_51D7j9527  (25-September-2021) ARM SDK, MIPS,ARM KRACK
 * NEW: shared: support openwrt for enhanced ap data (function)
 * CHANGED: dnsmasq: update to 2.86
