@@ -1809,6 +1809,13 @@ start_default_filter(int lanunit)
 	if ((fp=fopen("/tmp/filter.default", "w"))==NULL) return;
 
 	fprintf(fp, "*filter\n:INPUT ACCEPT [0:0]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [0:0]\n:logaccept - [0:0]\n:logdrop - [0:0]\n");
+#ifdef RTCONFIG_PROTECTION_SERVER
+	if (nvram_get_int("ptcsrv_enable") != 0) {
+		fprintf(fp, ":%s - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+		fprintf(fp, ":%sWAN - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+		fprintf(fp, ":%sLAN - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+	}
+#endif
 	fprintf(fp, "-A INPUT -m state --state INVALID -j DROP\n");
 	fprintf(fp, "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n");
 #ifdef RTCONFIG_PROTECTION_SERVER
@@ -2280,8 +2287,11 @@ filter_setting(char *wan_if, char *wan_ip, char *lan_if, char *lan_ip, char *log
 #endif
 	fprintf(fp, ":logaccept - [0:0]\n:logdrop - [0:0]\n");
 #ifdef RTCONFIG_PROTECTION_SERVER
-	if (nvram_get_int("ptcsrv_enable") != 0)
+	if (nvram_get_int("ptcsrv_enable") != 0) {
 		fprintf(fp, ":%s - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+		fprintf(fp, ":%sWAN - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+		fprintf(fp, ":%sLAN - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+	}
 #endif
 
 #ifdef RTCONFIG_IPV6
@@ -3310,8 +3320,11 @@ filter_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)
 #endif
 	fprintf(fp, ":logaccept - [0:0]\n:logdrop - [0:0]\n");
 #ifdef RTCONFIG_PROTECTION_SERVER
-	if (nvram_get_int("ptcsrv_enable") != 0)
+	if (nvram_get_int("ptcsrv_enable") != 0) {
 		fprintf(fp, ":%s - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+		fprintf(fp, ":%sWAN - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+		fprintf(fp, ":%sLAN - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+	}
 #endif
 #ifdef RTCONFIG_IPV6
 	if (ipv6_enabled()){
