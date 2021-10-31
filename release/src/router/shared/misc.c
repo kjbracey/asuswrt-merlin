@@ -1655,8 +1655,13 @@ void get_parent_leases(void)
 	char cmd[2048];
 	const char *lan_gateway, *http_lanport;
 
-	if (nvram_match("ap_parent_data", "0") || !(nvram_get_int("sw_mode") == SW_MODE_AP))
+	if (!(nvram_get_int("sw_mode") == SW_MODE_AP))
 		return;
+
+	if (nvram_match("ap_parent_data", "0")) {
+		unlink("/var/lib/misc/dnsmasq.leases");		
+		return;
+	}
 
 	lan_gateway = nvram_safe_get("lan_gateway");
 	http_lanport = nvram_safe_get("http_lanport");
