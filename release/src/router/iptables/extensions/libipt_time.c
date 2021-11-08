@@ -478,9 +478,9 @@ print(const struct ipt_ip *ip,
 	divide_time(time->time_stop, &hour_stop, &minute_stop);
 	printf("TIME ");
 	if (time->time_start != 0)
-		printf("from %d:%d ", hour_start, minute_start);
+		printf("from %02u:%02u ", hour_start, minute_start);
 	if (time->time_stop != 1439) /* 23*60+59 = 1439 */
-		printf("to %d:%d ", hour_stop, minute_stop);
+		printf("to %02u:%02u ", hour_stop, minute_stop);
 	printf("on ");
 	if (time->days_match == 127)
 		printf("all days ");
@@ -508,11 +508,11 @@ save(const struct ipt_ip *ip, const struct ipt_entry_match *match)
 	divide_time(time->time_start, &hour_start, &minute_start);
 	divide_time(time->time_stop, &hour_stop, &minute_stop);
 	if (time->time_start != 0)
-		printf("--timestart %.2d:%.2d ",
+		printf("--timestart %02u:%02u ",
 		        hour_start, minute_start);
 	
 	if (time->time_stop != 1439) /* 23*60+59 = 1439 */
-		printf("--timestop %.2d:%.2d ",
+		printf("--timestop %02u:%02u ",
 		        hour_stop, minute_stop);
 	
 	if (time->days_match != 127)
