@@ -30,7 +30,7 @@
 
 static const char *qosfn = "/tmp/qos";
 static const char *mangle_fn = "/tmp/mangle_rules";
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 static const char *mangle_fn_ipv6 = "/tmp/mangle_rules_ipv6";
 #endif
 
@@ -180,7 +180,7 @@ void del_iQosRules(void)
 			eval("iptables", "-t", "mangle", "-F");
 		}
 	}
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 	sprintf(&buffer[0], "%s", mangle_fn_ipv6);
 	if(check_if_file_exist(&buffer[0])) {
 		argv[3] = &buffer[0];
@@ -206,7 +206,7 @@ void del_iQosRules(void)
 int add_qos_rules(char *pcWANIF)
 {
 	FILE *fn;
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 	FILE *fn_ipv6 = NULL;
 #endif
 	char *buf;
@@ -229,7 +229,7 @@ int add_qos_rules(char *pcWANIF)
 
 	if( pcWANIF == NULL || nvram_get_int("qos_enable") != 1 || nvram_get_int("qos_type") != 0) return -1;
 	if ((fn = fopen(mangle_fn, "w")) == NULL) return -2;
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 	if (ipv6_enabled() && (fn_ipv6 = fopen(mangle_fn_ipv6, "w")) == NULL){
 		fclose(fn);
 		return -3;
@@ -261,7 +261,7 @@ int add_qos_rules(char *pcWANIF)
 		"-A QOSO -m mark ! --mark 0/0xff00 -j RETURN\n"
 		, (nvram_get_int("fw_nat_loopback") ? "" : "-A QOSO -m mark --mark 0x8000/0x8000 -j RETURN")
 		);
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 	if (ipv6_enabled())
 	fprintf(fn_ipv6,
 		"*mangle\n"
@@ -302,7 +302,7 @@ int add_qos_rules(char *pcWANIF)
 		}
 
 		v4v6_ok = IPT_V4;
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 		if (ipv6_enabled()) {
 			v4v6_ok |= IPT_V6;
 			v6rule_ok = 1;
@@ -601,7 +601,7 @@ int add_qos_rules(char *pcWANIF)
 			}
 		}
 		
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 		if (ipv6_enabled() && (v4v6_ok & IPT_V6)){
 			// step1. check proto != "NO"
 			if(strcmp(proto_1, "NO")){
@@ -735,7 +735,7 @@ int add_qos_rules(char *pcWANIF)
 		logmessage("qos-rules","error setting ipv4_lan_ipaddr!");
 	free(buf);
 
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 	if (ipv6_enabled()) {
 		/* ipv6_lan_addr for ip6tables use (LAN download) */
 		for ( i = 1; i <= MAX_RETRY; i++ ) {
@@ -787,7 +787,7 @@ int add_qos_rules(char *pcWANIF)
 		);
 	}
 
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 		if (ipv6_enabled() && *wan6face) {
 			fprintf(fn_ipv6,
 				"-A POSTROUTING -s %s -d %s -j CONNMARK --set-return 0x9/0x1ff\n"
@@ -854,7 +854,7 @@ int add_qos_rules(char *pcWANIF)
                 if(manual_return)
                         fprintf(fn , "-A QOSO -j RETURN\n");
 
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 	if (ipv6_enabled() && *wan6face) {
 #ifdef CONFIG_BCMWL5 // TODO: it is only for the case, eth0 as wan, vlanx as lan
 		if(strncmp(wan6face, "ppp", 3)==0){
@@ -910,7 +910,7 @@ int add_qos_rules(char *pcWANIF)
 #ifdef CLS_ACT
 			fprintf(fn, "-A PREROUTING -i %s -j IMQ --todev 0\n", pcWANIF);
 #endif
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 			if (ipv6_enabled() && *wan6face) {
 				fprintf(fn_ipv6, "-A PREROUTING -m conntrack --ctstate RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n");
 #ifdef CLS_ACT
@@ -944,7 +944,7 @@ int add_qos_rules(char *pcWANIF)
 		logmessage("qos-rules", "ipv4_lan_addr not available - skipping rules (%s)", mangle_fn);
 	}
 
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 	if (ipv6_enabled())
 	{
 		fprintf(fn_ipv6, "COMMIT\n");
@@ -1198,7 +1198,7 @@ int start_tqos(void)
 		"\t$TQA parent 1:9 handle 9: $SFQ\n"
 		"\t$TFA parent 1: prio 0 protocol %s handle 9 fw flowid 1:9\n",
 		obw_max, obw_max, protocol);
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 	if (ipv6_enabled() && *wan6face) {
 	fprintf(f,
 		"\t$TFA parent 1: prio 1 protocol %s handle 9 fw flowid 1:9\n",
@@ -1244,7 +1244,7 @@ int start_tqos(void)
 				x, x,
 				x, protocol, (i + 1), x,
 				x, protocol, (i + 1)|0x100, x);
-#ifdef RTCONFIG_IPV6
+#if defined(RTCONFIG_IPV6) && defined(RTCONFIG_BCMARM)
 		if (ipv6_enabled() && *wan6face) {
 			fprintf(f,
 			"\t$TFA parent 1: prio %d protocol %s handle %d fw flowid 1:%d\n"
