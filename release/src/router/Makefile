@@ -133,17 +133,14 @@ ifeq ($(RTCONFIG_DSL),y)
 obj-y += dsl_drv_tool
 endif
 
-ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
 IPTABLES := iptables-1.4.x
 IPTC_LIBDIR := $(TOP)/$(IPTABLES)/libiptc/.libs
 IPTC_LIBS := -lip4tc $(if $(RTCONFIG_IGD2), $(if $(RTCONFIG_IPV6),-lip6tc,),) -liptc
 obj-y += iptables-1.4.x
+
+ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
 obj-y += iproute2-3.x
 else
-IPTABLES := iptables
-IPTC_LIBDIR := $(TOP)/$(IPTABLES)
-IPTC_LIBS := -liptc
-obj-y += iptables
 obj-y += iproute2
 endif
 
@@ -511,8 +508,8 @@ obj-y += openssl-1.1 # include for all builds
 obj-y += haveged
 obj-y += udp-broadcast-relay-redux
 obj-y += socat
-ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
 obj-y += libnfnetlink-1.0.1
+ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
 obj-y += libmnl-1.0.4
 obj-y += ipset-7
 else
@@ -1617,7 +1614,7 @@ iptables-1.4.x-clean:
 
 libnfnetlink/stamp-h1:
 # tomatoraf.com, Victek
-	cd $(TOP)/libnfnetlink && CC=$(CC) STRIP=$(STRIP) \
+	cd $(TOP)/libnfnetlink && CC=$(CC) STRIP="$(STRIP)" \
 		CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
 		$(CONFIGURE) --prefix=/usr --enable-shared --enable-static
