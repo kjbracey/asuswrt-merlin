@@ -560,8 +560,15 @@ static int xtables_getportbyname(const char *name)
 {
 	struct addrinfo *res = NULL, *p;
 	int ret;
+	int port = -1;
+	char *c;
 
 	ret = getaddrinfo(NULL, name, NULL, &res);
+	if (ret == EAI_SERVICE) {
+		port = strtoul(name, &c, 10);
+		if (*c == '\0' && port > 0)
+			return port;
+	}
 	if (ret < 0)
 		return -1;
 	ret = -1;
