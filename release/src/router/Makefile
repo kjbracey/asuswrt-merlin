@@ -2088,7 +2088,7 @@ accel-pptpd-install: accel-pptpd
 	$(MAKE) -C accel-pptpd server_install
 
 pptpd/stamp-h1:
-	cd $(TOP)/pptpd && $(CONFIGURE) --prefix=$(INSTALLDIR)/pptpd --enable-bcrelay CC=$(CC) STRIP=$(STRIP) AR=$(AR) LD=$(LD) NM=$(NM) RANLIB=$(RANLIB)
+	cd $(TOP)/pptpd && $(CONFIGURE) --prefix=$(INSTALLDIR)/pptpd --enable-bcrelay CC=$(CC) STRIP="$(STRIP)" AR=$(AR) LD=$(LD) NM=$(NM) RANLIB=$(RANLIB)
 	touch $@
 
 pptpd: pptpd/stamp-h1
