@@ -10,6 +10,7 @@
 #ifndef _NF_CONNTRACK_TUPLE_H
 #define _NF_CONNTRACK_TUPLE_H
 
+#include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/nf_conntrack_tuple_common.h>
 
 /* A `tuple' is a structure containing the information to uniquely
@@ -20,15 +21,8 @@
   "non-manipulatable" lines, for the benefit of the NAT code.
 */
 
-#define NF_CT_TUPLE_L3SIZE	4
-
-/* The l3 protocol-specific manipulable parts of the tuple: always in
-   network order! */
-union nf_conntrack_address {
-	u_int32_t all[NF_CT_TUPLE_L3SIZE];
-	__be32 ip;
-	__be32 ip6[4];
-};
+#define nf_conntrack_address	nf_inet_addr
+#define NF_CT_TUPLE_L3SIZE	ARRAY_SIZE(((union nf_inet_addr *)NULL)->all)
 
 /* The protocol-specific manipulable parts of the tuple: always in
    network order! */
