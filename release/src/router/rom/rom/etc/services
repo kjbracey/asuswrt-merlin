@@ -171,9 +171,13 @@ conference	531/tcp		chat
 netnews		532/tcp		readnews
 netwall		533/udp				# -for emergency broadcasts
 uucp		540/tcp		uucpd		# uucp daemon
+dhcpv6-client	546/udp
+dhcpv6-server	547/udp
+dhcpv6-server	547/tcp
 afpovertcp	548/tcp				# AFP over TCP
 afpovertcp	548/udp				# AFP over TCP
 remotefs	556/tcp		rfs_server rfs	# Brunhoff remote filesystem
+dhcp-failover	647/tcp
 #
 webster		765/tcp				# Network dictionary
 webster		765/udp
