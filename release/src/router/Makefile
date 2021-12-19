@@ -1036,17 +1036,19 @@ oldconfig oldconf: koldconf roldconf bboldconf
 # overrides and extra dependencies
 #
 
-busybox: dummy
-	@$(MAKE) -C busybox $(PARALLEL_BUILD) \
-	EXTRA_CFLAGS="-fPIC $(EXTRACFLAGS) -I$(STAGEDIR)/usr/include -idirafter $(KDIR)/include \
-		$(if $(RTCONFIG_BWDPI),-DBWDPI_LOGWAR,)" \
-	EXTRA_LDFLAGS="-L$(STAGEDIR)/usr/lib"
+define makeBusybox
+	@$(MAKE) -C busybox $(1) $(PARALLEL_BUILD) \
+		EXTRA_CFLAGS="-fPIC $(EXTRACFLAGS) -I$(STAGEDIR)/usr/include -idirafter $(KDIR)/include \
+			$(if $(RTCONFIG_BWDPI),-DBWDPI_LOGWAR,)" \
+		EXTRA_LDFLAGS="-L$(STAGEDIR)/usr/lib"
+endef
 
-# V=1
+busybox: dummy
+	$(call makeBusybox)
 
 busybox-install:
 	rm -rf $(INSTALLDIR)/busybox
-	$(MAKE) -C busybox install EXTRA_CFLAGS="-fPIC $(EXTRACFLAGS)" CONFIG_PREFIX=$(INSTALLDIR)/busybox
+	$(call makeBusybox, install CONFIG_PREFIX=$(INSTALLDIR)/busybox)
 	chmod 4755 $(INSTALLDIR)/busybox/bin/busybox
 
 busybox-clean:
