@@ -78,6 +78,26 @@ target_v1(struct sk_buff **pskb,
 }
 
 
+static unsigned int
+mark_tg(struct sk_buff **pskb, const struct net_device *in,
+        const struct net_device *out, unsigned int hooknum,
+        const struct xt_target *target, const void *targinfo)
+{
+	const struct xt_mark_tginfo2 *info = targinfo;
+
+	(*pskb)->mark = ((*pskb)->mark & ~info->mask) ^ info->mark;
+
+#ifdef  HNDCTF
+	{
+		enum ip_conntrack_info ctinfo;
+		struct nf_conn *ct = nf_ct_get(*pskb, &ctinfo);
+		if(ct) ct->ctf_flags |= CTF_FLAGS_EXCLUDED;
+	}
+#endif  /* HNDCTF */
+
+	return XT_CONTINUE;
+}
+
 static int
 checkentry_v0(const char *tablename,
 	      const void *entry,
@@ -192,6 +212,22 @@ static struct xt_target xt_mark_target[] = {
 		.targetsize	= sizeof(struct xt_mark_target_info),
 		.table		= "mangle",
 		.me		= THIS_MODULE,
+	},
+	{
+		.name           = "MARK",
+		.revision       = 2,
+		.family         = AF_INET,
+		.target         = mark_tg,
+		.targetsize     = sizeof(struct xt_mark_tginfo2),
+		.me             = THIS_MODULE,
+	},
+	{
+		.name           = "MARK",
+		.revision       = 2,
+		.family         = AF_INET6,
+		.target         = mark_tg,
+		.targetsize     = sizeof(struct xt_mark_tginfo2),
+		.me             = THIS_MODULE,
 	},
 };
 
