@@ -6789,7 +6789,7 @@ struct mime_handler mime_handlers[] = {
 	{ "general.js|quick.js",  "text/javascript", no_cache_IE7, NULL, do_ej, do_auth },
 #endif //TRANSLATE_ON_FLY
 
-	{ "**.js",  "text/javascript", no_cache_IE7, NULL, do_ej, do_auth },
+	{ "**.js", "text/javascript", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
 	{ "**.cab", "text/txt", NULL, NULL, do_file, do_auth },
 	{ "**.CFG", "application/force-download", NULL, NULL, do_prf_file, do_auth },
 	{ "**.ovpn", "application/force-download", NULL, NULL, do_prf_ovpn_file, do_auth },
