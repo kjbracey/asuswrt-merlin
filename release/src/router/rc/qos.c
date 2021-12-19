@@ -257,7 +257,7 @@ int add_qos_rules(char *pcWANIF)
 		":OUTPUT ACCEPT [0:0]\n"
 		":QOSO - [0:0]\n"
 		"%s\n" //NAT Loopback
-		"-A QOSO -m conntrack --ctstate RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n"
+		"-A QOSO -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n"
 		"-A QOSO -m mark ! --mark 0/0xff00 -j RETURN\n"
 		, (nvram_get_int("fw_nat_loopback") ? "" : "-A QOSO -m mark --mark 0x8000/0x8000 -j RETURN")
 		);
@@ -268,7 +268,7 @@ int add_qos_rules(char *pcWANIF)
 		":PREROUTING ACCEPT [0:0]\n"
 		":OUTPUT ACCEPT [0:0]\n"
 		":QOSO - [0:0]\n"
-		"-A QOSO -m conntrack --ctstate RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n"
+		"-A QOSO -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n"
 		"-A QOSO -m mark ! --mark 0/0xff00 -j RETURN\n"
 		);
 #endif
@@ -906,13 +906,13 @@ int add_qos_rules(char *pcWANIF)
                 if ((!g) || ((p = strsep(&g, ",")) == NULL)) continue;
                 if ((inuse & (1 << i)) == 0) continue;
                 if (atoi(p) > 0) {
-                        fprintf(fn, "-A PREROUTING -m conntrack --ctstate RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n");
+                        fprintf(fn, "-A PREROUTING -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n");
 #ifdef CLS_ACT
 			fprintf(fn, "-A PREROUTING -i %s -j IMQ --todev 0\n", pcWANIF);
 #endif
 #ifdef RTCONFIG_IPV6
 			if (ipv6_enabled() && *wan6face) {
-				fprintf(fn_ipv6, "-A PREROUTING -m conntrack --ctstate RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n");
+				fprintf(fn_ipv6, "-A PREROUTING -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n");
 #ifdef CLS_ACT
 				fprintf(fn_ipv6, "-A PREROUTING -i %s -j IMQ --todev 0\n", wan6face);
 #endif
