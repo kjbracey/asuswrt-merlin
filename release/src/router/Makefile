@@ -1069,7 +1069,7 @@ else
 endif
 
 e2fsprogs: e2fsprogs/Makefile
-	$(MAKE) -C $@
+	$(MAKE) -C $@ $(PARALLEL_BUILD)
 
 e2fsprogs-clean:
 	-@$(MAKE) -C e2fsprogs clean
@@ -1287,6 +1287,8 @@ wb: openssl libxml2 curl
 push_log: wb
 
 rc: shared nvram$(BCMEX)libbcmcrypto libdisk $(PUSH_LOG) $(if $(RTCONFIG_QTN),libqcsapi_client) $(if $(CONFIG_LIBBCM),libbcm)
+	@$(SEP)
+	@$(MAKE) -C rc $(PARALLEL_BUILD)
 
 rc-install:
 	$(MAKE) -C rc INSTALLDIR=$(INSTALLDIR)/rc install
@@ -1516,9 +1518,9 @@ nettle/stamp-h1:
 	@touch nettle/stamp-h1
 
 nettle: nettle/stamp-h1
-	$(SEP)
-	$(MAKE) -C nettle
-	$(MAKE) -C nettle install
+	@$(SEP)
+	@$(MAKE) -C nettle $(PARALLEL_BUILD)
+	@$(MAKE) -C nettle install
 
 nettle-clean:
 	-@$(MAKE) -C nettle clean
@@ -3898,7 +3900,7 @@ wget/Makefile: wget/Makefile.in
 		LDFLAGS="$(EXTRALDFLAGS) -Wl,--gc-sections -L$(TOP)/openssl-1.1 -lssl -lcrypto -L$(TOP)/zlib -lz -lpthread"
 
 wget: openssl-1.1 zlib wget/Makefile
-	$(MAKE) -C $@
+	$(MAKE) -C $@ $(PARALLEL_BUILD)
 
 wget-clean:
 	[ ! -f wget/Makefile ] || $(MAKE) -C wget distclean
