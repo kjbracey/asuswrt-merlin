@@ -96,7 +96,7 @@ endif
 #
 #
 #
-SEP=echo "\033[41;1m   $@   \033[0m"
+SEP=printf "\033[41;1m   $@   \033[0m\n"
 
 #
 # standard packages
