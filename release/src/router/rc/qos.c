@@ -707,6 +707,9 @@ int add_qos_rules(char *pcWANIF)
 	}
 	free(buf);
 
+	method = nvram_get_int("qos_method");	// strict rule ordering
+	gum = (method == 0) ? 0x100 : 0;
+
 	/* lan_addr for iptables use (LAN download) */
 	char *a, *b, *c, *d;
 	char lan_addr[20];
@@ -830,7 +833,8 @@ int add_qos_rules(char *pcWANIF)
 		add_EbtablesRules();
 
 		// for multicast
-		fprintf(fn, "-A QOSO -d 224.0.0.0/4 -j CONNMARK --set-return 0x1/0x1ff\n");
+		fprintf(fn, "-A QOSO -d 224.0.0.0/4 -j CONNMARK --set-return 0x%x/0x1ff\n",
+			1|gum);
                 if(manual_return)
                         fprintf(fn , "-A QOSO -d 224.0.0.0/4 -j RETURN\n");
 /*
@@ -851,7 +855,7 @@ int add_qos_rules(char *pcWANIF)
 			"-A QOSO -j CONNMARK --set-return 0x%x/0x1ff\n"
 	                "-A FORWARD -o %s -j QOSO\n"
         	        "-A OUTPUT -o %s -j QOSO\n",
-                	        class_num, pcWANIF, pcWANIF);
+                	        class_num|gum, pcWANIF, pcWANIF);
                 if(manual_return)
                         fprintf(fn , "-A QOSO -j RETURN\n");
 
@@ -868,7 +872,8 @@ int add_qos_rules(char *pcWANIF)
 			add_EbtablesRules();
 
 			// for multicast
-			fprintf(fn_ipv6, "-A QOSO -d ff00::/8 -j CONNMARK --set-return 0x1/0x1ff\n");
+			fprintf(fn_ipv6, "-A QOSO -d ff00::/8 -j CONNMARK --set-return 0x%x/0x1ff\n",
+				1|gum);
                         if(manual_return)
                                 fprintf(fn_ipv6, "-A QOSO -d ff00::/8 -j RETURN\n");
 /*
@@ -890,7 +895,7 @@ int add_qos_rules(char *pcWANIF)
                 	"-A FORWARD -o %s -j QOSO\n"
 			"-A OUTPUT -o %s -p icmpv6 -j RETURN\n"
                 	"-A OUTPUT -o %s -j QOSO\n",
-				class_num, wan6face, wan6face, wan6face);
+				class_num|gum, wan6face, wan6face, wan6face);
 		if(manual_return)
 			fprintf(fn_ipv6, "-A QOSO -j RETURN\n");
 	}
