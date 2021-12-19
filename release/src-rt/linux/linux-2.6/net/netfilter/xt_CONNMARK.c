@@ -85,6 +85,47 @@ target(struct sk_buff **pskb,
 	return XT_CONTINUE;
 }
 
+static unsigned int
+connmark_tg(struct sk_buff **pskb, const struct net_device *in,
+            const struct net_device *out, unsigned int hooknum,
+            const struct xt_target *target, const void *targinfo)
+{
+	struct sk_buff *skb = *pskb;
+	const struct xt_connmark_tginfo1 *info = targinfo;
+	enum ip_conntrack_info ctinfo;
+	struct nf_conn *ct;
+	u_int32_t newmark;
+
+	ct = nf_ct_get(skb, &ctinfo);
+	if (ct == NULL)
+		return XT_CONTINUE;
+
+	switch (info->mode) {
+	case XT_CONNMARK_SET:
+		newmark = (ct->mark & ~info->ctmask) ^ info->ctmark;
+		if (ct->mark != newmark) {
+			ct->mark = newmark;
+			nf_conntrack_event_cache(IPCT_MARK, skb);
+		}
+		break;
+	case XT_CONNMARK_SAVE:
+		newmark = (ct->mark & ~info->ctmask) ^
+		          (skb->mark & info->nfmask);
+		if (ct->mark != newmark) {
+			ct->mark = newmark;
+			nf_conntrack_event_cache(IPCT_MARK, skb);
+		}
+		break;
+	case XT_CONNMARK_RESTORE:
+		newmark = (skb->mark & ~info->nfmask) ^
+		          (ct->mark & info->ctmask);
+		skb->mark = newmark;
+		break;
+	}
+
+	return XT_CONTINUE;
+}
+
 static int
 checkentry(const char *tablename,
 	   const void *entry,
@@ -112,6 +153,19 @@ checkentry(const char *tablename,
 		return 0;
 	}
 	return 1;
+}
+
+static int
+connmark_tg_check(const char *tablename, const void *entry,
+                  const struct xt_target *target, void *targinfo,
+                  unsigned int hook_mask)
+{
+	if (nf_ct_l3proto_try_module_get(target->family) < 0) {
+		printk(KERN_WARNING "cannot load conntrack support for "
+		       "proto=%u\n", target->family);
+		return false;
+	}
+	return true;
 }
 
 static void
@@ -174,6 +228,26 @@ static struct xt_target xt_connmark_target[] = {
 		.target		= target,
 		.targetsize	= sizeof(struct xt_connmark_target_info),
 		.me		= THIS_MODULE
+	},
+	{
+		.name           = "CONNMARK",
+		.revision       = 1,
+		.family         = AF_INET,
+		.checkentry     = connmark_tg_check,
+		.target         = connmark_tg,
+		.targetsize     = sizeof(struct xt_connmark_tginfo1),
+		.destroy        = destroy,
+		.me             = THIS_MODULE,
+	},
+	{
+		.name           = "CONNMARK",
+		.revision       = 1,
+		.family         = AF_INET6,
+		.checkentry     = connmark_tg_check,
+		.target         = connmark_tg,
+		.targetsize     = sizeof(struct xt_connmark_tginfo1),
+		.destroy        = destroy,
+		.me             = THIS_MODULE,
 	},
 };
 
