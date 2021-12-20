@@ -1197,10 +1197,10 @@ int start_tqos(void)
 		"#LAN/WAN\n"
 		"\ttc qdisc del dev $I root 2>/dev/null\n"
 		"\ttc qdisc del dev $I ingress 2>/dev/null\n"
-		"\t$TQA root handle 1: htb %s\n"
+		"\t$TQA root handle 1: htb default %u %s\n"
 		"\ttc qdisc del dev $DLIF root 2>/dev/null\n"
 		"\ttc qdisc del dev $DLIF ingress 2>/dev/null\n"
-		"\t$TQADL root handle 2: htb %s\n"
+		"\t$TQADL root handle 2: htb default %u %s\n"
 
 		"# upload 1:1 (unrestricted)\n"
 		"\t$TCA parent 1: classid 1:1 htb rate %ukbit ceil %ukbit %s\n"
@@ -1208,7 +1208,8 @@ int start_tqos(void)
 		"\t$TCA parent 1: classid 1:2 htb rate %ukbit ceil %ukbit %s %s\n" ,
 			(nvram_get("qos_iface") ? : get_wan_ifname(wan_primary_ifunit())), // judge WAN interface
 			qsched,
-			r2q, r2q,
+			(nvram_get_int("qos_default") + 1) * 10, r2q,
+			(nvram_get_int("qos_default") + 1) * 10, r2q,
 			obw_max, obw_max, burst_root,
 			obw, calc(obw, ceiling_factor), burst_root, overheadstr);
 
