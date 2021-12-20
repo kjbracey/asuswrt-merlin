@@ -25,6 +25,10 @@
 
 #include "libnetlink.h"
 
+#ifndef SOCK_CLOEXEC
+#define SOCK_CLOEXEC 0
+#endif
+
 int rcvbuf = 1024 * 1024;
 
 void rtnl_close(struct rtnl_handle *rth)

@@ -2403,9 +2403,11 @@ iproute2-install: iproute2
 	install -D iproute2/ip/ip $(INSTALLDIR)/iproute2/usr/sbin/ip
 	$(STRIP) $(INSTALLDIR)/iproute2/usr/sbin/ip
 
+.PHONY: iproute2-3.x
 iproute2-3.x: kernel_header iptables-1.4.x
 	@$(SEP)
-	@$(MAKE) -C $@ IPTABLES_DIR=$(TOP)/iptables-1.4.x KERNEL_INCLUDE=$(TOP)/kernel_header/include EXTRACFLAGS="$(EXTRACFLAGS) $(if $(RTCONFIG_IPV6),-DUSE_IPV6,-DNO_IPV6)"
+	@$(MAKE) -C $@ $(PARALLEL_BUILD) IPTABLES_DIR=$(TOP)/iptables-1.4.x KERNEL_INCLUDE=$(TOP)/kernel_header/include \
+		EXTRACFLAGS="$(EXTRACFLAGS) -std=gnu99 $(if $(RTCONFIG_IPV6),-DUSE_IPV6,-DNO_IPV6) $(if $(RTCONFIG_BCMARM),,-DNEED_UNSHARE)"
 
 iproute2-3.x-install: iproute2-3.x
 	install -D iproute2-3.x/tc/tc $(INSTALLDIR)/iproute2-3.x/usr/sbin/tc

@@ -906,3 +906,13 @@ int do_each_netns(int (*func)(char *nsname, void *arg), void *arg,
 
 	return netns_foreach(on_netns, &nsf);
 }
+
+#ifdef NEED_UNSHARE
+#include <sys/syscall.h>
+#include <sched.h>
+
+int unshare(int flags)
+{
+	return syscall(SYS_unshare, flags);
+}
+#endif

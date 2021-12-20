@@ -13,6 +13,10 @@
 #include "utils.h"
 #include "namespace.h"
 
+#ifndef SOCK_CLOEXEC
+#define SOCK_CLOEXEC 0
+#endif
+
 static void bind_etc(const char *name)
 {
 	char etc_netns_path[MAXPATHLEN];
