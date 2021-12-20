@@ -302,6 +302,7 @@ int add_qos_rules(char *pcWANIF)
 		}
 
 		v4v6_ok = IPT_V4;
+		v6rule_ok = 0;
 #ifdef RTCONFIG_IPV6
 		if (ipv6_enabled()) {
 			v4v6_ok |= IPT_V6;
