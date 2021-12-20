@@ -137,12 +137,7 @@ IPTABLES := iptables-1.4.x
 IPTC_LIBDIR := $(TOP)/$(IPTABLES)/libiptc/.libs
 IPTC_LIBS := -lip4tc $(if $(RTCONFIG_IGD2), $(if $(RTCONFIG_IPV6),-lip6tc,),) -liptc
 obj-y += iptables-1.4.x
-
-ifneq ($(or $(findstring linux-2.6.36,$(LINUXDIR)),$(findstring linux-3.x,$(LINUXDIR))),)
 obj-y += iproute2-3.x
-else
-obj-y += iproute2
-endif
 
 obj-y += libbcmcrypto
 ifeq ($(RTCONFIG_HTTPS),y)
