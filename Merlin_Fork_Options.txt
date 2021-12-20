@@ -564,6 +564,58 @@ NTP sync without internet access
         Reboot Required:        No
         Notes:                  Allows syncing to local NTP server when WAN/internet is not connected
 ---------------------------------------------------------------------------------------------------------------
+QoS overhead
+
+        Can be set in gui:      Yes
+        Enable via NVRAM:       nvram set qos_overhead=x
+                                  (where x = value in bytes, 0-99)
+                                  (+ qos_atm value * 100)
+                                  (+ qos_mpu value * 1000)
+
+
+        Routers Supported:      All
+        Released:               Available for MIPS since Update-??
+        Reboot Required:        No (must restart QoS)
+        Notes:                  Overhead is now interpreted as relative to the
+                                IP payload, as per Cake, and corresponding to
+                                the GUI values. So overhead for basic Ethernet data
+                                is 18 (14 bytes of header and 4 bytes of FCS),
+                                not including preamble etc.
+                                qos_atm and qos_mpu can be encoded into high
+                                order digits to allow GUI to manipulate
+                                nvram variable.
+---------------------------------------------------------------------------------------------------------------
+QoS minimum packet length
+
+        Can be set in gui:      No
+        Enable via NVRAM:       nvram set qos_mpu=x
+                                  (where x = value in bytes, 0-255)
+
+
+        Routers Supported:      All
+        Released:               Update-??
+        Reboot Required:        No (must restart QoS)
+        Notes:                  Minimum packet length, including overhead. For
+                                Ethernet this would be 64, with the overhead
+                                being 18. Accounting for preamble would increase
+                                both values.
+---------------------------------------------------------------------------------------------------------------
+QoS ATM compensation
+
+        Can be set in gui:      No
+        Enable via NVRAM:       nvram set qos_atm=x
+                                  (where x = 0, no compensation - default, x = 1, atm compensation, x = 2, ptm compensation)
+
+
+        Routers Supported:      All
+        Released:               Update-??
+        Reboot Required:        No (must restart QoS)
+        Notes:                  Activate compensation for ATM framing.
+                                Previously ATM compensation was always enabled.
+                                PTM compensation is not currently available, and
+                                is treated as none, but is allowed for as an
+                                NVRAM setting.
+---------------------------------------------------------------------------------------------------------------
 
 
 Disabling the special options:

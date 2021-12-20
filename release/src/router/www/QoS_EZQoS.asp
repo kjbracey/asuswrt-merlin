@@ -53,10 +53,8 @@ var value1K = 1000;
 
 if ((based_modelid == "RT-AC56U") || (based_modelid == "RT-AC68U")) {
 	var codel_support = true;
-	var overhead_support = true;
 } else {
 	var codel_support = false;
-	var overhead_support = false;
 }
 
 var overlib_str0 = new Array();	//Viz add 2011.06 for record longer qos rule desc
@@ -74,8 +72,7 @@ function initial(){
 		document.form.qos_default.parentNode.parentNode.style.display = "";
 		if (codel_support)
 			document.getElementById('qos_sched_tr').style.display = "";
-		if (overhead_support)
-			document.getElementById('qos_overhead_tr').style.display = "";
+		document.getElementById('qos_overhead_tr').style.display = "";
 	}else{
 		document.form.qos_obw.parentNode.parentNode.style.display = "none";
 		document.form.qos_ibw.parentNode.parentNode.style.display = "none";
@@ -111,10 +108,7 @@ function changeRule(obj){
 			document.getElementById('qos_sched_tr').style.display = "";
 		else
 			document.getElementById('qos_sched_tr').style.display = "none";
-		if (overhead_support)
-			document.getElementById('qos_overhead_tr').style.display = "";
-		else
-			document.getElementById('qos_overhead_tr').style.display = "none";
+		document.getElementById('qos_overhead_tr').style.display = "";
 		showqos_rulelist();
 	}else if($(obj).value == "2"){
 		document.form.qos_obw.parentNode.parentNode.style.display = "none";
@@ -577,16 +571,24 @@ function showqos_bw_rulelist(){
 										</tr>
 
 										<tr id="qos_overhead_tr" style="display:none">
-											<th>DSL/ATM Overhead Value</th>
+											<th>WAN packet overhead</th>
 											<td colspan="2">
 												<select name="qos_overhead" class="input_option" >
 													<option value="0" <% nvram_match("qos_overhead", "0","selected"); %>>0-None (Not a DSL connection)</option>
-													<option value="32" <% nvram_match("qos_overhead", "32","selected"); %>>32-PPPoE VC-Mux (Router authentication)</option>
-													<option value="40" <% nvram_match("qos_overhead", "40","selected"); %>>40-PPPoE LLC/Snap (Router authentication)</option>
-													<option value="8" <% nvram_match("qos_overhead", "8","selected"); %>>8-PPPoE RFC2684/RFC1483 Routed VC-Mux (Modem authentication)</option>
-													<option value="16" <% nvram_match("qos_overhead", "16","selected"); %>>16-PPPoE RFC2684/RFC1483 Routed LLC/Snap (Modem authentication)</option>
-													<option value="24" <% nvram_match("qos_overhead", "24","selected"); %>>24-DHCP RFC2684/RFC1483 Bridged VC-Mux</option>
-													<option value="132" <% nvram_match("qos_overhead", "132","selected"); %>>32-DHCP RFC2684/RFC1483 Bridged LLC/Snap</option>
+													<option value="148" <% nvram_match("qos_overhead", "148","selected"); %>>48(ATM)-Conservative default</option>
+													<option value="84038" <% nvram_match("qos_overhead", "84038","selected"); %>>38(min 84)-Ethernet</option>
+													<option value="84042" <% nvram_match("qos_overhead", "84042","selected"); %>>42(min 84)-Ethernet with VLAN</option>
+													<option value="64018" <% nvram_match("qos_overhead", "64018","selected"); %>>18(min 64)-Cable (DOCSIS)</option>
+													<option value="132" <% nvram_match("qos_overhead", "132","selected"); %>>32(ATM)-ADSL PPPoE VC-Mux (Router authentication)</option>
+													<option value="140" <% nvram_match("qos_overhead", "140","selected"); %>>40(ATM)-ADSL PPPoE LLC/Snap (Router authentication)</option>
+													<option value="108" <% nvram_match("qos_overhead", "108","selected"); %>>8(ATM)-ADSL IPoA RFC2684/RFC1483 Routed VC-Mux (Modem authentication)</option>
+													<option value="116" <% nvram_match("qos_overhead", "116","selected"); %>>16(ATM)-ADSL IPoA RFC2684/RFC1483 Routed LLC/Snap (Modem authentication)</option>
+													<option value="124" <% nvram_match("qos_overhead", "124","selected"); %>>24(ATM)-ADSL DHCP RFC2684/RFC1483 Bridged VC-Mux</option>
+													<option value="100132" <% nvram_match("qos_overhead", "100132","selected"); %>>32(ATM)-ADSL DHCP RFC2684/RFC1483 Bridged LLC/Snap</option>
+													<option value="110" <% nvram_match("qos_overhead", "110","selected"); %>>10(ATM)-ADSL PPPoA RFC2684/RFC1483 Routed VC-Mux</option>
+													<option value="114" <% nvram_match("qos_overhead", "114","selected"); %>>14(ATM)-ADSL PPPoA RFC2684/RFC1483 Routed LLC</option>
+													<option value="230" <% nvram_match("qos_overhead", "230","selected"); %>>30(PTM)-VDSL2 PPPoE PTM</option>
+													<option value="222" <% nvram_match("qos_overhead", "222","selected"); %>>22(PTM)-VDSL2 Bridged PTM</option>
 												</select>
 											</td>
 										</tr>

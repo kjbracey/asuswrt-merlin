@@ -1024,8 +1024,9 @@ int start_tqos(void)
 	char *protocol6="ipv6";
 #endif
 //	int down_class_num=6;   // for download class_num = 0x6 / 0x106
-	int overhead = 0;
-	char overheadstr[sizeof("overhead 64 linklayer atm")];
+	int overhead = 0, overheaddl = 0;
+	char overheadstr[sizeof("overhead 99 mpu 255 linklayer ethernet")];
+	char overheaddlstr[sizeof("overhead 99 mpu 255 linklayer ethernet")];
 	unsigned int l, u, v;  // vars for use in intermediate bw calcs
 
 	// judge interface by get_wan_ifname
@@ -1054,6 +1055,62 @@ int start_tqos(void)
 	if ((f = fopen(qosfn, "w")) == NULL) return -2;
 
 	fprintf(stderr, "[qos] tc START!\n");
+
+	// GUI puts ATM indicator in 100s of qos_overhead and MPU in 1000s
+	// Also allow dummy values in 100000s to disambiguate otherwise equal
+	// numbers for GUI.
+	overhead = nvram_get_int("qos_overhead") % 100000;
+	int qos_atm, mpu;
+	if(overhead > 1000){
+		mpu = overhead / 1000;
+		overhead %= 1000;
+	}
+	else {
+		mpu = nvram_get_int("qos_mpu");
+	}
+	if(overhead > 100){
+		qos_atm = overhead / 100;
+		overhead %= 100;
+	}
+	else {
+		qos_atm = nvram_get_int("qos_atm");
+	}
+
+	// GUI sets qos_atm to 2 for PTM, but tc/kernel don't support that
+	// as a linklayer parameter. Instead derate ibw and obw appropriately
+	if (qos_atm == 2) {
+		ibw = ibw * 64 / 65;
+		obw = obw * 64 / 65;
+		qos_atm = 0;
+	}
+
+	overheaddl = overhead;
+
+	if(strncmp(wan_ifname, "ppp", 3)==0){
+		// do nothing
+	}
+	else {
+		// Adjust from Cake-like IP overhead as seen in GUI to what htb uses
+		// (it already counts the Ethernet header, so it's not part of its overhead)
+		overhead -= 14;
+	}
+	// 0 would make Cake count IP only, but HTB can't do that.
+	if (overhead < 0)
+		overhead = 0;
+
+	snprintf(overheadstr, sizeof(overheadstr),"overhead %d mpu %d %s",
+		 overhead, mpu, qos_atm == 1 ? "linklayer atm" : "linklayer ethernet");
+
+#ifndef CLS_ACT
+	// When using br0 to shape downloads, need same MAC header adjustment
+	// as eth0 uploads.
+	// If using imq0, we do not, same as ppp0.
+	overheaddl -= 14;
+	if (overheaddl < 0)
+		overheaddl = 0;
+#endif
+	snprintf(overheaddlstr, sizeof(overheaddlstr),"overhead %d mpu %d %s",
+		 overheaddl, mpu, qos_atm == 1 ? "linklayer atm" : "linklayer ethernet");
 
 	/* r2q */
 	if ((i = nvram_get_int("qos_r2q")) == 0) {
@@ -1117,17 +1174,6 @@ int start_tqos(void)
 	sprintf(qsched, "sfq perturb 10 %s", sfq_limit);
 #endif
 
-#ifdef RTCONFIG_BCMARM
-	overhead = nvram_get_int("qos_overhead")%100;
-
-	if (overhead > 0)
-		snprintf(overheadstr, sizeof(overheadstr),"overhead %d linklayer atm", overhead);
-	else
-		strcpy(overheadstr, "");
-#else
-	strcpy(overheadstr, "");
-#endif
-
 	/* WAN */
 	fprintf(f,
 		"#!/bin/sh\n"
@@ -1157,13 +1203,13 @@ int start_tqos(void)
 		"\t$TQADL root handle 2: htb %s\n"
 
 		"# upload 1:1 (unrestricted)\n"
-		"\t$TCA parent 1: classid 1:1 htb rate %ukbit ceil %ukbit %s %s\n"
+		"\t$TCA parent 1: classid 1:1 htb rate %ukbit ceil %ukbit %s\n"
 		"# upload 1:2 (ouput bandwidth)\n"
 		"\t$TCA parent 1: classid 1:2 htb rate %ukbit ceil %ukbit %s %s\n" ,
 			(nvram_get("qos_iface") ? : get_wan_ifname(wan_primary_ifunit())), // judge WAN interface
 			qsched,
 			r2q, r2q,
-			obw_max, obw_max, burst_root, overheadstr,
+			obw_max, obw_max, burst_root,
 			obw, calc(obw, ceiling_factor), burst_root, overheadstr);
 
 	inuse = nvram_get_int("qos_inuse");
@@ -1343,8 +1389,8 @@ int start_tqos(void)
 					"\t$TCADL parent 2:1 classid 2:9 htb rate %ukbit ceil %ukbit prio 1\n"
 					"\t$TQADL parent 2:9 handle 9: $SFQ\n"
 					"\t$TFADL parent 2: prio 1 protocol all handle 9 fw flowid 2:9\n",
-						ibw_max, ibw_max, burst_root, overheadstr,
-						ibw, ibw_max, burst_root, overheadstr,
+						ibw_max, ibw_max, burst_root, overheaddlstr,
+						ibw, ibw_max, burst_root, overheaddlstr,
 						ibw_max, ibw_max
 
 //					"\ttc qdisc del dev $DLIF ingress 2>/dev/null\n"
@@ -1377,7 +1423,7 @@ int start_tqos(void)
 				"\t$TFADL parent 2: prio %d protocol all handle %d fw flowid 2:%d\n"
 				"\t$TFADL parent 2: prio %d protocol all handle %d fw flowid 2:%d\n",
 					i, rate, ceil,
-					x, l, u, burst_leaf, (i >= 6) ? 7 : (i + 1), mtu, overheadstr,
+					x, l, u, burst_leaf, (i >= 6) ? 7 : (i + 1), mtu, overheaddlstr,
 					x, x,
 					x, (i + 1), x,
 					x, (i + 1)|0x100, x);
