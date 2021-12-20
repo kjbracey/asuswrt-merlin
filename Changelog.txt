@@ -4,6 +4,19 @@ NOTE: [*] Indicated fork unique change
 
 Changelog
 ---------
+374.43_52E7j9527  (19-December-2021) ARM SDK, MIPS,ARM KRACK
+* CHANGED: nettle: update to 3.7.3
+* CHANGED: curl: update to 7.79.1
+* CHANGED: make: enable additional ipv6 conntrack modules (MIPS)
+* CHANGED: kernel: enable additional ipv6 modules (MIPS)
+* CHANGED: qos: cannot support ipv6 qos on mips
+* FIXED: firewall: initialize all protection server rule chains
+* FIXED: shared: unlink parent leases if ext data option disabled
+* FIXED: iptables: mips: fix output formatting of timestart/timestop rules
+* FIXED: repo: add repo missing files
+* FIXED: httpd: Enable POST/GET handling for **.js
+
+
 374.43_52E3j9527  (20-October-2021) ARM SDK, MIPS,ARM KRACK
 * FIXED: webui: fix ipv6 setup page error
 
