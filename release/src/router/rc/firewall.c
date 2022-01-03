@@ -1816,8 +1816,8 @@ start_default_filter(int lanunit)
 		fprintf(fp, ":%sLAN - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
 	}
 #endif
-	fprintf(fp, "-A INPUT -m state --state INVALID -j DROP\n");
 	fprintf(fp, "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n");
+	fprintf(fp, "-A INPUT -m state --state INVALID -j DROP\n");
 #ifdef RTCONFIG_PROTECTION_SERVER
 	if (nvram_get_int("ptcsrv_enable") != 0) {
 		if (nvram_get_int("telnetd_enable") != 0
