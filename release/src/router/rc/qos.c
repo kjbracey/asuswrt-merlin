@@ -1402,6 +1402,7 @@ int start_tqos(void)
 */
 		}
 		free(buf);
+		free(buf2);
 	}
 
 	fputs(
