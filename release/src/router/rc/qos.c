@@ -34,8 +34,19 @@ static const char *mangle_fn = "/tmp/mangle_rules";
 static const char *mangle_fn_ipv6 = "/tmp/mangle_rules_ipv6";
 #endif
 
+static const char * const class_name[9] = {
+	"HIGHEST",
+	"HIGH",
+	"MEDIUM",
+	"LOW",
+	"LOWEST",
+	"DOWNLOAD",
+	"7",
+	"8",
+	"LAN"
+};
+
 int etable_flag = 0;
-int manual_return = 0;
 
 #define MAX_RETRY 10
 #define BUF_SIZE 256
@@ -203,6 +214,36 @@ void del_iQosRules(void)
 #endif
 }
 
+static void add_mark_targets(FILE *fn)
+{
+	int i;
+	// Targets HIGHEST etc set bottom 8 bits of packet mark.
+	for (i = 0; i < 9; i++) {
+		if (i == 5) {
+			// marks 6-8 not used
+			i = 7;
+			continue;
+		}
+		fprintf(fn,
+			":%s - [0:0]\n"
+			"-A %s -j MARK --set-mark 0x%x/0xff\n",
+			class_name[i],
+			class_name[i], i+1);
+	}
+
+	// Targets HIGHEST+ etc set bottom 8 bits of packet mark,
+	// and set the connection mark to 0x10n.
+	for (i = 0; i < 5; i++) {
+		fprintf(fn,
+			":%s+ - [0:0]\n"
+			"-A %s+ -j CONNMARK --set-mark 0x%x\n"
+			"-A %s+ -j MARK --set-mark 0x%x/0xff\n",
+			class_name[i],
+			class_name[i], 0x100|(i+1),
+			class_name[i], i+1);
+	}
+}
+
 int add_qos_rules(char *pcWANIF)
 {
 	FILE *fn;
@@ -214,10 +255,10 @@ int add_qos_rules(char *pcWANIF)
 	char *p;
 	char *desc, *addr, *port, *prio, *transferred, *proto;
 	int class_num;
-	int down_class_num=6; 	// for download class_num = 0x6 / 0x106
+	//int down_class_num=6; 	// for download class_num = 0x6 / 0x106
 	int i, inuse;
 	char q_inuse[32]; 	// for inuse 
-	char dport[192], saddr_1[256], saddr_2[256], maddr[256], proto_1[8], proto_2[8],conn[256], end[256], end2[256];
+	char dport[192], saddr_1[256], saddr_2[256], maddr[256], proto_1[8], proto_2[8],conn[256], end[256];
 	int method;
 	int gum;
 	int sticky_enable;
@@ -238,9 +279,6 @@ int add_qos_rules(char *pcWANIF)
 
 	inuse = sticky_enable = 0;
 
-        if(get_model()==MODEL_RTAC56U || get_model()==MODEL_RTAC56S || get_model()==MODEL_RTAC68U || get_model()==MODEL_DSLAC68U || get_model()==MODEL_RTAC87U)
-                manual_return = 1;
-
 	if (nvram_match("qos_sticky", "0"))
 		sticky_enable = 1;
 
@@ -257,8 +295,8 @@ int add_qos_rules(char *pcWANIF)
 		":OUTPUT ACCEPT [0:0]\n"
 		":QOSO - [0:0]\n"
 		"%s\n" //NAT Loopback
-		"-A QOSO -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n"
-		"-A QOSO -m mark ! --mark 0/0xff00 -j RETURN\n"
+		"-A QOSO -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0xff\n"
+		"-A QOSO -m state --state RELATED,ESTABLISHED -m connmark ! --mark 0/0x100 -j RETURN\n"
 		, (nvram_get_int("fw_nat_loopback") ? "" : "-A QOSO -m mark --mark 0x8000/0x8000 -j RETURN")
 		);
 #ifdef RTCONFIG_IPV6
@@ -268,9 +306,15 @@ int add_qos_rules(char *pcWANIF)
 		":PREROUTING ACCEPT [0:0]\n"
 		":OUTPUT ACCEPT [0:0]\n"
 		":QOSO - [0:0]\n"
-		"-A QOSO -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n"
-		"-A QOSO -m mark ! --mark 0/0xff00 -j RETURN\n"
+		"-A QOSO -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0xff\n"
+		"-A QOSO -m state --state RELATED,ESTABLISHED -m connmark ! --mark 0/0x100 -j RETURN\n"
 		);
+#endif
+
+	add_mark_targets(fn);
+#ifdef RTCONFIG_IPV6
+	if (ipv6_enabled())
+		add_mark_targets(fn_ipv6);
 #endif
 
 	g = buf = strdup(nvram_safe_get("qos_rulelist"));
@@ -326,12 +370,9 @@ int add_qos_rules(char *pcWANIF)
 //		method = 1;
 //		gum = 0;
 //#endif
-	        class_num |= gum;
-		down_class_num |= gum; // for download
 
 		chain = "QOSO";                     // chain name
-                sprintf(end , " -j CONNMARK --set-return 0x%x/0x1ff\n", class_num);	// CONNMARK string
-		sprintf(end2, " -j RETURN\n");
+		sprintf(end, "-g %s%s\n", class_name[class_num-1], gum ? "+" : ""); // mark-setting target
 
 		/*************************************************/
 		/*                        addr                   */
@@ -528,35 +569,23 @@ int add_qos_rules(char *pcWANIF)
 					// step3. check saddr for ip-range;saddr_1 could be empty, dport only
 					if(strcmp(maddr, "")){
                                                 fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_1, dport, maddr, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_1, dport, maddr, conn, end2);
                                         }
 					else{
                                                 fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_1, dport, saddr_1, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_1, dport, saddr_1, conn, end2);
 					}
                                         if(strcmp(saddr_2, "")){
                                                 fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_1, dport, saddr_2, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_1, dport, saddr_2, conn, end2);
                                         }
 				}
 				else{
 					if(strcmp(maddr, "")){
                                                 fprintf(fn, "-A %s %s %s %s", chain, maddr, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s", chain, maddr, conn, end2);
                                         }
 					else{
                                                 fprintf(fn, "-A %s %s %s %s", chain, saddr_1, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s", chain, saddr_1, conn, end2);
 					}
                                         if(strcmp(saddr_2, "")){
                                                 fprintf(fn, "-A %s %s %s %s", chain, saddr_2, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s", chain, saddr_2, conn, end2);
                                         }
 				}
 			}
@@ -568,35 +597,23 @@ int add_qos_rules(char *pcWANIF)
 					// step3. check saddr for ip-range;saddr_1 could be empty, dport only
 					if(strcmp(maddr, "")){
                                                 fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_2, dport, maddr, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_2, dport, maddr, conn, end2);
                                         }
 					else{
                                                 fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_2, dport, saddr_1, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_2, dport, saddr_1, conn, end2);
 					}
                                         if(strcmp(saddr_2, "")){
                                                 fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_2, dport, saddr_2, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s %s %s", chain, proto_2, dport, saddr_2, conn, end2);
                                         }
 				}
 				else{
 					if(strcmp(maddr, "")){
                                                 fprintf(fn, "-A %s %s %s %s", chain, maddr, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s", chain, maddr, conn, end2);
                                         }
 					else{
                                                 fprintf(fn, "-A %s %s %s %s", chain, saddr_1, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s", chain, saddr_1, conn, end2);
 					}
                                         if(strcmp(saddr_2, "")){
                                                 fprintf(fn, "-A %s %s %s %s", chain, saddr_2, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn, "-A %s %s %s %s", chain, saddr_2, conn, end2);
                                         }
 				}
 			}
@@ -612,21 +629,15 @@ int add_qos_rules(char *pcWANIF)
 					// don't build ipv6 rules with ipv4 addresses
 					if(strcmp(maddr, "")){
                                                 fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_1, dport, maddr, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_1, dport, maddr, conn, end2);
                                         }
 					else{
 						if (v6rule_ok) {
 							fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_1, dport, saddr_1, conn, end);
-							if(manual_return)
-							fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_1, dport, saddr_1, conn, end2);
 						}
 					}
                                         if(strcmp(saddr_2, "")){
 						if (v6rule_ok) {
 							fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_1, dport, saddr_2, conn, end);
-							if(manual_return)
-							fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_1, dport, saddr_2, conn, end2);
 						}
                                         }
 					
@@ -634,21 +645,15 @@ int add_qos_rules(char *pcWANIF)
 				else{
 					if(strcmp(maddr, "")){
                                                 fprintf(fn_ipv6, "-A %s %s %s %s", chain, maddr, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, maddr, conn, end2);
                                         }
 					else{
 						if (v6rule_ok) {
 	                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, saddr_1, conn, end);
-	                                                if(manual_return)
-	                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, saddr_1, conn, end2);
 						}
 					}
                                         if(strcmp(saddr_2, "")){
 						if (v6rule_ok) {
 	                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, saddr_2, conn, end);
-	                                                if(manual_return)
-	                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, saddr_2, conn, end2);
 						}
                                         }
 				}
@@ -662,42 +667,30 @@ int add_qos_rules(char *pcWANIF)
 					// don't build ipv6 rules with ipv4 addresses
 					if(strcmp(maddr, "")){
                                                 fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_2, dport, maddr, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_2, dport, maddr, conn, end2);
                                         }
 					else{
 						if (v6rule_ok) {
 	                                                fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_2, dport, saddr_1, conn, end);
-	                                                if(manual_return)
-	                                                fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_2, dport, saddr_1, conn, end2);
 						}
 					}
                                         if(strcmp(saddr_2, "")){
 						if (v6rule_ok) {
 	                                                fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_2, dport, saddr_2, conn, end);
-	                                                if(manual_return)
-	                                                fprintf(fn_ipv6, "-A %s %s %s %s %s %s", chain, proto_2, dport, saddr_2, conn, end2);
 						}
                                         }
 				}
 				else{
 					if(strcmp(maddr, "")){
                                                 fprintf(fn_ipv6, "-A %s %s %s %s", chain, maddr, conn, end);
-                                                if(manual_return)
-                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, maddr, conn, end2);
                                         }
 					else{
 						if (v6rule_ok) {
 	                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, saddr_1, conn, end);
-	                                                if(manual_return)
-	                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, saddr_1, conn, end2);
 						}
 					}
                                         if(strcmp(saddr_2, "")){
 						if (v6rule_ok) {
 	                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, saddr_2, conn, end);
-	                                                if(manual_return)
-	                                                fprintf(fn_ipv6, "-A %s %s %s %s", chain, saddr_2, conn, end2);
 						}
                                         }
 				}
@@ -709,6 +702,7 @@ int add_qos_rules(char *pcWANIF)
 
 	method = nvram_get_int("qos_method");	// strict rule ordering
 	gum = (method == 0) ? 0x100 : 0;
+	const char *gum_mark = gum ? "+" : "";
 
 	/* lan_addr for iptables use (LAN download) */
 	char *a, *b, *c, *d;
@@ -772,50 +766,28 @@ int add_qos_rules(char *pcWANIF)
 
 	// access router : mark 9
 	fprintf(fn,
-		"-A POSTROUTING -s %s -d %s -j CONNMARK --set-return 0x9/0x1ff\n"
-		"-A PREROUTING -s %s -d %s -j CONNMARK --set-return 0x9/0x1ff\n"
+		"-A POSTROUTING -s %s -d %s -g LAN\n"
+		"-A PREROUTING -s %s -d %s -g LAN\n"
 //		, nvram_safe_get("lan_ipaddr"), lan_addr
 //		, lan_addr, nvram_safe_get("lan_ipaddr")
 		, lan_addr, lan_addr
 		, lan_addr, lan_addr
 		);
-
-	if(manual_return){
-	fprintf(fn,
-		"-A POSTROUTING -s %s -d %s -j RETURN\n"
-		"-A PREROUTING -s %s -d %s -j RETURN\n"
-//		, nvram_safe_get("lan_ipaddr"), lan_addr
-//		, lan_addr, nvram_safe_get("lan_ipaddr")
-		, lan_addr, lan_addr
-		, lan_addr, lan_addr
-		);
-	}
 
 #ifdef RTCONFIG_IPV6
 		if (ipv6_enabled() && *wan6face) {
 			fprintf(fn_ipv6,
-				"-A POSTROUTING -s %s -d %s -j CONNMARK --set-return 0x9/0x1ff\n"
-				"-A PREROUTING -s %s -d %s -j CONNMARK --set-return 0x9/0x1ff\n"
+				"-A POSTROUTING -s %s -d %s -g LAN\n"
+				"-A PREROUTING -s %s -d %s -g LAN\n"
 //				, nvram_safe_get("ipv6_rtr_addr"), ipv6_lan_addr
 //				, ipv6_lan_addr, nvram_safe_get("ipv6_rtr_addr")
 				, ipv6_lan_addr, ipv6_lan_addr
 				, ipv6_lan_addr, ipv6_lan_addr
 				);
-
-			if(manual_return){
-			fprintf(fn_ipv6,
-				"-A POSTROUTING -s %s -d %s -j RETURN\n"
-				"-A PREROUTING -s %s -d %s -j RETURN\n"
-//				, nvram_safe_get("ipv6_rtr_addr"), ipv6_lan_addr
-//				, ipv6_lan_addr, nvram_safe_get("ipv6_rtr_addr")
-				, ipv6_lan_addr, ipv6_lan_addr
-				, ipv6_lan_addr, ipv6_lan_addr
-				);
-			}
 		}
 #endif
 
-	//fprintf(stderr, "[qos] down_class_num=%x\n", down_class_num);
+	//fprintf(stderr, "[qos] down_class_num=%x\n", down_class_num|gum);
 
 	/* The default class */
         i = nvram_get_int("qos_default");
@@ -833,31 +805,26 @@ int add_qos_rules(char *pcWANIF)
 		add_EbtablesRules();
 
 		// for multicast
-		fprintf(fn, "-A QOSO -d 224.0.0.0/4 -j CONNMARK --set-return 0x%x/0x1ff\n",
-			1|gum);
-                if(manual_return)
-                        fprintf(fn , "-A QOSO -d 224.0.0.0/4 -j RETURN\n");
+		fprintf(fn, "-A QOSO -d 224.0.0.0/4 -g HIGHEST%s\n",
+			gum_mark);
 /*
 		// for download (LAN or wireless)
-		fprintf(fn, "-A QOSO -d %s -j CONNMARK --set-return 0x%x/0xf\n", lan_addr, down_class_num);
-                if(manual_return)
-                        fprintf(fn , "-A QOSO -d %s -j RETURN\n", lan_addr);
+		fprintf(fn, "-A QOSO -d %s -g %s%s\n", lan_addr, class_name[down_class_num-1], gum_mark);
 */
 /* Requires bridge netfilter, but slows down and breaks EMF/IGS IGMP IPTV Snooping
 		// for WLAN to LAN bridge issue
-		fprintf(fn, "-A POSTROUTING -d %s -m physdev --physdev-is-in -j CONNMARK --set-return 0x6/0xf\n", lan_addr);
+		fprintf(fn, "-A POSTROUTING -d %s -m physdev --physdev-is-in -g DOWNLOAD\n", lan_addr);
 */
 		// for download, interface br0
 		fprintf(fn, "-A POSTROUTING -o br0 -j QOSO\n");
 	}
 #endif
 		fprintf(fn,
-			"-A QOSO -j CONNMARK --set-return 0x%x/0x1ff\n"
+			"-A QOSO -g %s%s\n"
 	                "-A FORWARD -o %s -j QOSO\n"
         	        "-A OUTPUT -o %s -j QOSO\n",
-                	        class_num|gum, pcWANIF, pcWANIF);
-                if(manual_return)
-                        fprintf(fn , "-A QOSO -j RETURN\n");
+			class_name[class_num-1], gum_mark,
+			pcWANIF, pcWANIF);
 
 #ifdef RTCONFIG_IPV6
 	if (ipv6_enabled() && *wan6face) {
@@ -872,32 +839,27 @@ int add_qos_rules(char *pcWANIF)
 			add_EbtablesRules();
 
 			// for multicast
-			fprintf(fn_ipv6, "-A QOSO -d ff00::/8 -j CONNMARK --set-return 0x%x/0x1ff\n",
-				1|gum);
-                        if(manual_return)
-                                fprintf(fn_ipv6, "-A QOSO -d ff00::/8 -j RETURN\n");
+			fprintf(fn_ipv6, "-A QOSO -d ff00::/8 -g HIGHEST%s\n",
+				gum_mark);
 /*
 			// for download (LAN or wireless)
-			fprintf(fn_ipv6, "-A QOSO -d %s -j CONNMARK --set-return 0x%x/0x1ff\n", ipv6_lan_addr, down_class_num);
-                        if(manual_return)
-                                fprintf(fn_ipv6, "-A QOSO -d %s -j RETURN\n", ipv6_lan_addr);
+			fprintf(fn_ipv6, "-A QOSO -d %s -g %s%s\n", ipv6_lan_addr, class_name[down_class_num-1], gum_mark);
 */
 /* Requires bridge netfilter, but slows down and breaks EMF/IGS IGMP IPTV Snooping
 			// for WLAN to LAN bridge issue
-			fprintf(fn_ipv6, "-A POSTROUTING -d %s -m physdev --physdev-is-in -j CONNMARK --set-return 0x6/0x1ff\n", lan_addr);
+			fprintf(fn_ipv6, "-A POSTROUTING -d %s -m physdev --physdev-is-in -g DOWNLOAD\n", lan_addr);
 */
 			// for download, interface br0
 			fprintf(fn_ipv6, "-A POSTROUTING -o br0 -j QOSO\n");
 		}
 #endif
         	fprintf(fn_ipv6,
-			"-A QOSO -j CONNMARK --set-return 0x%x/0x1ff\n"
+			"-A QOSO -g %s%s\n"
                 	"-A FORWARD -o %s -j QOSO\n"
 			"-A OUTPUT -o %s -p icmpv6 -j RETURN\n"
                 	"-A OUTPUT -o %s -j QOSO\n",
-				class_num|gum, wan6face, wan6face, wan6face);
-		if(manual_return)
-			fprintf(fn_ipv6, "-A QOSO -j RETURN\n");
+			class_name[class_num-1], gum_mark,
+			wan6face, wan6face, wan6face);
 	}
 #endif
 
@@ -912,13 +874,11 @@ int add_qos_rules(char *pcWANIF)
                 if ((!g) || ((p = strsep(&g, ",")) == NULL)) continue;
                 if ((inuse & (1 << i)) == 0) continue;
                 if (atoi(p) > 0) {
-                        fprintf(fn, "-A PREROUTING -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n");
 #ifdef CLS_ACT
 			fprintf(fn, "-A PREROUTING -i %s -j IMQ --todev 0\n", pcWANIF);
 #endif
 #ifdef RTCONFIG_IPV6
 			if (ipv6_enabled() && *wan6face) {
-				fprintf(fn_ipv6, "-A PREROUTING -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --mask 0x1ff\n");
 #ifdef CLS_ACT
 				fprintf(fn_ipv6, "-A PREROUTING -i %s -j IMQ --todev 0\n", wan6face);
 #endif
@@ -1290,20 +1250,16 @@ int start_tqos(void)
 			"# egress %d: %u-%u%%\n"
 			"\t$TCA parent 1:2 classid 1:%d htb rate %ukbit %s %s prio %d quantum %u %s\n"
 			"\t$TQA parent 1:%d handle %d: $SFQ\n"
-			"\t$TFA parent 1: prio %d protocol %s handle %d fw flowid 1:%d\n"
 			"\t$TFA parent 1: prio %d protocol %s handle %d fw flowid 1:%d\n",
 				i, rate, ceil,
 				x, calc(bw, rate), s, burst_leaf, (i >= 6) ? 7 : (i + 1), mtu, overheadstr,
 				x, x,
-				x, protocol, (i + 1), x,
-				x, protocol, (i + 1)|0x100, x);
+				x, protocol, (i + 1), x);
 #ifdef RTCONFIG_IPV6
 		if (ipv6_enabled() && *wan6face) {
 			fprintf(f,
-			"\t$TFA parent 1: prio %d protocol %s handle %d fw flowid 1:%d\n"
 			"\t$TFA parent 1: prio %d protocol %s handle %d fw flowid 1:%d\n",
-			x + 1, protocol6, (i + 1), x,
-			x + 1, protocol6, (i + 1)|0x100, x);
+			x + 1, protocol6, (i + 1), x);
 		}
 #endif
 	}
@@ -1421,13 +1377,11 @@ int start_tqos(void)
 				"# ingress %d: %u-%u%%\n"
 				"\t$TCADL parent 2:2 classid 2:%d htb rate %ukbit ceil %ukbit %s prio %d quantum %u %s\n"
 				"\t$TQADL parent 2:%d handle %d: $SFQ\n"
-				"\t$TFADL parent 2: prio %d protocol all handle %d fw flowid 2:%d\n"
 				"\t$TFADL parent 2: prio %d protocol all handle %d fw flowid 2:%d\n",
 					i, rate, ceil,
 					x, l, u, burst_leaf, (i >= 6) ? 7 : (i + 1), mtu, overheaddlstr,
 					x, x,
-					x, (i + 1), x,
-					x, (i + 1)|0x100, x);
+					x, (i + 1), x);
 /* #else
 			x = i + 1;
 			fprintf(f,
@@ -1551,6 +1505,7 @@ static int add_bandwidth_limiter_rules(char *pcWANIF)
 	int i, addr_type;
 	char *action = NULL;
 	char mssid_mark[4];
+	int manual_return;
 
 #ifdef CONFIG_BCMWL5
 	del_EbtablesRules(); // flush ebtables nat table
@@ -1559,18 +1514,8 @@ static int add_bandwidth_limiter_rules(char *pcWANIF)
 
 	if ((fn = fopen(mangle_fn, "w")) == NULL) return -2;
 
-	switch (get_model()){
-		case MODEL_DSLN55U:
-		case MODEL_RTN13U:
-		case MODEL_RTN56U:
-			action = "CONNMARK --set-return";
-			manual_return = 0;
-			break;
-		default:
-			action = "MARK --set-mark";
-			manual_return = 1;
-			break;
-	}
+	action = "MARK --set-mark";
+	manual_return = 1;
 
 	/* ASUSWRT
 	qos_bw_rulelist :
