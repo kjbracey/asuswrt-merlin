@@ -616,6 +616,22 @@ QoS ATM compensation
                                 is treated as none, but is allowed for as an
                                 NVRAM setting.
 ---------------------------------------------------------------------------------------------------------------
+QoS DiffServ handling
+
+        Can be set in gui:      No
+        Enable via NVRAM:       nvram set qos_diffserv_ul=[on (default) | off]
+                                nvram set qos_diffserv_dl=[on | off (default)]
+
+        Routers Supported:      All
+        Released:               Update-??
+        Reboot Required:        No (must restart QoS)
+        Notes:                  Classify traffic with Differentiated Services
+                                code points, if present. When enabled, any
+                                packets with a known code point other than DF
+                                (Default Forwarding) will assigned to a class
+                                based on that code point, rather than using
+                                TCP, ICMP or user rules.
+---------------------------------------------------------------------------------------------------------------
 
 
 Disabling the special options:

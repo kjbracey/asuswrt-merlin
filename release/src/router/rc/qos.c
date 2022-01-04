@@ -244,6 +244,108 @@ static void add_mark_targets(FILE *fn)
 	}
 }
 
+static void add_dscp_rules(FILE *f, const char *cmd, int parent)
+{
+	// Note table uses dummy u32 0 0 matches and relies on hash value only
+	// so it can be used by both IPv4 and IPv6
+	fprintf(f,
+		"# DSCP table\n"
+		"\t%s parent %d: prio 999 protocol all handle 7: u32 "
+		"divisor 64\n"						// DSCP perfect hash table
+		// HIGHEST
+		"\t%s parent %d: prio 999 protocol all u32 "		// EF (46) Expedited Forwarding
+		"match u32 0 0 ht 7:2e: class %d:10\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// VA (44) Voice Admit
+		"match u32 0 0 ht 7:2c: class %d:10\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// CS7 (56) Treat as network control to match CAKE
+		"match u32 0 0 ht 7:38: class %d:10\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// CS6 (48) Network Control
+		"match u32 0 0 ht 7:30: class %d:10\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// CS5 (40) Signaling
+		"match u32 0 0 ht 7:28: class %d:10\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// CS4 (32) Real-Time Interactive
+		"match u32 0 0 ht 7:20: class %d:10\n"
+		// HIGH
+		"\t%s parent %d: prio 999 protocol all u32 "		// CS2 (16) Operations, Admin, Management
+		"match u32 0 0 ht 7:10: class %d:20\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF21 (18) Low-Latency Data
+		"match u32 0 0 ht 7:12: class %d:20\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF22 (20) Low-Latency Data
+		"match u32 0 0 ht 7:14: class %d:20\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF23 (22) Low-Latency Data
+		"match u32 0 0 ht 7:16: class %d:20\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// TOS 4 Minimize Delay
+		"match u32 0 0 ht 7:4: class %d:20\n"
+		// MEDIUM
+		"\t%s parent %d: prio 999 protocol all u32 "		// CS3 (24) Broadcast Video
+		"match u32 0 0 ht 7:18: class %d:30\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF41 (34) Multimedia Conferencing
+		"match u32 0 0 ht 7:22: class %d:30\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF42 (36) Multimedia Conferencing
+		"match u32 0 0 ht 7:24: class %d:30\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF43 (38) Multimedia Conferencing
+		"match u32 0 0 ht 7:26: class %d:30\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF31 (26) Multimedia Streaming
+		"match u32 0 0 ht 7:1a: class %d:30\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF32 (28) Multimedia Streaming
+		"match u32 0 0 ht 7:1c: class %d:30\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF33 (30) Multimedia Streaming
+		"match u32 0 0 ht 7:1e: class %d:30\n"
+		// LOW
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF11 (10) High-Throughput Data
+		"match u32 0 0 ht 7:a: class %d:40\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF12 (12) High-Throughput Data
+		"match u32 0 0 ht 7:c: class %d:40\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// AF13 (14) High-Throughput Data
+		"match u32 0 0 ht 7:e: class %d:40\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// TOS 2 Maximize Throughput
+		"match u32 0 0 ht 7:2: class %d:40\n"
+		// LOWEST
+		"\t%s parent %d: prio 999 protocol all u32 "		// LE (1) Lower Effort
+		"match u32 0 0 ht 7:1: class %d:50\n"
+		"\t%s parent %d: prio 999 protocol all u32 "		// CS1 (8) Low-Priority Data (legacy)
+		"match u32 0 0 ht 7:8: class %d:50\n"
+		// IPv4 filter linking to table
+		"\t%s parent %d: prio 7 protocol ip u32 "
+		"match u32 0 0 link 7: hashkey mask 0x00fc0000 at 0\n",
+		cmd, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent, parent,
+		cmd, parent);
+#ifdef RTCONFIG_IPV6
+	if (ipv6_enabled()) {
+		fprintf(f,
+		// IPv6 filter linking to table
+		"\t%s parent %d: prio 8 protocol ipv6 u32 "
+		"match u32 0 0 link 7: hashkey mask 0x0fc00000 at 0\n",
+		cmd, parent);
+	}
+#endif
+
+}
+
 int add_qos_rules(char *pcWANIF)
 {
 	FILE *fn;
@@ -1220,6 +1322,10 @@ int start_tqos(void)
 	}
 	free(buf);
 
+	if (nvram_match("qos_diffserv_ul", "on")) {
+		add_dscp_rules(f, "$TFA", 1);
+	}
+
 	/*
 		10000 = ACK
 		00100 = RST
@@ -1403,6 +1509,10 @@ int start_tqos(void)
 		}
 		free(buf);
 		free(buf2);
+
+		if (nvram_match("qos_diffserv_dl", "on")) {
+			add_dscp_rules(f, "$TFADL", 2);
+		}
 	}
 
 	fputs(
