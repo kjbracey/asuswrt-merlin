@@ -996,7 +996,7 @@ int start_tqos(void)
 
 	if (!nvram_match("qos_enable", "1")) return -1;
 
-	wan_ifname = get_wan_ifname(wan_primary_ifunit());
+	wan_ifname = (nvram_get("qos_iface") ? : get_wan_ifname(wan_primary_ifunit()));
 	if (!wan_ifname || (strlen(wan_ifname) <= 0)) {
 		logmessage("qos-init", "wan_ifname not defined!");
 		nvram_set_int("qos_addr_err", 4);
@@ -1015,6 +1015,7 @@ int start_tqos(void)
 	if ((f = fopen(qosfn, "w")) == NULL) return -2;
 
 	fprintf(stderr, "[qos] tc START!\n");
+	wan_ifname = strdup(wan_ifname);
 
 	// GUI puts ATM indicator in 100s of qos_overhead and MPU in 1000s
 	// Also allow dummy values in 100000s to disambiguate otherwise equal
@@ -1166,7 +1167,7 @@ int start_tqos(void)
 		"\t$TCA parent 1: classid 1:1 htb rate %ukbit ceil %ukbit %s\n"
 		"# upload 1:2 (ouput bandwidth)\n"
 		"\t$TCA parent 1: classid 1:2 htb rate %ukbit ceil %ukbit %s %s\n" ,
-			(nvram_get("qos_iface") ? : get_wan_ifname(wan_primary_ifunit())), // judge WAN interface
+			wan_ifname,
 			qsched,
 			(nvram_get_int("qos_default") + 1) * 10, r2q,
 			(nvram_get_int("qos_default") + 1) * 10, r2q,
@@ -1433,6 +1434,7 @@ int start_tqos(void)
 		"esac\n",
 		f);
 
+	free(wan_ifname);
 	fclose(f);
 	chmod(qosfn, 0700);
 	eval((char *)qosfn, "start");
@@ -1654,7 +1656,7 @@ static int start_bandwidth_limiter(void)
 
 	if (!nvram_match("qos_enable", "1")) return -1;
 
-	wan_ifname = get_wan_ifname(wan_primary_ifunit());
+	wan_ifname = nvram_get("qos_iface") ? : get_wan_ifname(wan_primary_ifunit());
 	if (!wan_ifname || (strlen(wan_ifname) <= 0)) {
 		logmessage("qos-init", "wan_ifname not defined!");
 		return -2;
@@ -1689,8 +1691,8 @@ static int start_bandwidth_limiter(void)
 		"WAN=%s\n"
 		"\n"
 		"case \"$1\" in\n"
-		"start)\n"
-		, (nvram_get("qos_iface") ? : get_wan_ifname(wan_primary_ifunit()))
+		"start)\n",
+		wan_ifname
 	);
 
 	/* ASUSWRT
