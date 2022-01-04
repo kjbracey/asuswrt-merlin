@@ -511,7 +511,7 @@ int add_qos_rules(char *pcWANIF)
 			min = atol(tmp);
 
 			if(strcmp(q_max,"") == 0) // q_max == NULL
-				sprintf(conn, "-m connbytes --connbytes %ld:%s --connbytes-dir both --connbytes-mode bytes", min*1000, q_max);
+				sprintf(conn, "-m connbytes --connbytes %ld: --connbytes-dir both --connbytes-mode bytes", min*1000);
 			else{// q_max != NULL
 				sprintf(tmp, "%s", q_max);
 				max = atol(tmp);
