@@ -963,7 +963,7 @@ int start_tqos(void)
 	char *buf, *g, *p;
 	char *buf2, *g2, *p2;
 	char *wan_ifname;
-	unsigned int rate, irate_min;
+	unsigned int rate;
 	unsigned int ceil;
 	unsigned int ibw, obw, bw;
 	unsigned int ibw_max, obw_max;
@@ -979,10 +979,6 @@ int start_tqos(void)
 	char r2q[32];
 	char sfq_limit[32];
 	char qsched[64];
-#ifdef CONFIG_BCMWL5
-	char *protocol="ip";
-	char *protocol6="ipv6";
-#endif
 //	int down_class_num=6;   // for download class_num = 0x6 / 0x106
 	int overhead = 0, overheaddl = 0;
 	char overheadstr[sizeof("overhead 99 mpu 255 linklayer ethernet")];
@@ -1177,48 +1173,13 @@ int start_tqos(void)
 	inuse = nvram_get_int("qos_inuse");
 
 	/* LAN protocol: 802.1q */
-#ifdef CONFIG_BCMWL5 // TODO: it is only for the case, eth0 as wan, vlanx as lan
-	protocol = "ip"; // base protocol ipv4
-	protocol6 = "ipv6"; // need separate filter for ipv6 for upload
-	irate_min = 100;
-	g = buf = strdup(nvram_safe_get("qos_irates"));
-	for (i = 0; i < 5; ++i) {
-		if ((!g) || ((p = strsep(&g, ",")) == NULL)) break;
-		if ((inuse & (1 << i)) == 0) continue;
-		if ((rate = atoi(p)) < 1) continue;     // 0 = off
-
-		if ((rate > 0) && (rate < irate_min)) irate_min = rate; // get minimum in use download rate
-	}
-/*
-
-	fprintf(f,
-		"# download 2:1\n"
-		"\t$TCADL parent 2: classid 2:1 htb rate %ukbit ceil %ukbit %s %s\n",
-		"# 2:60 ALL Download for BCM\n"
-		"\t$TCADL parent 2:1 classid 2:60 htb rate %ukbit ceil %ukbit burst 100000 cburst 100000 prio 6 quantum %u\n"
-		"\t$TQADL parent 2:60 handle 60: pfifo\n"
-		"\t$TFADL parent 2: prio 60 protocol all handle %d fw flowid 2:60\n",
-		ibw_max, ibw_max, burst_root, overheadstr,
-		nvram_get_int("qos_ibwopt") ? calc(ibw, irate_min) : ibw, nvram_get_int("qos_ibwopt") ? calc(ibw, ceiling_factor) : ibw_max, mtu,
-		down_class_num);
-*/
-#endif
-
-	// access local lan : mark 9
 	// default : 10Gbps
 	fprintf(f,
 		"# access lan\n"
 		"\t$TCA parent 1:1 classid 1:9 htb rate %ukbit ceil %ukbit prio 0\n"
 		"\t$TQA parent 1:9 handle 9: $SFQ\n"
-		"\t$TFA parent 1: prio 0 protocol %s handle 9 fw flowid 1:9\n",
-		obw_max, obw_max, protocol);
-#ifdef RTCONFIG_IPV6
-	if (ipv6_enabled() && *wan6face) {
-	fprintf(f,
-		"\t$TFA parent 1: prio 1 protocol %s handle 9 fw flowid 1:9\n",
-		protocol6);
-	}
-#endif
+		"\t$TFA parent 1: prio 1 protocol 802.1q u32 match u32 0 0 flowid 1:9\n",
+		obw_max, obw_max);
 
 	g = buf = strdup(nvram_safe_get("qos_orates"));
 	for (i = 0; i < 5; ++i) { // 0~4 , 0:highest, 4:lowest
@@ -1251,18 +1212,11 @@ int start_tqos(void)
 			"# egress %d: %u-%u%%\n"
 			"\t$TCA parent 1:2 classid 1:%d htb rate %ukbit %s %s prio %d quantum %u %s\n"
 			"\t$TQA parent 1:%d handle %d: $SFQ\n"
-			"\t$TFA parent 1: prio %d protocol %s handle %d fw flowid 1:%d\n",
+			"\t$TFA parent 1: prio %d protocol all handle %d fw flowid 1:%d\n",
 				i, rate, ceil,
 				x, calc(bw, rate), s, burst_leaf, (i >= 6) ? 7 : (i + 1), mtu, overheadstr,
 				x, x,
-				x, protocol, (i + 1), x);
-#ifdef RTCONFIG_IPV6
-		if (ipv6_enabled() && *wan6face) {
-			fprintf(f,
-			"\t$TFA parent 1: prio %d protocol %s handle %d fw flowid 1:%d\n",
-			x + 1, protocol6, (i + 1), x);
-		}
-#endif
+				x, (i + 1), x);
 	}
 	free(buf);
 
