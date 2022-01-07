@@ -966,6 +966,8 @@ int add_qos_rules(char *pcWANIF)
 #endif
 
         inuse |= (1 << i) | 1;  // default and highest are always built
+        if (nvram_match("qos_diffserv_ul", "on") || nvram_match("qos_diffserv_dl", "on"))
+                inuse |= 0x1f;  // diffserv uses all 5 levels
         sprintf(q_inuse, "%d", inuse);
         nvram_set("qos_inuse", q_inuse);
 	fprintf(stderr, "[qos] qos_inuse=%d\n", inuse);
